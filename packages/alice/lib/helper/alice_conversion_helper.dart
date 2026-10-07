@@ -40,4 +40,18 @@ class AliceConversionHelper {
     return '${duration.inMinutes} $_minutes ${duration.inSeconds.remainder(60)} $_seconds '
         '${duration.inMilliseconds.remainder(1000)} $_milliseconds';
   }
+
+  /// Formats [time] as HH:mm:ss.SSS.
+  static String formatClockTime(DateTime time) =>
+      '${_pad(time.hour)}:${_pad(time.minute)}:${_pad(time.second)}.'
+      '${_pad(time.millisecond, 3)}';
+
+  /// Formats [time] as yyyy-MM-dd HH:mm:ss.SSS.
+  static String formatDateTime(DateTime time) =>
+      '${time.year}-${_pad(time.month)}-${_pad(time.day)} '
+      '${formatClockTime(time)}';
+
+  /// Pads [value] with leading zeros to [width] digits.
+  static String _pad(int value, [int width = 2]) =>
+      value.toString().padLeft(width, '0');
 }

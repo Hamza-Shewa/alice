@@ -1,7 +1,7 @@
 import 'package:alice/helper/alice_conversion_helper.dart';
 import 'package:alice/helper/alice_url_validator.dart';
 import 'package:alice/model/alice_http_call.dart';
-import 'package:alice/model/alice_http_response.dart';
+import 'package:alice/ui/common/alice_call_badges.dart';
 import 'package:alice/ui/common/alice_theme.dart';
 import 'package:alice/ui/common/alice_url_issue_banner.dart';
 import 'package:flutter/material.dart';
@@ -52,13 +52,13 @@ class AliceCallListItemWidget extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _MethodBadge(method: call.method),
+                  AliceMethodBadge(method: call.method),
                   const SizedBox(width: 10),
                   Expanded(
                     child: _Endpoint(call: call, hasUrlIssues: hasUrlIssues),
                   ),
                   const SizedBox(width: 10),
-                  _ResponseStatus(call: call, color: statusColor),
+                  AliceStatusPill(call: call),
                 ],
               ),
               const SizedBox(height: 6),
@@ -71,36 +71,6 @@ class AliceCallListItemWidget extends StatelessWidget {
               _ConnectionStats(call: call),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Widget which renders the HTTP method as a compact badge.
-class _MethodBadge extends StatelessWidget {
-  const _MethodBadge({required this.method});
-
-  final String method;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      constraints: const BoxConstraints(minWidth: 52),
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-      decoration: BoxDecoration(
-        color: colorScheme.onSurface.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        method.toUpperCase(),
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.5,
-          color: colorScheme.onSurface,
         ),
       ),
     );
@@ -168,58 +138,6 @@ class _ServerAddress extends StatelessWidget {
   }
 }
 
-/// Widget which renders response status as a colored pill, or a progress
-/// indicator while the call is still in progress.
-class _ResponseStatus extends StatelessWidget {
-  const _ResponseStatus({required this.call, required this.color});
-
-  final AliceHttpCall call;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    if (call.loading) {
-      return const Padding(
-        padding: EdgeInsets.all(2),
-        child: SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            valueColor: AlwaysStoppedAnimation<Color>(AliceTheme.lightRed),
-          ),
-        ),
-      );
-    }
-    if (call.response == null) {
-      return const SizedBox.shrink();
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        _getStatus(call.response!),
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w700,
-          color: color,
-        ),
-      ),
-    );
-  }
-
-  /// Get status based on [response].
-  String _getStatus(AliceHttpResponse response) => switch (response.status) {
-    -1 => 'ERR',
-    0 => '???',
-    _ => '${response.status}',
-  };
-}
-
 /// Widget which renders connection stats based on [call].
 class _ConnectionStats extends StatelessWidget {
   const _ConnectionStats({required this.call});
@@ -236,7 +154,7 @@ class _ConnectionStats extends StatelessWidget {
           icon: Icons.schedule,
           text:
               call.request?.time != null
-                  ? _formatTime(call.request!.time)
+                  ? AliceConversionHelper.formatClockTime(call.request!.time)
                   : 'n/a',
         ),
         _StatItem(
@@ -252,16 +170,6 @@ class _ConnectionStats extends StatelessWidget {
       ],
     );
   }
-
-  /// Formats call time as HH:mm:ss.SSS.
-  String _formatTime(DateTime time) =>
-      '${formatTimeUnit(time.hour)}:'
-      '${formatTimeUnit(time.minute)}:'
-      '${formatTimeUnit(time.second)}.'
-      '${time.millisecond.toString().padLeft(3, '0')}';
-
-  /// Format one of time units.
-  String formatTimeUnit(int timeUnit) => timeUnit.toString().padLeft(2, '0');
 }
 
 /// Single connection stat: an icon followed by a value.
