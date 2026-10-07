@@ -102,6 +102,23 @@ class AliceTranslations {
         AliceTranslationKey.callsListRawLogs: "Toggle raw logs",
         AliceTranslationKey.callsListScrollTop: "Scroll to top",
         AliceTranslationKey.callsListScrollBottom: "Scroll to bottom",
+        AliceTranslationKey.urlIssueTitle: "Malformed URL",
+        AliceTranslationKey.urlIssueSuggestion: "Did you mean:",
+        AliceTranslationKey.urlIssueMore: "+[count] more issues",
+        AliceTranslationKey.urlIssuePortWithDot:
+            "Port is separated with '.' instead of ':'",
+        AliceTranslationKey.urlIssueMissingSlashAfterPort:
+            "Missing '/' between port and path",
+        AliceTranslationKey.urlIssueMissingSlashAfterHost:
+            "Missing '/' between IP address and path",
+        AliceTranslationKey.urlIssueMissingSlashAfterVersion:
+            "Missing '/' after API version",
+        AliceTranslationKey.urlIssueInvalidIp: "IP address is invalid",
+        AliceTranslationKey.urlIssueDoubleSlash: "Path contains '//'",
+        AliceTranslationKey.urlIssueWhitespace: "URL contains whitespace",
+        AliceTranslationKey.urlIssueMissingScheme:
+            "URL has no http:// or https:// scheme",
+        AliceTranslationKey.callOverviewUrl: "URL:",
         AliceTranslationKey.logsError: "Failed to display error",
         AliceTranslationKey.logsItemError: "Error:",
         AliceTranslationKey.logsItemStackTrace: "Stack trace:",
@@ -282,6 +299,23 @@ class AliceTranslations {
         AliceTranslationKey.callsListRawLogs: "Przełącz surowe logi",
         AliceTranslationKey.callsListScrollTop: "Przewiń na górę",
         AliceTranslationKey.callsListScrollBottom: "Przewiń na dół",
+        AliceTranslationKey.urlIssueTitle: "Nieprawidłowy URL",
+        AliceTranslationKey.urlIssueSuggestion: "Czy chodziło o:",
+        AliceTranslationKey.urlIssueMore: "+[count] więcej problemów",
+        AliceTranslationKey.urlIssuePortWithDot:
+            "Port oddzielony kropką '.' zamiast ':'",
+        AliceTranslationKey.urlIssueMissingSlashAfterPort:
+            "Brak '/' między portem a ścieżką",
+        AliceTranslationKey.urlIssueMissingSlashAfterHost:
+            "Brak '/' między adresem IP a ścieżką",
+        AliceTranslationKey.urlIssueMissingSlashAfterVersion:
+            "Brak '/' po wersji API",
+        AliceTranslationKey.urlIssueInvalidIp: "Adres IP jest nieprawidłowy",
+        AliceTranslationKey.urlIssueDoubleSlash: "Ścieżka zawiera '//'",
+        AliceTranslationKey.urlIssueWhitespace: "URL zawiera białe znaki",
+        AliceTranslationKey.urlIssueMissingScheme:
+            "URL nie zawiera schematu http:// lub https://",
+        AliceTranslationKey.callOverviewUrl: "URL:",
         AliceTranslationKey.logsError: "Problem z wyświetleniem logów.",
         AliceTranslationKey.logsItemError: "Błąd:",
         AliceTranslationKey.logsItemStackTrace: "Ślad stosu:",

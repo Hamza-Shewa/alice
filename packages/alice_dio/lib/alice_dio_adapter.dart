@@ -18,21 +18,34 @@ class AliceDioAdapter extends InterceptorsWrapper with AliceAdapter {
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     final call = AliceHttpCall(options.hashCode);
 
-    final uri = options.uri;
+    // A typo in base URL or path (e.g. "http://host:505" + "api/login")
+    // makes the URL unparsable. Record the call anyway, so Alice can show
+    // what went wrong instead of silently dropping it.
+    final Uri? uri = _tryGetUri(options);
     call.method = options.method;
-    var path = options.uri.path;
-    if (path.isEmpty) {
-      path = '/';
+    if (uri != null) {
+      var path = uri.path;
+      if (path.isEmpty) {
+        path = '/';
+      }
+      call
+        ..endpoint = path
+        ..server = uri.host
+        ..uri = uri.toString()
+        ..secure = uri.scheme == 'https';
+    } else {
+      final rawUrl = _getRawUrl(options);
+      final match = RegExp(
+        r'^(?:([a-zA-Z][a-zA-Z0-9+.-]*):\/\/)?([^\/?#]*)(.*)$',
+      ).firstMatch(rawUrl);
+      final path = match?.group(3) ?? '';
+      call
+        ..endpoint = path.isEmpty ? '/' : path
+        ..server = match?.group(2) ?? ''
+        ..uri = rawUrl
+        ..secure = match?.group(1) == 'https';
     }
-    call
-      ..endpoint = path
-      ..server = uri.host
-      ..client = 'Dio'
-      ..uri = options.uri.toString();
-
-    if (uri.scheme == 'https') {
-      call.secure = true;
-    }
+    call.client = 'Dio';
 
     final request = AliceHttpRequest();
 
@@ -79,7 +92,7 @@ class AliceDioAdapter extends InterceptorsWrapper with AliceAdapter {
       ..time = DateTime.now()
       ..headers = AliceParser.parseHeaders(headers: options.headers)
       ..contentType = options.contentType.toString()
-      ..queryParameters = uri.queryParameters;
+      ..queryParameters = uri?.queryParameters ?? options.queryParameters;
 
     call
       ..request = request
@@ -87,6 +100,25 @@ class AliceDioAdapter extends InterceptorsWrapper with AliceAdapter {
 
     aliceCore.addCall(call);
     handler.next(options);
+  }
+
+  /// Returns [options] URI or null when the URL can't be parsed.
+  Uri? _tryGetUri(RequestOptions options) {
+    try {
+      return options.uri;
+    } on FormatException {
+      return null;
+    }
+  }
+
+  /// Returns URL built the same way as [RequestOptions.uri], but without
+  /// parsing it.
+  String _getRawUrl(RequestOptions options) {
+    final path = options.path;
+    if (path.startsWith(RegExp(r'https?:'))) {
+      return path;
+    }
+    return options.baseUrl + path;
   }
 
   /// Handles dio response and adds data to alice http call

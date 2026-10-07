@@ -51,4 +51,25 @@ void main() {
 
     expect(tapped, call);
   });
+
+  testWidgets('shows malformed URL banner with suggestion', (tester) async {
+    final call = _call(status: -1)..uri = 'http://192.168.1.1:505api/login';
+    await _pump(tester, AliceCallListItemWidget(call, (_) {}));
+
+    expect(find.text('MALFORMED URL'), findsOneWidget);
+    expect(
+      find.textContaining(
+        'http://192.168.1.1:505/api/login',
+        findRichText: true,
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('does not show banner for valid URL', (tester) async {
+    final call = _call(status: 200)..uri = 'https://api.example.com/v1/users';
+    await _pump(tester, AliceCallListItemWidget(call, (_) {}));
+
+    expect(find.text('MALFORMED URL'), findsNothing);
+  });
 }

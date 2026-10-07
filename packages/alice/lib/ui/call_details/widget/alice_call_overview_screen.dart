@@ -1,9 +1,11 @@
 import 'package:alice/helper/alice_conversion_helper.dart';
+import 'package:alice/helper/alice_url_validator.dart';
 import 'package:alice/model/alice_http_call.dart';
 import 'package:alice/model/alice_translation.dart';
 import 'package:alice/ui/call_details/widget/alice_call_list_row.dart';
 import 'package:alice/ui/common/alice_context_ext.dart';
 import 'package:alice/ui/common/alice_scroll_behavior.dart';
+import 'package:alice/ui/common/alice_url_issue_banner.dart';
 import 'package:flutter/material.dart';
 
 /// Screen which displays call overview data, for example method, server.
@@ -14,12 +16,18 @@ class AliceCallOverviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final List<AliceUrlIssue> urlIssues = AliceUrlValidator.validateCall(call);
     return Container(
       padding: const EdgeInsets.all(6),
       child: ScrollConfiguration(
         behavior: AliceScrollBehavior(),
         child: ListView(
           children: [
+            if (urlIssues.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: AliceUrlIssueBanner(issues: urlIssues),
+              ),
             AliceCallListRow(
               name: context.i18n(AliceTranslationKey.callOverviewMethod),
               value: call.method,
@@ -32,6 +40,11 @@ class AliceCallOverviewScreen extends StatelessWidget {
               name: context.i18n(AliceTranslationKey.callOverviewEndpoint),
               value: call.endpoint,
             ),
+            if (call.uri.isNotEmpty)
+              AliceCallListRow(
+                name: context.i18n(AliceTranslationKey.callOverviewUrl),
+                value: call.uri,
+              ),
             AliceCallListRow(
               name: context.i18n(AliceTranslationKey.callOverviewStarted),
               value: call.request?.time.toString(),
