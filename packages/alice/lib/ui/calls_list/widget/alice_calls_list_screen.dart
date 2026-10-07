@@ -80,13 +80,16 @@ class AliceCallsListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Sort once per build instead of once per rendered row.
+    final List<AliceHttpCall> sortedCalls = _sortedCalls;
     return ScrollConfiguration(
       behavior: AliceScrollBehavior(),
       child: ListView.builder(
-        itemCount: calls.length,
+        padding: const EdgeInsets.only(bottom: 24),
+        itemCount: sortedCalls.length,
         itemBuilder:
             (_, int index) =>
-                AliceCallListItemWidget(_sortedCalls[index], onListItemClicked),
+                AliceCallListItemWidget(sortedCalls[index], onListItemClicked),
       ),
     );
   }

@@ -4,8 +4,8 @@ import 'package:alice/model/alice_http_response.dart';
 import 'package:alice/ui/common/alice_theme.dart';
 import 'package:flutter/material.dart';
 
-const int _endpointMaxLines = 10;
-const int _serverMaxLines = 5;
+const int _endpointMaxLines = 2;
+const double _statusBarWidth = 4;
 
 /// Widget which renders one row in calls list view. It displays general
 /// information about call.
@@ -17,110 +17,129 @@ class AliceCallListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color requestColor = _getEndpointTextColor(context);
-    final Color statusColor = _getStatusTextColor(context);
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final Color statusColor =
+        call.loading
+            ? AliceTheme.grey
+            : AliceTheme.getStatusColor(context, call.response?.status);
 
     return InkWell(
       onTap: () => itemClickAction.call(call),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _EndpointAndMethod(call: call, color: requestColor),
-                      const SizedBox(height: 4),
-                      _ServerAddress(call: call),
-                      const SizedBox(height: 4),
-                      _ConnectionStats(call: call),
-                    ],
-                  ),
-                ),
-                _ResponseStatus(call: call, color: statusColor),
-              ],
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: BorderDirectional(
+            start: BorderSide(color: statusColor, width: _statusBarWidth),
+            bottom: BorderSide(
+              color: colorScheme.onSurface.withValues(alpha: 0.12),
             ),
           ),
-          const Divider(height: 1, color: AliceTheme.grey),
-        ],
+        ),
+        child: Padding(
+          padding: const EdgeInsetsDirectional.fromSTEB(12, 12, 16, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _MethodBadge(method: call.method),
+                  const SizedBox(width: 10),
+                  Expanded(child: _Endpoint(call: call)),
+                  const SizedBox(width: 10),
+                  _ResponseStatus(call: call, color: statusColor),
+                ],
+              ),
+              const SizedBox(height: 6),
+              _ServerAddress(call: call),
+              const SizedBox(height: 8),
+              _ConnectionStats(call: call),
+            ],
+          ),
+        ),
       ),
     );
   }
+}
 
-  /// Get response status text color based on response status.
-  Color _getStatusTextColor(BuildContext context) => switch (call
-      .response
-      ?.status) {
-    -1 => AliceTheme.red,
-    int status when status < 200 =>
-      Theme.of(context).textTheme.bodyLarge?.color ?? AliceTheme.grey,
-    int status when status >= 200 && status < 300 => AliceTheme.green,
-    int status when status >= 300 && status < 400 => AliceTheme.orange,
-    int status when status >= 400 && status < 600 => AliceTheme.red,
-    _ => Theme.of(context).textTheme.bodyLarge!.color ?? AliceTheme.grey,
-  };
+/// Widget which renders the HTTP method as a compact badge.
+class _MethodBadge extends StatelessWidget {
+  const _MethodBadge({required this.method});
 
-  /// Returns endpoint text color based on call state.
-  Color _getEndpointTextColor(BuildContext context) =>
-      call.loading ? AliceTheme.grey : _getStatusTextColor(context);
+  final String method;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      constraints: const BoxConstraints(minWidth: 52),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+      decoration: BoxDecoration(
+        color: colorScheme.onSurface.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        method.toUpperCase(),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.5,
+          color: colorScheme.onSurface,
+        ),
+      ),
+    );
+  }
+}
+
+/// Widget which renders endpoint of the call.
+class _Endpoint extends StatelessWidget {
+  const _Endpoint({required this.call});
+
+  final AliceHttpCall call;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return Text(
+      call.endpoint,
+      maxLines: _endpointMaxLines,
+      overflow: TextOverflow.ellipsis,
+      style: theme.textTheme.titleSmall?.copyWith(
+        fontWeight: FontWeight.w600,
+        height: 1.3,
+        color:
+            call.loading
+                ? theme.colorScheme.onSurfaceVariant
+                : theme.colorScheme.onSurface,
+      ),
+    );
+  }
 }
 
 /// Widget which renders server address line.
 class _ServerAddress extends StatelessWidget {
-  final AliceHttpCall call;
-
   const _ServerAddress({required this.call});
+
+  final AliceHttpCall call;
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return Row(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(right: 3),
-          child: Icon(
-            call.secure ? Icons.lock_outline : Icons.lock_open,
-            color: call.secure ? AliceTheme.green : AliceTheme.red,
-            size: 12,
-          ),
+        Icon(
+          call.secure ? Icons.lock_outline : Icons.lock_open,
+          color: AliceTheme.getStatusColor(context, call.secure ? 200 : 400),
+          size: 14,
         ),
+        const SizedBox(width: 4),
         Expanded(
           child: Text(
             call.server,
             overflow: TextOverflow.ellipsis,
-            maxLines: _serverMaxLines,
-            style: const TextStyle(fontSize: 14),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// Widget which renders endpoint and the HTTP method line.
-class _EndpointAndMethod extends StatelessWidget {
-  final AliceHttpCall call;
-  final Color color;
-
-  const _EndpointAndMethod({required this.call, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(call.method, style: TextStyle(fontSize: 16, color: color)),
-        const Padding(padding: EdgeInsets.only(left: 10)),
-        Flexible(
-          // ignore: avoid_unnecessary_containers
-          child: Container(
-            child: Text(
-              call.endpoint,
-              maxLines: _endpointMaxLines,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 16, color: color),
+            maxLines: 1,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ),
@@ -129,35 +148,46 @@ class _EndpointAndMethod extends StatelessWidget {
   }
 }
 
-/// Widget which renders response status line.
+/// Widget which renders response status as a colored pill, or a progress
+/// indicator while the call is still in progress.
 class _ResponseStatus extends StatelessWidget {
-  final AliceHttpCall call;
-  final Color color;
-
   const _ResponseStatus({required this.call, required this.color});
 
+  final AliceHttpCall call;
+  final Color color;
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 50,
-      child: Column(
-        children: [
-          if (call.loading) ...[
-            const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(AliceTheme.lightRed),
-              ),
-            ),
-            const SizedBox(height: 4),
-          ],
-          if (call.response != null)
-            Text(
-              _getStatus(call.response!),
-              style: TextStyle(fontSize: 16, color: color),
-            ),
-        ],
+    if (call.loading) {
+      return const Padding(
+        padding: EdgeInsets.all(2),
+        child: SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(AliceTheme.lightRed),
+          ),
+        ),
+      );
+    }
+    if (call.response == null) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        _getStatus(call.response!),
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
+          color: color,
+        ),
       ),
     );
   }
@@ -172,47 +202,72 @@ class _ResponseStatus extends StatelessWidget {
 
 /// Widget which renders connection stats based on [call].
 class _ConnectionStats extends StatelessWidget {
-  final AliceHttpCall call;
-
   const _ConnectionStats({required this.call});
+
+  final AliceHttpCall call;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Wrap(
+      spacing: 16,
+      runSpacing: 4,
       children: [
-        Flexible(
-          child: Text(
-            call.request?.time != null
-                ? _formatTime(call.request!.time)
-                : 'n/a',
-            style: const TextStyle(fontSize: 12),
-          ),
+        _StatItem(
+          icon: Icons.schedule,
+          text:
+              call.request?.time != null
+                  ? _formatTime(call.request!.time)
+                  : 'n/a',
         ),
-        Flexible(
-          child: Text(
-            AliceConversionHelper.formatTime(call.duration),
-            style: const TextStyle(fontSize: 12),
-          ),
+        _StatItem(
+          icon: Icons.timer_outlined,
+          text: AliceConversionHelper.formatTime(call.duration),
         ),
-        Flexible(
-          child: Text(
-            '${AliceConversionHelper.formatBytes(call.request?.size ?? 0)} / '
-            '${AliceConversionHelper.formatBytes(call.response?.size ?? 0)}',
-            style: const TextStyle(fontSize: 12),
-          ),
+        _StatItem(
+          icon: Icons.swap_vert,
+          text:
+              '${AliceConversionHelper.formatBytes(call.request?.size ?? 0)} / '
+              '${AliceConversionHelper.formatBytes(call.response?.size ?? 0)}',
         ),
       ],
     );
   }
 
-  /// Formats call time.
+  /// Formats call time as HH:mm:ss.SSS.
   String _formatTime(DateTime time) =>
       '${formatTimeUnit(time.hour)}:'
       '${formatTimeUnit(time.minute)}:'
-      '${formatTimeUnit(time.second)}:'
-      '${formatTimeUnit(time.millisecond)}';
+      '${formatTimeUnit(time.second)}.'
+      '${time.millisecond.toString().padLeft(3, '0')}';
 
   /// Format one of time units.
   String formatTimeUnit(int timeUnit) => timeUnit.toString().padLeft(2, '0');
+}
+
+/// Single connection stat: an icon followed by a value.
+class _StatItem extends StatelessWidget {
+  const _StatItem({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final Color color = theme.colorScheme.onSurfaceVariant;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: color),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: color,
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
+        ),
+      ],
+    );
+  }
 }

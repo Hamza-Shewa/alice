@@ -10,6 +10,12 @@ class AliceTheme {
   static const Color orange = Color(0xffffa801);
   static const Color white = Color(0xffffffff);
 
+  // Darker variants used on light backgrounds so status text keeps a
+  // readable contrast ratio.
+  static const Color darkRed = Color(0xffc62828);
+  static const Color darkGreen = Color(0xff00804a);
+  static const Color darkOrange = Color(0xffa85c00);
+
   /// Returns general theme data.
   static ThemeData getTheme() {
     return ThemeData(
@@ -33,6 +39,22 @@ class AliceTheme {
       _isDarkMode
           ? const ColorScheme.dark(primary: AliceTheme.lightRed)
           : const ColorScheme.light(primary: AliceTheme.lightRed);
+
+  /// Returns color which represents HTTP [status]. Brighter colors are used in
+  /// dark mode and darker ones in light mode to keep text readable.
+  static Color getStatusColor(BuildContext context, int? status) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color neutral = Theme.of(context).colorScheme.onSurfaceVariant;
+    return switch (status) {
+      -1 => isDark ? red : darkRed,
+      int status when status >= 200 && status < 300 =>
+        isDark ? green : darkGreen,
+      int status when status >= 300 && status < 400 =>
+        isDark ? orange : darkOrange,
+      int status when status >= 400 && status < 600 => isDark ? red : darkRed,
+      _ => neutral,
+    };
+  }
 
   /// Return log text color based on diagnostic [level].
   static Color getLogTextColor(BuildContext context, DiagnosticLevel level) =>
