@@ -14,6 +14,7 @@ import 'package:alice/ui/common/alice_page.dart';
 import 'package:alice/ui/common/alice_theme.dart';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// Call details page which displays 4 tabs: overview, request, response, error.
 class AliceCallDetailsPage extends StatefulWidget {
@@ -52,6 +53,15 @@ class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
                 length: 4,
                 child: Scaffold(
                   appBar: AppBar(
+                    actions: [
+                      IconButton(
+                        icon: const Icon(Icons.copy_all),
+                        tooltip: context.i18n(
+                          AliceTranslationKey.callOverviewCopyAll,
+                        ),
+                        onPressed: () => _copyCall(call),
+                      ),
+                    ],
                     bottom: TabBar(
                       indicatorColor: AliceTheme.lightRed,
                       tabs:
@@ -104,6 +114,29 @@ class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
   /// and tries to invoke system action to share it.
   void _shareCall() async {
     await AliceExportHelper.shareCall(context: context, call: widget.call);
+  }
+
+  /// Copies everything related to [call] (general data, request and
+  /// response headers and bodies, error and curl) to clipboard.
+  Future<void> _copyCall(AliceHttpCall call) async {
+    final String log = AliceExportHelper.buildCallLog(
+      context: context,
+      call: call,
+    );
+    await Clipboard.setData(ClipboardData(text: log));
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            context.i18n(AliceTranslationKey.callOverviewCopiedAll),
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
   }
 
   /// Get tab name based on [item] type.

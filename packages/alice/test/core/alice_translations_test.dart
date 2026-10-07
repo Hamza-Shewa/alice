@@ -60,5 +60,25 @@ void main() {
         "Żądanie",
       );
     });
+
+    test("should return arabic translation", () {
+      expect(
+        AliceTranslations.get(
+          languageCode: "ar",
+          key: AliceTranslationKey.callDetailsRequest,
+        ),
+        "الطلب",
+      );
+    });
+
+    test("should fall back to english for missing key", () {
+      expect(
+        AliceTranslations.get(
+          languageCode: "pl",
+          key: AliceTranslationKey.alice,
+        ),
+        "Alice",
+      );
+    });
   });
 }

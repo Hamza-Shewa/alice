@@ -19,11 +19,15 @@ AliceHttpCall _call({String uri = 'https://api.example.com/v1/users'}) =>
       ..request =
           (AliceHttpRequest()
             ..time = DateTime(2026, 10, 7, 14, 3, 1, 37)
-            ..size = 230)
+            ..size = 230
+            ..headers = {'x-request-header': 'request-value'}
+            ..body = 'request body text')
       ..response =
           (AliceHttpResponse()
             ..status = 200
             ..size = 1840
+            ..headers = {'x-response-header': 'response-value'}
+            ..body = 'response body text'
             ..time = DateTime(2026, 10, 7, 14, 3, 1, 379));
 
 Future<void> _pump(WidgetTester tester, AliceHttpCall call) =>
@@ -70,5 +74,32 @@ void main() {
 
     expect(copied, 'https://api.example.com/v1/users');
     expect(find.text('URL copied to clipboard'), findsOneWidget);
+  });
+
+  testWidgets('renders request and response headers and bodies', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 6000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await _pump(tester, _call());
+
+    expect(find.text('x-request-header'), findsOneWidget);
+    expect(find.text('request-value'), findsOneWidget);
+    expect(find.text('request body text'), findsOneWidget);
+    expect(find.text('x-response-header'), findsOneWidget);
+    expect(find.text('response-value'), findsOneWidget);
+    expect(find.text('response body text'), findsOneWidget);
+  });
+
+  testWidgets('explains status code on tap', (tester) async {
+    await _pump(tester, _call());
+
+    await tester.tap(find.text('200'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('OK'), findsOneWidget);
+    expect(find.text('Success'), findsOneWidget);
+    expect(find.text('The request succeeded.'), findsOneWidget);
   });
 }
