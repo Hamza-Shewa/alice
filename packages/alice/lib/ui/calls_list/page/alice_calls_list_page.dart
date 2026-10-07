@@ -84,6 +84,7 @@ class _AliceCallsListPageState extends State<AliceCallsListPage>
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
             onPressed: _onBackPressed,
           ),
           title:
@@ -91,6 +92,7 @@ class _AliceCallsListPageState extends State<AliceCallsListPage>
                   ? _SearchTextField(
                     textEditingController: _queryTextEditingController,
                     onChanged: _updateSearchQuery,
+                    onClearPressed: _onClearSearchPressed,
                   )
                   : Text(context.i18n(AliceTranslationKey.alice)),
           actions:
@@ -98,16 +100,31 @@ class _AliceCallsListPageState extends State<AliceCallsListPage>
                   ? <Widget>[
                     IconButton(
                       icon: const Icon(Icons.terminal),
+                      tooltip: context.i18n(
+                        AliceTranslationKey.callsListRawLogs,
+                      ),
+                      isSelected: isAndroidRawLogsEnabled,
                       onPressed: _onLogsChangePressed,
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete),
+                      icon: const Icon(Icons.delete_outline),
+                      tooltip: context.i18n(
+                        AliceTranslationKey.callsListDelete,
+                      ),
                       onPressed: _onClearLogsPressed,
                     ),
                   ]
                   : <Widget>[
                     IconButton(
-                      icon: const Icon(Icons.search),
+                      icon: Icon(_searchEnabled ? Icons.close : Icons.search),
+                      tooltip:
+                          _searchEnabled
+                              ? MaterialLocalizations.of(
+                                context,
+                              ).closeButtonTooltip
+                              : context.i18n(
+                                AliceTranslationKey.callsListSearch,
+                              ),
                       onPressed: _onSearchPressed,
                     ),
                     _ContextMenuButton(onMenuItemSelected: _onMenuItemSelected),
@@ -115,6 +132,11 @@ class _AliceCallsListPageState extends State<AliceCallsListPage>
           bottom: TabBar(
             controller: _tabController,
             indicatorColor: AliceTheme.lightRed,
+            indicatorSize: TabBarIndicatorSize.tab,
+            labelStyle: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
             tabs:
                 AliceCallsListTabItem.values.map((item) {
                   return Tab(text: _getTabName(item: item));
@@ -141,7 +163,7 @@ class _AliceCallsListPageState extends State<AliceCallsListPage>
         floatingActionButton:
             isLoggerTab
                 ? _LoggerFloatingActionButtons(scrollLogsList: _scrollLogsList)
-                : const SizedBox(),
+                : null,
       ),
     );
   }
@@ -298,6 +320,11 @@ class _AliceCallsListPageState extends State<AliceCallsListPage>
     }
   }
 
+  /// Called when clear search button has been pressed. Clears the query.
+  void _onClearSearchPressed() => setState(() {
+    _queryTextEditingController.clear();
+  });
+
   /// Filters calls based on query.
   void _updateSearchQuery(String query) => setState(() {});
 
@@ -328,7 +355,7 @@ class _AliceCallsListPageState extends State<AliceCallsListPage>
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
         _scrollController.position.minScrollExtent,
-        duration: const Duration(microseconds: 500),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.ease,
       );
     }
@@ -339,7 +366,7 @@ class _AliceCallsListPageState extends State<AliceCallsListPage>
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
-        duration: const Duration(microseconds: 500),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.ease,
       );
     }
@@ -351,20 +378,37 @@ class _SearchTextField extends StatelessWidget {
   const _SearchTextField({
     required this.textEditingController,
     required this.onChanged,
+    required this.onClearPressed,
   });
 
   final TextEditingController textEditingController;
   final void Function(String) onChanged;
+  final void Function() onClearPressed;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: textEditingController,
       autofocus: true,
+      textInputAction: TextInputAction.search,
       decoration: InputDecoration(
         hintText: context.i18n(AliceTranslationKey.callsListSearchHint),
         hintStyle: const TextStyle(fontSize: 16, color: AliceTheme.grey),
         border: InputBorder.none,
+        suffixIcon: ValueListenableBuilder<TextEditingValue>(
+          valueListenable: textEditingController,
+          builder:
+              (context, value, _) =>
+                  value.text.isEmpty
+                      ? const SizedBox.shrink()
+                      : IconButton(
+                        icon: const Icon(Icons.backspace_outlined, size: 20),
+                        tooltip: context.i18n(
+                          AliceTranslationKey.callsListClearSearch,
+                        ),
+                        onPressed: onClearPressed,
+                      ),
+        ),
       ),
       style: const TextStyle(fontSize: 16),
       onChanged: onChanged,
@@ -382,6 +426,7 @@ class _ContextMenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<AliceCallDetailsMenuItemType>(
+      icon: const Icon(Icons.more_vert),
       onSelected: onMenuItemSelected,
       itemBuilder:
           (BuildContext context) => [
@@ -392,7 +437,7 @@ class _ContextMenuButton extends StatelessWidget {
                 child: Row(
                   children: [
                     Icon(_getIcon(itemType: item), color: AliceTheme.lightRed),
-                    const Padding(padding: EdgeInsets.only(left: 10)),
+                    const SizedBox(width: 12),
                     Text(_getTitle(context: context, itemType: item)),
                   ],
                 ),
@@ -424,11 +469,11 @@ class _ContextMenuButton extends StatelessWidget {
       case AliceCallDetailsMenuItemType.sort:
         return Icons.sort;
       case AliceCallDetailsMenuItemType.delete:
-        return Icons.delete;
+        return Icons.delete_outline;
       case AliceCallDetailsMenuItemType.stats:
         return Icons.insert_chart;
       case AliceCallDetailsMenuItemType.save:
-        return Icons.save;
+        return Icons.save_outlined;
     }
   }
 }
@@ -443,9 +488,12 @@ class _LoggerFloatingActionButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisSize: MainAxisSize.min,
       children: [
         FloatingActionButton(
           heroTag: 'h1',
+          mini: true,
+          tooltip: context.i18n(AliceTranslationKey.callsListScrollTop),
           backgroundColor: AliceTheme.lightRed,
           onPressed: () => scrollLogsList(true),
           child: const Icon(Icons.arrow_upward, color: AliceTheme.white),
@@ -453,6 +501,8 @@ class _LoggerFloatingActionButtons extends StatelessWidget {
         const SizedBox(height: 8),
         FloatingActionButton(
           heroTag: 'h2',
+          mini: true,
+          tooltip: context.i18n(AliceTranslationKey.callsListScrollBottom),
           backgroundColor: AliceTheme.lightRed,
           onPressed: () => scrollLogsList(false),
           child: const Icon(Icons.arrow_downward, color: AliceTheme.white),

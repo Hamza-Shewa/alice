@@ -40,6 +40,21 @@ void main() {
   });
 
   group("AliceDioAdapter", () {
+    test("should record call when URL can't be parsed", () async {
+      dio.options.baseUrl = 'http://192.168.1.1:505';
+
+      await expectLater(dio.get<void>('api/login'), throwsA(anything));
+
+      final call =
+          verify(() => aliceCore.addCall(captureAny())).captured.single
+              as AliceHttpCall;
+      expect(call.uri, 'http://192.168.1.1:505api/login');
+      expect(call.server, '192.168.1.1:505api');
+      expect(call.endpoint, '/login');
+      expect(call.method, 'GET');
+      expect(call.secure, false);
+    });
+
     test("should handle GET call with json response", () async {
       dioAdapter.onGet(
         'https://test.com/json',

@@ -10,6 +10,7 @@ class AliceTranslations {
     List<AliceTranslationData> translations = [];
     translations.add(_buildEnTranslations());
     translations.add(_buildPlTranslations());
+    translations.add(_buildArTranslations());
     return translations;
   }
 
@@ -93,6 +94,52 @@ class AliceTranslations {
         AliceTranslationKey.callsListStats: "Stats",
         AliceTranslationKey.callsListSave: "Save",
         AliceTranslationKey.logsEmpty: "There are no logs to show",
+        AliceTranslationKey.callsListSearch: "Search",
+        AliceTranslationKey.callsListClearSearch: "Clear search",
+        AliceTranslationKey.callsListEmpty: "No HTTP calls yet",
+        AliceTranslationKey.callsListEmptyDescription:
+            "Requests made by your app will appear here.",
+        AliceTranslationKey.callsListNoResults: "No calls match \"[query]\"",
+        AliceTranslationKey.callsListRawLogs: "Toggle raw logs",
+        AliceTranslationKey.callsListScrollTop: "Scroll to top",
+        AliceTranslationKey.callsListScrollBottom: "Scroll to bottom",
+        AliceTranslationKey.urlIssueTitle: "Malformed URL",
+        AliceTranslationKey.urlIssueSuggestion: "Did you mean:",
+        AliceTranslationKey.urlIssueMore: "+[count] more issues",
+        AliceTranslationKey.urlIssuePortWithDot:
+            "Port is separated with '.' instead of ':'",
+        AliceTranslationKey.urlIssueMissingSlashAfterPort:
+            "Missing '/' between port and path",
+        AliceTranslationKey.urlIssueMissingSlashAfterHost:
+            "Missing '/' between IP address and path",
+        AliceTranslationKey.urlIssueMissingSlashAfterVersion:
+            "Missing '/' after API version",
+        AliceTranslationKey.urlIssueInvalidIp: "IP address is invalid",
+        AliceTranslationKey.urlIssueDoubleSlash: "Path contains '//'",
+        AliceTranslationKey.urlIssueWhitespace: "URL contains whitespace",
+        AliceTranslationKey.urlIssueMissingScheme:
+            "URL has no http:// or https:// scheme",
+        AliceTranslationKey.callOverviewTiming: "Timing",
+        AliceTranslationKey.callOverviewConnection: "Connection",
+        AliceTranslationKey.callOverviewCopyUrl: "Copy URL",
+        AliceTranslationKey.callOverviewCopied: "URL copied to clipboard",
+        AliceTranslationKey.callOverviewPending: "Pending…",
+        AliceTranslationKey.callOverviewCopyAll: "Copy all request data",
+        AliceTranslationKey.callOverviewCopiedAll:
+            "Request data copied to clipboard",
+        AliceTranslationKey.callOverviewCopy: "Copy",
+        AliceTranslationKey.callOverviewCopiedValue: "Copied to clipboard",
+        AliceTranslationKey.callOverviewShowMore: "Show more",
+        AliceTranslationKey.callOverviewShowLess: "Show less",
+        AliceTranslationKey.statusCategoryInformational: "Informational",
+        AliceTranslationKey.statusCategorySuccess: "Success",
+        AliceTranslationKey.statusCategoryRedirection: "Redirection",
+        AliceTranslationKey.statusCategoryClientError: "Client error",
+        AliceTranslationKey.statusCategoryServerError: "Server error",
+        AliceTranslationKey.statusCategoryFailed: "No response",
+        AliceTranslationKey.statusUnknownDescription:
+            "There is no description for this status code.",
+        AliceTranslationKey.statusTapHint: "What does this status mean?",
         AliceTranslationKey.logsError: "Failed to display error",
         AliceTranslationKey.logsItemError: "Error:",
         AliceTranslationKey.logsItemStackTrace: "Stack trace:",
@@ -263,6 +310,54 @@ class AliceTranslations {
         AliceTranslationKey.callsListStats: "Statystyki",
         AliceTranslationKey.callsListSave: "Zapis",
         AliceTranslationKey.logsEmpty: "Brak rezultatów",
+        AliceTranslationKey.callsListSearch: "Szukaj",
+        AliceTranslationKey.callsListClearSearch: "Wyczyść wyszukiwanie",
+        AliceTranslationKey.callsListEmpty: "Brak połączeń HTTP",
+        AliceTranslationKey.callsListEmptyDescription:
+            "Żądania wysyłane przez aplikację pojawią się tutaj.",
+        AliceTranslationKey.callsListNoResults:
+            "Brak połączeń pasujących do \"[query]\"",
+        AliceTranslationKey.callsListRawLogs: "Przełącz surowe logi",
+        AliceTranslationKey.callsListScrollTop: "Przewiń na górę",
+        AliceTranslationKey.callsListScrollBottom: "Przewiń na dół",
+        AliceTranslationKey.urlIssueTitle: "Nieprawidłowy URL",
+        AliceTranslationKey.urlIssueSuggestion: "Czy chodziło o:",
+        AliceTranslationKey.urlIssueMore: "+[count] więcej problemów",
+        AliceTranslationKey.urlIssuePortWithDot:
+            "Port oddzielony kropką '.' zamiast ':'",
+        AliceTranslationKey.urlIssueMissingSlashAfterPort:
+            "Brak '/' między portem a ścieżką",
+        AliceTranslationKey.urlIssueMissingSlashAfterHost:
+            "Brak '/' między adresem IP a ścieżką",
+        AliceTranslationKey.urlIssueMissingSlashAfterVersion:
+            "Brak '/' po wersji API",
+        AliceTranslationKey.urlIssueInvalidIp: "Adres IP jest nieprawidłowy",
+        AliceTranslationKey.urlIssueDoubleSlash: "Ścieżka zawiera '//'",
+        AliceTranslationKey.urlIssueWhitespace: "URL zawiera białe znaki",
+        AliceTranslationKey.urlIssueMissingScheme:
+            "URL nie zawiera schematu http:// lub https://",
+        AliceTranslationKey.callOverviewTiming: "Czas",
+        AliceTranslationKey.callOverviewConnection: "Połączenie",
+        AliceTranslationKey.callOverviewCopyUrl: "Kopiuj URL",
+        AliceTranslationKey.callOverviewCopied: "Skopiowano URL do schowka",
+        AliceTranslationKey.callOverviewPending: "Oczekiwanie…",
+        AliceTranslationKey.callOverviewCopyAll:
+            "Kopiuj wszystkie dane żądania",
+        AliceTranslationKey.callOverviewCopiedAll:
+            "Skopiowano dane żądania do schowka",
+        AliceTranslationKey.callOverviewCopy: "Kopiuj",
+        AliceTranslationKey.callOverviewCopiedValue: "Skopiowano do schowka",
+        AliceTranslationKey.callOverviewShowMore: "Pokaż więcej",
+        AliceTranslationKey.callOverviewShowLess: "Pokaż mniej",
+        AliceTranslationKey.statusCategoryInformational: "Informacyjny",
+        AliceTranslationKey.statusCategorySuccess: "Sukces",
+        AliceTranslationKey.statusCategoryRedirection: "Przekierowanie",
+        AliceTranslationKey.statusCategoryClientError: "Błąd klienta",
+        AliceTranslationKey.statusCategoryServerError: "Błąd serwera",
+        AliceTranslationKey.statusCategoryFailed: "Brak odpowiedzi",
+        AliceTranslationKey.statusUnknownDescription:
+            "Brak opisu dla tego kodu statusu.",
+        AliceTranslationKey.statusTapHint: "Co oznacza ten status?",
         AliceTranslationKey.logsError: "Problem z wyświetleniem logów.",
         AliceTranslationKey.logsItemError: "Błąd:",
         AliceTranslationKey.logsItemStackTrace: "Ślad stosu:",
@@ -355,8 +450,224 @@ class AliceTranslations {
     );
   }
 
-  /// Returns localized value for specific [languageCode] and [key]. If value
-  /// can't be selected then [key] will be returned.
+  /// Builds [AliceTranslationData] for arabic language.
+  static AliceTranslationData _buildArTranslations() {
+    return AliceTranslationData(
+      languageCode: "ar",
+      values: {
+        AliceTranslationKey.alice: "Alice",
+        AliceTranslationKey.callDetails: "تفاصيل طلب HTTP",
+        AliceTranslationKey.emailSubject: "تقرير Alice",
+        AliceTranslationKey.callDetailsOverview: "نظرة عامة",
+        AliceTranslationKey.callDetailsRequest: "الطلب",
+        AliceTranslationKey.callDetailsResponse: "الاستجابة",
+        AliceTranslationKey.callDetailsError: "الخطأ",
+        AliceTranslationKey.callDetailsEmpty: "فشل تحميل البيانات",
+        AliceTranslationKey.callErrorScreenErrorEmpty: "لا يوجد خطأ",
+        AliceTranslationKey.callErrorScreenError: "الخطأ:",
+        AliceTranslationKey.callErrorScreenStacktrace: "تتبع المكدس:",
+        AliceTranslationKey.callErrorScreenEmpty: "لا يوجد شيء لعرضه هنا",
+        AliceTranslationKey.callOverviewMethod: "الطريقة:",
+        AliceTranslationKey.callOverviewServer: "الخادم:",
+        AliceTranslationKey.callOverviewEndpoint: "نقطة النهاية:",
+        AliceTranslationKey.callOverviewStarted: "البدء:",
+        AliceTranslationKey.callOverviewFinished: "الانتهاء:",
+        AliceTranslationKey.callOverviewDuration: "المدة:",
+        AliceTranslationKey.callOverviewBytesSent: "البيانات المرسلة:",
+        AliceTranslationKey.callOverviewBytesReceived: "البيانات المستلمة:",
+        AliceTranslationKey.callOverviewClient: "العميل:",
+        AliceTranslationKey.callOverviewSecure: "آمن:",
+        AliceTranslationKey.callRequestStarted: "البدء:",
+        AliceTranslationKey.callRequestBytesSent: "البيانات المرسلة:",
+        AliceTranslationKey.callRequestContentType: "نوع المحتوى:",
+        AliceTranslationKey.callRequestBody: "المحتوى:",
+        AliceTranslationKey.callRequestBodyEmpty: "المحتوى فارغ",
+        AliceTranslationKey.callRequestFormDataFields: "حقول النموذج:",
+        AliceTranslationKey.callRequestFormDataFiles: "ملفات النموذج:",
+        AliceTranslationKey.callRequestHeaders: "الترويسات:",
+        AliceTranslationKey.callRequestHeadersEmpty: "الترويسات فارغة",
+        AliceTranslationKey.callRequestQueryParameters: "معاملات الاستعلام",
+        AliceTranslationKey.callRequestQueryParametersEmpty:
+            "معاملات الاستعلام فارغة",
+        AliceTranslationKey.callResponseWaitingForResponse:
+            "بانتظار الاستجابة...",
+        AliceTranslationKey.callResponseError: "خطأ",
+        AliceTranslationKey.callResponseReceived: "الاستلام:",
+        AliceTranslationKey.callResponseBytesReceived: "البيانات المستلمة:",
+        AliceTranslationKey.callResponseStatus: "الحالة:",
+        AliceTranslationKey.callResponseHeaders: "الترويسات:",
+        AliceTranslationKey.callResponseHeadersEmpty: "الترويسات فارغة",
+        AliceTranslationKey.callResponseBodyImage: "المحتوى: صورة",
+        AliceTranslationKey.callResponseBody: "المحتوى:",
+        AliceTranslationKey.callResponseTooLargeToShow: "أكبر من أن يُعرض",
+        AliceTranslationKey.callResponseBodyShow: "عرض المحتوى",
+        AliceTranslationKey.callResponseLargeBodyShowWarning:
+            "تحذير! سيستغرق عرض الناتج بعض الوقت.",
+        AliceTranslationKey.callResponseBodyVideo: "المحتوى: فيديو",
+        AliceTranslationKey.callResponseBodyVideoWebBrowser:
+            "فتح الفيديو في المتصفح",
+        AliceTranslationKey.callResponseHeadersUnknown: "غير معروف",
+        AliceTranslationKey.callResponseBodyUnknown:
+            "محتوى غير مدعوم. يستطيع Alice عرض محتوى الفيديو والصور والنصوص. نوع محتوى الاستجابة [contentType] ولا يمكن معالجته. يمكنك تجربة الزر أدناه لعرض المحتوى كنص، لكن قد يفشل ذلك.",
+        AliceTranslationKey.callResponseBodyUnknownShow:
+            "عرض المحتوى غير المدعوم",
+        AliceTranslationKey.callsListInspector: "المراقب",
+        AliceTranslationKey.callsListLogger: "السجلات",
+        AliceTranslationKey.callsListDeleteLogsDialogTitle: "حذف السجلات",
+        AliceTranslationKey.callsListDeleteLogsDialogDescription:
+            "هل تريد مسح السجلات؟",
+        AliceTranslationKey.callsListYes: "نعم",
+        AliceTranslationKey.callsListNo: "لا",
+        AliceTranslationKey.callsListDeleteCallsDialogTitle: "حذف الطلبات",
+        AliceTranslationKey.callsListDeleteCallsDialogDescription:
+            "هل تريد حذف طلبات HTTP؟",
+        AliceTranslationKey.callsListSearchHint: "ابحث في طلبات HTTP...",
+        AliceTranslationKey.callsListSort: "ترتيب",
+        AliceTranslationKey.callsListDelete: "حذف",
+        AliceTranslationKey.callsListStats: "الإحصائيات",
+        AliceTranslationKey.callsListSave: "حفظ",
+        AliceTranslationKey.logsEmpty: "لا توجد سجلات لعرضها",
+        AliceTranslationKey.callsListSearch: "بحث",
+        AliceTranslationKey.callsListClearSearch: "مسح البحث",
+        AliceTranslationKey.callsListEmpty: "لا توجد طلبات HTTP بعد",
+        AliceTranslationKey.callsListEmptyDescription:
+            "ستظهر هنا الطلبات التي يرسلها تطبيقك.",
+        AliceTranslationKey.callsListNoResults:
+            "لا توجد طلبات تطابق \"[query]\"",
+        AliceTranslationKey.callsListRawLogs: "تبديل السجلات الخام",
+        AliceTranslationKey.callsListScrollTop: "التمرير للأعلى",
+        AliceTranslationKey.callsListScrollBottom: "التمرير للأسفل",
+        AliceTranslationKey.urlIssueTitle: "رابط غير صالح",
+        AliceTranslationKey.urlIssueSuggestion: "هل تقصد:",
+        AliceTranslationKey.urlIssueMore: "+[count] مشاكل أخرى",
+        AliceTranslationKey.urlIssuePortWithDot:
+            "تم فصل المنفذ بـ '.' بدلاً من ':'",
+        AliceTranslationKey.urlIssueMissingSlashAfterPort:
+            "ينقص '/' بين المنفذ والمسار",
+        AliceTranslationKey.urlIssueMissingSlashAfterHost:
+            "ينقص '/' بين عنوان IP والمسار",
+        AliceTranslationKey.urlIssueMissingSlashAfterVersion:
+            "ينقص '/' بعد إصدار الـ API",
+        AliceTranslationKey.urlIssueInvalidIp: "عنوان IP غير صالح",
+        AliceTranslationKey.urlIssueDoubleSlash: "المسار يحتوي على '//'",
+        AliceTranslationKey.urlIssueWhitespace: "الرابط يحتوي على مسافات",
+        AliceTranslationKey.urlIssueMissingScheme:
+            "الرابط لا يبدأ بـ http:// أو https://",
+        AliceTranslationKey.callOverviewTiming: "التوقيت",
+        AliceTranslationKey.callOverviewConnection: "الاتصال",
+        AliceTranslationKey.callOverviewCopyUrl: "نسخ الرابط",
+        AliceTranslationKey.callOverviewCopied: "تم نسخ الرابط إلى الحافظة",
+        AliceTranslationKey.callOverviewPending: "قيد الانتظار…",
+        AliceTranslationKey.callOverviewCopyAll: "نسخ كل بيانات الطلب",
+        AliceTranslationKey.callOverviewCopiedAll:
+            "تم نسخ بيانات الطلب إلى الحافظة",
+        AliceTranslationKey.callOverviewCopy: "نسخ",
+        AliceTranslationKey.callOverviewCopiedValue: "تم النسخ إلى الحافظة",
+        AliceTranslationKey.callOverviewShowMore: "عرض المزيد",
+        AliceTranslationKey.callOverviewShowLess: "عرض أقل",
+        AliceTranslationKey.statusCategoryInformational: "معلوماتية",
+        AliceTranslationKey.statusCategorySuccess: "نجاح",
+        AliceTranslationKey.statusCategoryRedirection: "إعادة توجيه",
+        AliceTranslationKey.statusCategoryClientError: "خطأ من العميل",
+        AliceTranslationKey.statusCategoryServerError: "خطأ من الخادم",
+        AliceTranslationKey.statusCategoryFailed: "لا توجد استجابة",
+        AliceTranslationKey.statusUnknownDescription:
+            "لا يوجد وصف لرمز الحالة هذا.",
+        AliceTranslationKey.statusTapHint: "ماذا يعني رمز الحالة هذا؟",
+        AliceTranslationKey.logsError: "فشل عرض الخطأ",
+        AliceTranslationKey.logsItemError: "الخطأ:",
+        AliceTranslationKey.logsItemStackTrace: "تتبع المكدس:",
+        AliceTranslationKey.logsCopied: "تم النسخ إلى الحافظة.",
+        AliceTranslationKey.sortDialogTitle: "اختر طريقة الترتيب",
+        AliceTranslationKey.sortDialogAscending: "تصاعدي",
+        AliceTranslationKey.sortDialogDescending: "تنازلي",
+        AliceTranslationKey.sortDialogAccept: "موافق",
+        AliceTranslationKey.sortDialogCancel: "إلغاء",
+        AliceTranslationKey.sortDialogTime: "وقت الإنشاء (افتراضي)",
+        AliceTranslationKey.sortDialogResponseTime: "وقت الاستجابة",
+        AliceTranslationKey.sortDialogResponseCode: "رمز الاستجابة",
+        AliceTranslationKey.sortDialogResponseSize: "حجم الاستجابة",
+        AliceTranslationKey.sortDialogEndpoint: "نقطة النهاية",
+        AliceTranslationKey.statsTitle: "الإحصائيات",
+        AliceTranslationKey.statsTotalRequests: "إجمالي الطلبات:",
+        AliceTranslationKey.statsPendingRequests: "الطلبات المعلقة:",
+        AliceTranslationKey.statsSuccessRequests: "الطلبات الناجحة:",
+        AliceTranslationKey.statsRedirectionRequests: "طلبات إعادة التوجيه:",
+        AliceTranslationKey.statsErrorRequests: "الطلبات الفاشلة:",
+        AliceTranslationKey.statsBytesSent: "البيانات المرسلة:",
+        AliceTranslationKey.statsBytesReceived: "البيانات المستلمة:",
+        AliceTranslationKey.statsAverageRequestTime: "متوسط وقت الطلب:",
+        AliceTranslationKey.statsMaxRequestTime: "أطول وقت طلب:",
+        AliceTranslationKey.statsMinRequestTime: "أقصر وقت طلب:",
+        AliceTranslationKey.statsGetRequests: "طلبات GET:",
+        AliceTranslationKey.statsPostRequests: "طلبات POST:",
+        AliceTranslationKey.statsDeleteRequests: "طلبات DELETE:",
+        AliceTranslationKey.statsPutRequests: "طلبات PUT:",
+        AliceTranslationKey.statsPatchRequests: "طلبات PATCH:",
+        AliceTranslationKey.statsSecuredRequests: "الطلبات الآمنة:",
+        AliceTranslationKey.statsUnsecuredRequests: "الطلبات غير الآمنة:",
+        AliceTranslationKey.notificationLoading: "قيد التحميل:",
+        AliceTranslationKey.notificationSuccess: "نجاح:",
+        AliceTranslationKey.notificationRedirect: "إعادة توجيه:",
+        AliceTranslationKey.notificationError: "خطأ:",
+        AliceTranslationKey.notificationTotalRequests:
+            "Alice (إجمالي [callCount] طلب HTTP)",
+        AliceTranslationKey.saveDialogPermissionErrorTitle: "خطأ في الصلاحيات",
+        AliceTranslationKey.saveDialogPermissionErrorDescription:
+            "لم يتم منح الصلاحية. تعذر حفظ السجلات.",
+        AliceTranslationKey.saveDialogEmptyErrorTitle: "سجل الطلبات فارغ",
+        AliceTranslationKey.saveDialogEmptyErrorDescription:
+            "لا توجد طلبات لحفظها.",
+        AliceTranslationKey.saveDialogFileSaveErrorTitle: "خطأ في الحفظ",
+        AliceTranslationKey.saveDialogFileSaveErrorDescription:
+            "فشل حفظ طلبات HTTP في ملف.",
+        AliceTranslationKey.saveSuccessTitle: "تم حفظ السجلات",
+        AliceTranslationKey.saveSuccessDescription:
+            "تم حفظ السجلات بنجاح في [path].",
+        AliceTranslationKey.saveSuccessView: "عرض الملف",
+        AliceTranslationKey.saveHeaderTitle: "Alice - مراقب HTTP",
+        AliceTranslationKey.saveHeaderAppName: "اسم التطبيق:",
+        AliceTranslationKey.saveHeaderPackage: "الحزمة:",
+        AliceTranslationKey.saveHeaderVersion: "الإصدار:",
+        AliceTranslationKey.saveHeaderBuildNumber: "رقم البناء:",
+        AliceTranslationKey.saveHeaderGenerated: "تاريخ الإنشاء:",
+        AliceTranslationKey.saveLogId: "المعرف:",
+        AliceTranslationKey.saveLogGeneralData: "بيانات عامة",
+        AliceTranslationKey.saveLogServer: "الخادم:",
+        AliceTranslationKey.saveLogMethod: "الطريقة:",
+        AliceTranslationKey.saveLogEndpoint: "نقطة النهاية:",
+        AliceTranslationKey.saveLogClient: "العميل:",
+        AliceTranslationKey.saveLogDuration: "المدة:",
+        AliceTranslationKey.saveLogSecured: "اتصال آمن:",
+        AliceTranslationKey.saveLogCompleted: "مكتمل:",
+        AliceTranslationKey.saveLogRequest: "الطلب",
+        AliceTranslationKey.saveLogRequestTime: "وقت الطلب:",
+        AliceTranslationKey.saveLogRequestContentType: "نوع محتوى الطلب:",
+        AliceTranslationKey.saveLogRequestCookies:
+            "ملفات تعريف الارتباط للطلب:",
+        AliceTranslationKey.saveLogRequestHeaders: "ترويسات الطلب:",
+        AliceTranslationKey.saveLogRequestQueryParams: "معاملات استعلام الطلب:",
+        AliceTranslationKey.saveLogRequestSize: "حجم الطلب:",
+        AliceTranslationKey.saveLogRequestBody: "محتوى الطلب:",
+        AliceTranslationKey.saveLogResponse: "الاستجابة",
+        AliceTranslationKey.saveLogResponseTime: "وقت الاستجابة:",
+        AliceTranslationKey.saveLogResponseStatus: "حالة الاستجابة:",
+        AliceTranslationKey.saveLogResponseSize: "حجم الاستجابة:",
+        AliceTranslationKey.saveLogResponseHeaders: "ترويسات الاستجابة:",
+        AliceTranslationKey.saveLogResponseBody: "محتوى الاستجابة:",
+        AliceTranslationKey.saveLogError: "الخطأ",
+        AliceTranslationKey.saveLogStackTrace: "تتبع المكدس",
+        AliceTranslationKey.saveLogCurl: "Curl",
+        AliceTranslationKey.accept: "موافق",
+        AliceTranslationKey.parserFailed: "فشل التحليل: ",
+        AliceTranslationKey.unknown: "غير معروف",
+      },
+    );
+  }
+
+  /// Returns localized value for specific [languageCode] and [key]. English
+  /// is used when language or key is not translated. If value can't be
+  /// selected then [key] will be returned.
   static String get({
     required String languageCode,
     required AliceTranslationKey key,
@@ -366,8 +677,10 @@ class AliceTranslations {
         (element) => element.languageCode == languageCode,
         orElse: () => _translations.first,
       );
-      final value = data.values[key] ?? key.toString();
-      return value;
+      // Fall back to English (first language) for keys missing in [data].
+      return data.values[key] ??
+          _translations.first.values[key] ??
+          key.toString();
     } catch (error) {
       return key.toString();
     }

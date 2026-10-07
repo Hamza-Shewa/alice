@@ -27,5 +27,14 @@ void main() {
       expect(AliceConversionHelper.formatTime(60001), "1 min 0 s 1 ms");
       expect(AliceConversionHelper.formatTime(85000), "1 min 25 s 0 ms");
     });
+
+    test("should format clock time and date time", () {
+      final time = DateTime(2026, 3, 7, 9, 5, 4, 42);
+      expect(AliceConversionHelper.formatClockTime(time), "09:05:04.042");
+      expect(
+        AliceConversionHelper.formatDateTime(time),
+        "2026-03-07 09:05:04.042",
+      );
+    });
   });
 }

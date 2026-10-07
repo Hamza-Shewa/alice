@@ -109,7 +109,7 @@ class AliceExportHelper {
       final IOSink sink = file.openWrite(mode: FileMode.append)
         ..write(await _buildAliceLog(context: context));
       for (final AliceHttpCall call in calls) {
-        sink.write(_buildCallLog(context: context, call: call));
+        sink.write(buildCallLog(context: context, call: call));
       }
       await sink.flush();
       await sink.close();
@@ -137,8 +137,9 @@ class AliceExportHelper {
         '\n';
   }
 
-  /// Build log string based on [call].
-  static String _buildCallLog({
+  /// Builds log string based on [call]: general data, request and response
+  /// with headers and bodies, error and curl command.
+  static String buildCallLog({
     required BuildContext context,
     required AliceHttpCall call,
   }) {
@@ -220,7 +221,7 @@ class AliceExportHelper {
   }) async {
     try {
       return await _buildAliceLog(context: context) +
-          _buildCallLog(call: call, context: context);
+          buildCallLog(call: call, context: context);
     } catch (exception) {
       AliceUtils.log("Failed to generate call log: $exception");
       return null;
