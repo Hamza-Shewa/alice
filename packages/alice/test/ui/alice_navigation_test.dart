@@ -5,6 +5,8 @@ import 'package:alice/model/alice_http_call.dart';
 import 'package:alice/model/alice_http_request.dart';
 import 'package:alice/model/alice_http_response.dart';
 import 'package:alice/ui/calls_list/page/alice_calls_list_page.dart';
+import 'package:alice/ui/call_details/page/alice_call_details_page.dart';
+import 'package:alice/ui/call_details/widget/alice_call_overview_screen.dart';
 import 'package:alice/ui/common/alice_app_bar.dart';
 import 'package:alice/ui/common/alice_navigation.dart';
 import 'package:flutter/material.dart';
@@ -113,5 +115,57 @@ void main() {
     expect(opacities.where((double value) => value < 1), isEmpty);
     await tester.pumpAndSettle();
     debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('pages opened from Alice fade in place, the first one slides', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+
+    AliceNavigation.navigateToCallsList(core: core);
+    for (int i = 0; i < 5; i++) {
+      await tester.pump();
+      if (find.byType(AliceCallsListPage).evaluate().isNotEmpty) break;
+    }
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(
+      tester.getTopLeft(find.byType(AliceCallsListPage)).dx,
+      greaterThan(0),
+      reason: 'the first page slides in',
+    );
+    await tester.pumpAndSettle();
+
+    AliceNavigation.navigateToCallDetails(
+      call: core.getCalls().first,
+      core: core,
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    // The list is not pushed aside and the details page does not move, so
+    // the app bar hero can morph in place.
+    expect(tester.getTopLeft(find.byType(AliceCallsListPage)).dx, 0);
+    expect(tester.getTopLeft(find.byType(AliceCallDetailsPage)).dx, 0);
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('details page ignores updates of other calls', (tester) async {
+    await pumpApp(tester);
+    AliceNavigation.navigateToCallDetails(
+      call: core.getCalls().first,
+      core: core,
+    );
+    await tester.pumpAndSettle();
+    final Widget before = tester.widget(find.byType(AliceCallOverviewScreen));
+
+    core.addCall(AliceHttpCall(2)..uri = 'https://a.com/other');
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+
+    // Same widget instance: nothing was rebuilt, so scrolling isn't
+    // interrupted by traffic of other requests.
+    expect(
+      identical(before, tester.widget(find.byType(AliceCallOverviewScreen))),
+      isTrue,
+    );
   });
 }

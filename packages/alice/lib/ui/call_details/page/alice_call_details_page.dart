@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:alice/core/alice_core.dart';
+import 'package:alice/helper/alice_watcher.dart';
 import 'package:alice/helper/alice_export_helper.dart';
 import 'package:alice/model/alice_http_call.dart';
 import 'package:alice/model/alice_translation.dart';
@@ -12,6 +13,7 @@ import 'package:alice/ui/call_details/widget/alice_call_response_screen.dart';
 import 'package:alice/ui/common/alice_app_bar.dart';
 import 'package:alice/ui/common/alice_context_ext.dart';
 import 'package:alice/ui/common/alice_settings.dart';
+import 'package:alice/ui/common/alice_language.dart';
 import 'package:alice/ui/common/alice_page.dart';
 import 'package:alice/ui/common/alice_theme.dart';
 import 'package:collection/collection.dart' show IterableExtension;
@@ -43,6 +45,13 @@ class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
 
   AliceHttpCall get call => widget.call;
 
+  /// Last built page and what it was built from. The calls stream emits for
+  /// every call of the app, which would rebuild all tabs and make scrolling
+  /// stutter while requests are running. The page is rebuilt only when this
+  /// call or a setting changes.
+  Widget? _cachedPage;
+  Object? _cachedSignature;
+
   @override
   void dispose() {
     _tabController.dispose();
@@ -62,7 +71,21 @@ class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
               (AliceHttpCall snapshotCall) => snapshotCall.id == widget.call.id,
             );
             if (call != null) {
-              return Scaffold(
+              final Object signature = (
+                call.loading,
+                identityHashCode(call.response),
+                identityHashCode(call.error),
+                call.duration,
+                call.response?.status,
+                AliceLanguage.current.value,
+                AliceTheme.themeMode.value,
+                AliceWatcher.instance.version,
+              );
+              if (_cachedPage != null && _cachedSignature == signature) {
+                return _cachedPage!;
+              }
+              _cachedSignature = signature;
+              return _cachedPage = Scaffold(
                 appBar: AliceAppBar(
                   actions: [
                     AliceSettingsButton(core: widget.core),

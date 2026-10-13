@@ -118,10 +118,12 @@ class AliceWatcher extends ChangeNotifier {
 
   static const String _fileName = 'alice_watcher.json';
 
-  /// Fields watched by default: the `type` field used by some backends.
+  /// Fields watched by default: the `type` field used by some backends, which
+  /// is already used as status code.
   static List<AliceWatchedField> defaultFields() => [
     AliceWatchedField(
       path: 'type',
+      useAsStatus: true,
       values: [
         AliceWatchedValue(
           value: '1',
@@ -147,6 +149,9 @@ class AliceWatcher extends ChangeNotifier {
   int _version = 0;
   bool _loaded = false;
   bool _savePending = false;
+
+  /// Changes every time [fields] change. Used to refresh cached screens.
+  int get version => _version;
 
   /// Call after any change of [fields]. Notifies listeners and saves.
   void changed() {

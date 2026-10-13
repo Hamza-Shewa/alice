@@ -23,24 +23,33 @@ class AliceNavigation {
     return _navigateToPage(
       core: core,
       child: AliceCallDetailsPage(call: call, core: core),
+      fade: true,
     );
   }
 
   /// Navigates to stats page.
   static Future<void> navigateToStats({required AliceCore core}) {
-    return _navigateToPage(core: core, child: AliceStatsPage(core));
+    return _navigateToPage(core: core, child: AliceStatsPage(core), fade: true);
   }
 
   /// Navigates to response watcher page.
   static Future<void> navigateToWatcher({required AliceCore core}) {
-    return _navigateToPage(core: core, child: AliceWatcherPage(core: core));
+    return _navigateToPage(
+      core: core,
+      child: AliceWatcherPage(core: core),
+      fade: true,
+    );
   }
 
   /// Common helper method which checks whether context is available for
   /// navigation and navigates to a specific page.
+  ///
+  /// Pages opened from another Alice page use a [fade], so their app bars
+  /// cross-fade in place. The first page slides in over the host app.
   static Future<void> _navigateToPage({
     required AliceCore core,
     required Widget child,
+    bool fade = false,
   }) {
     var context = core.getContext();
     if (context == null) {
@@ -48,17 +57,28 @@ class AliceNavigation {
     }
     return Navigator.push<void>(
       context,
-      AliceRoute<void>(builder: (_) => child),
+      AliceRoute<void>(builder: (_) => child, fade: fade),
     );
   }
 }
 
-/// Page route used by all Alice pages. It runs an opaque slide transition
-/// with Alice theme on every platform. The default transition of Android fades
-/// the new page in, which lets the page of the host app shine through and
-/// flashes its background color when it differs from Alice colors.
+/// Page route used by all Alice pages. Transitions are opaque or run over
+/// another Alice page and use Alice theme on every platform. The default
+/// transition of Android fades the new page in over the host app, which lets
+/// its page shine through and flashes its background color when it differs
+/// from Alice colors.
+///
+/// The first page slides in. With [fade] the page fades in over the previous
+/// Alice page without moving. A page which slides would carry its app bar
+/// across the screen, while the app bar [Hero] stays in place and shows the
+/// old app bar on top of the new page.
 class AliceRoute<T> extends MaterialPageRoute<T> {
-  AliceRoute({required super.builder});
+  AliceRoute({required super.builder, this.fade = false});
+
+  final bool fade;
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 300);
 
   @override
   Widget buildTransitions(
@@ -74,13 +94,23 @@ class AliceRoute<T> extends MaterialPageRoute<T> {
       child: Builder(
         builder:
             (BuildContext context) =>
-                const CupertinoPageTransitionsBuilder().buildTransitions<T>(
-                  this,
-                  context,
-                  animation,
-                  secondaryAnimation,
-                  child,
-                ),
+                fade
+                    ? FadeTransition(
+                      opacity: animation.drive(
+                        CurveTween(curve: Curves.easeInOut),
+                      ),
+                      child: child,
+                    )
+                    : const CupertinoPageTransitionsBuilder()
+                        .buildTransitions<T>(
+                          this,
+                          context,
+                          animation,
+                          // No parallax: pages which are opened later
+                          // fade in place and the page below stays put.
+                          const AlwaysStoppedAnimation<double>(0),
+                          child,
+                        ),
       ),
     );
   }

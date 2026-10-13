@@ -60,8 +60,14 @@ void main() {
     watcher.changed();
   }
 
+  void ignoreType() {
+    watcher.fields.single.useAsStatus = false;
+    watcher.changed();
+  }
+
   group('watcher result next to the status', () {
     testWidgets('is hidden until the field is used as status', (tester) async {
+      ignoreType();
       await pump(tester, AliceCallListItemWidget(_call({'type': 2}), (_) {}));
       expect(find.textContaining('type 2'), findsNothing);
     });
@@ -136,13 +142,16 @@ void main() {
       expect(find.text('Server is down'), findsWidgets);
     });
 
-    testWidgets('turns the field into a status code', (tester) async {
+    testWidgets('turns the status code off and on', (tester) async {
       await openPage(tester);
+      expect(watcher.fields.single.useAsStatus, isTrue);
+
+      await tester.tap(find.byType(Switch));
+      await tester.pumpAndSettle();
       expect(watcher.fields.single.useAsStatus, isFalse);
 
       await tester.tap(find.byType(Switch));
       await tester.pumpAndSettle();
-
       expect(watcher.fields.single.useAsStatus, isTrue);
     });
 

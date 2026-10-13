@@ -24,17 +24,17 @@ void main() {
   });
 
   group('AliceWatcher', () {
-    test('watches the type field by default, but is not used as status', () {
+    test('watches the type field by default and uses it as status', () {
       expect(watcher.fields.single.path, 'type');
       expect(watcher.fields.single.values.map((v) => v.value), ['1', '2', '3']);
-      expect(watcher.fields.single.useAsStatus, isFalse);
-      expect(watcher.evaluate(_call({'type': 2})), isNull);
+      expect(watcher.fields.single.useAsStatus, isTrue);
+      expect(
+        watcher.evaluate(_call({'type': 2}))?.outcome,
+        AliceWatchOutcome.failed,
+      );
     });
 
     test('matches values of a field used as status', () {
-      watcher.fields.single.useAsStatus = true;
-      watcher.changed();
-
       expect(
         watcher.evaluate(_call({'content': 'x', 'type': 1}))?.outcome,
         AliceWatchOutcome.success,
@@ -83,9 +83,6 @@ void main() {
     });
 
     test('ignores unknown values, missing fields and non JSON', () {
-      watcher.fields.single.useAsStatus = true;
-      watcher.changed();
-
       expect(watcher.evaluate(_call({'type': 'user'})), isNull);
       expect(watcher.evaluate(_call({'other': 1})), isNull);
       expect(watcher.evaluate(_call('plain text')), isNull);
@@ -93,8 +90,6 @@ void main() {
     });
 
     test('results follow changes of the fields', () {
-      watcher.fields.single.useAsStatus = true;
-      watcher.changed();
       final AliceHttpCall call = _call({'type': 2});
       expect(watcher.evaluate(call)?.outcome, AliceWatchOutcome.failed);
 
@@ -105,7 +100,6 @@ void main() {
 
     test('survives a JSON round trip', () {
       final AliceWatchedField field = AliceWatcher.defaultFields().single;
-      field.useAsStatus = true;
       final AliceWatchedField copy = AliceWatchedField.fromJson(field.toJson());
       expect(copy.path, 'type');
       expect(copy.useAsStatus, isTrue);
@@ -116,9 +110,6 @@ void main() {
 
   group('AliceIssueAnalyzer with watcher', () {
     test('HTTP 200 with a failed type is a frontend issue', () {
-      watcher.fields.single.useAsStatus = true;
-      watcher.changed();
-
       final AliceIssue? failed = AliceIssueAnalyzer.analyze(_call({'type': 2}));
       expect(failed?.origin, AliceIssueOrigin.frontend);
       expect(failed?.details, 'type = 2 (Validation or business error)');
@@ -131,12 +122,12 @@ void main() {
     });
 
     test('is ignored while the field is not used as status', () {
+      watcher.fields.single.useAsStatus = false;
+      watcher.changed();
       expect(AliceIssueAnalyzer.analyze(_call({'type': 3})), isNull);
     });
 
     test('real HTTP errors win', () {
-      watcher.fields.single.useAsStatus = true;
-      watcher.changed();
       expect(
         AliceIssueAnalyzer.analyze(_call({'type': 1}, status: 500))?.origin,
         AliceIssueOrigin.backend,
