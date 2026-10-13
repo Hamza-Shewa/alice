@@ -11,6 +11,7 @@ import 'package:alice/ui/calls_list/model/alice_calls_list_tab_item.dart';
 import 'package:alice/ui/calls_list/widget/alice_inspector_screen.dart';
 import 'package:alice/ui/calls_list/widget/alice_sort_dialog.dart';
 import 'package:alice/ui/common/alice_context_ext.dart';
+import 'package:alice/ui/common/alice_language.dart';
 import 'package:alice/ui/common/alice_dialog.dart';
 import 'package:alice/ui/common/alice_navigation.dart';
 import 'package:alice/ui/common/alice_page.dart';
@@ -32,7 +33,7 @@ class AliceCallsListPage extends StatefulWidget {
 }
 
 class _AliceCallsListPageState extends State<AliceCallsListPage>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AliceLanguageListenerMixin {
   final TextEditingController _queryTextEditingController =
       TextEditingController();
   final List<AliceCallsListTabItem> _tabItems = AliceCallsListTabItem.values;
@@ -98,6 +99,7 @@ class _AliceCallsListPageState extends State<AliceCallsListPage>
           actions:
               isLoggerTab
                   ? <Widget>[
+                    const AliceLanguageButton(),
                     IconButton(
                       icon: const Icon(Icons.terminal),
                       tooltip: context.i18n(
@@ -115,6 +117,7 @@ class _AliceCallsListPageState extends State<AliceCallsListPage>
                     ),
                   ]
                   : <Widget>[
+                    const AliceLanguageButton(),
                     IconButton(
                       icon: Icon(_searchEnabled ? Icons.close : Icons.search),
                       tooltip:

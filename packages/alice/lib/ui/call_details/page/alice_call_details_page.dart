@@ -10,6 +10,7 @@ import 'package:alice/ui/call_details/widget/alice_call_overview_screen.dart';
 import 'package:alice/ui/call_details/widget/alice_call_request_screen.dart';
 import 'package:alice/ui/call_details/widget/alice_call_response_screen.dart';
 import 'package:alice/ui/common/alice_context_ext.dart';
+import 'package:alice/ui/common/alice_language.dart';
 import 'package:alice/ui/common/alice_page.dart';
 import 'package:alice/ui/common/alice_theme.dart';
 import 'package:collection/collection.dart' show IterableExtension;
@@ -33,7 +34,7 @@ class AliceCallDetailsPage extends StatefulWidget {
 
 /// State of call details page.
 class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AliceLanguageListenerMixin {
   AliceHttpCall get call => widget.call;
 
   @override
@@ -54,6 +55,7 @@ class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
                 child: Scaffold(
                   appBar: AppBar(
                     actions: [
+                      const AliceLanguageButton(),
                       IconButton(
                         icon: const Icon(Icons.copy_all),
                         tooltip: context.i18n(

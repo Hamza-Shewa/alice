@@ -32,7 +32,7 @@ void main() {
     test("should parse empty body", () {
       expect(
         AliceParser.formatBody(context: context, body: ''),
-        AliceTranslationKey.callRequestBodyEmpty.toString(),
+        "Body is empty",
       );
     });
 
@@ -57,7 +57,7 @@ void main() {
     test("should parse unknown content type", () {
       expect(
         AliceParser.getContentType(context: context, headers: {}),
-        AliceTranslationKey.unknown.toString(),
+        "Unknown",
       );
     });
 

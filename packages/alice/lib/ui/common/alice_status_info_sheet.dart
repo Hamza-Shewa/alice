@@ -2,6 +2,7 @@ import 'package:alice/core/alice_http_status.dart';
 import 'package:alice/model/alice_translation.dart';
 import 'package:alice/ui/common/alice_call_badges.dart';
 import 'package:alice/ui/common/alice_context_ext.dart';
+import 'package:alice/ui/common/alice_language.dart';
 import 'package:alice/ui/common/alice_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,11 @@ Future<void> showAliceStatusInfo({
     context: context,
     showDragHandle: true,
     isScrollControlled: true,
-    builder: (_) => AliceStatusInfoSheet(status: status),
+    builder:
+        (_) => Directionality(
+          textDirection: AliceLanguage.textDirection,
+          child: AliceStatusInfoSheet(status: status),
+        ),
   );
 }
 
@@ -30,7 +35,7 @@ class AliceStatusInfoSheet extends StatelessWidget {
     final Color color = AliceTheme.getStatusColor(context, status);
     final AliceHttpStatusInfo? info = AliceHttpStatus.get(
       status: status,
-      languageCode: Localizations.maybeLocaleOf(context)?.languageCode ?? 'en',
+      languageCode: AliceLanguage.current.value,
     );
     final AliceHttpStatusCategory category = AliceHttpStatus.getCategory(
       status,

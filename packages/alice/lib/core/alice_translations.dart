@@ -226,6 +226,16 @@ class AliceTranslations {
         AliceTranslationKey.accept: "Accept",
         AliceTranslationKey.parserFailed: "Failed to parse: ",
         AliceTranslationKey.unknown: "Unknown",
+        AliceTranslationKey.language: "Language",
+        AliceTranslationKey.callErrorScreenType: "Type",
+        AliceTranslationKey.callResponseBodyUnsupportedTitle:
+            "Unsupported content",
+        AliceTranslationKey.callResponseBodyUnsupportedDescription:
+            "Alice can render JSON, XML, text, image and video bodies. This "
+            "response has Content-Type [contentType], which can't be previewed.",
+        AliceTranslationKey.callResponseBodyUnsupportedWarning:
+            "You can try to show the body as raw text, but it may be "
+            "unreadable.",
       },
     );
   }
@@ -446,6 +456,17 @@ class AliceTranslations {
         AliceTranslationKey.accept: "Akceptuj",
         AliceTranslationKey.parserFailed: "Problem z parsowaniem: ",
         AliceTranslationKey.unknown: "Nieznane",
+        AliceTranslationKey.language: "Język",
+        AliceTranslationKey.callErrorScreenType: "Typ",
+        AliceTranslationKey.callResponseBodyUnsupportedTitle:
+            "Nieobsługiwana treść",
+        AliceTranslationKey.callResponseBodyUnsupportedDescription:
+            "Alice potrafi wyświetlić treść JSON, XML, tekstową, obrazy i "
+            "wideo. Ta odpowiedź ma Content-Type [contentType], którego nie "
+            "można wyświetlić.",
+        AliceTranslationKey.callResponseBodyUnsupportedWarning:
+            "Możesz spróbować wyświetlić treść jako surowy tekst, ale może "
+            "być nieczytelna.",
       },
     );
   }
@@ -661,6 +682,14 @@ class AliceTranslations {
         AliceTranslationKey.accept: "موافق",
         AliceTranslationKey.parserFailed: "فشل التحليل: ",
         AliceTranslationKey.unknown: "غير معروف",
+        AliceTranslationKey.language: "اللغة",
+        AliceTranslationKey.callErrorScreenType: "النوع",
+        AliceTranslationKey.callResponseBodyUnsupportedTitle: "محتوى غير مدعوم",
+        AliceTranslationKey.callResponseBodyUnsupportedDescription:
+            "يمكن لـ Alice عرض JSON وXML والنصوص والصور والفيديو. نوع "
+            "المحتوى [contentType] لهذه الاستجابة لا يمكن معاينته.",
+        AliceTranslationKey.callResponseBodyUnsupportedWarning:
+            "يمكنك محاولة عرض المحتوى كنص خام، لكنه قد يكون غير مقروء.",
       },
     );
   }

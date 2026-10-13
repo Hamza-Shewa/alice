@@ -1,4 +1,5 @@
 import 'package:alice/core/alice_core.dart';
+import 'package:alice/ui/common/alice_language.dart';
 import 'package:alice/ui/common/alice_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +14,7 @@ class AlicePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Directionality(
       textDirection:
-          core.configuration.directionality ?? Directionality.of(context),
+          core.configuration.directionality ?? AliceLanguage.textDirection,
       child: Theme(data: AliceTheme.getTheme(), child: child),
     );
   }

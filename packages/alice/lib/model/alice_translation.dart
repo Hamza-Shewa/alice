@@ -194,4 +194,9 @@ enum AliceTranslationKey {
   accept,
   parserFailed,
   unknown,
+  language,
+  callErrorScreenType,
+  callResponseBodyUnsupportedTitle,
+  callResponseBodyUnsupportedDescription,
+  callResponseBodyUnsupportedWarning,
 }

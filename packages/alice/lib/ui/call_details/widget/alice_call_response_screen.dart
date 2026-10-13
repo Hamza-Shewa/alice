@@ -3,6 +3,8 @@ import 'package:alice/model/alice_http_call.dart';
 import 'package:alice/model/alice_translation.dart';
 import 'package:alice/ui/call_details/widget/alice_call_list_row.dart';
 import 'package:alice/ui/common/alice_context_ext.dart';
+import 'package:alice/ui/common/alice_detail_widgets.dart';
+import 'package:alice/ui/common/alice_theme.dart';
 import 'package:alice/utils/alice_parser.dart';
 import 'package:alice/ui/common/alice_scroll_behavior.dart';
 import 'package:alice/utils/num_comparison.dart';
@@ -360,7 +362,8 @@ class _VideoBody extends StatelessWidget {
   }
 }
 
-/// Widget which renders unknown body message.
+/// Widget which renders unsupported body: explains why the body can't be
+/// previewed and allows to show it as raw text.
 class _UnknownBody extends StatelessWidget {
   static const _contentType = "[contentType]";
 
@@ -376,41 +379,135 @@ class _UnknownBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     final Map<String, String>? headers = call.response?.headers;
     final String contentType =
         AliceParser.getContentType(context: context, headers: headers) ??
         context.i18n(AliceTranslationKey.callResponseHeadersUnknown);
+    final Color warningColor = AliceTheme.getStatusColor(context, 300);
 
-    if (showUnsupportedBody) {
-      final bodyContent = AliceParser.formatBody(
-        context: context,
-        body: call.response?.body,
-        contentType: AliceParser.getContentType(
-          context: context,
-          headers: headers,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: AliceOutlinedCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.visibility_off_outlined, color: warningColor),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    context.i18n(
+                      AliceTranslationKey.callResponseBodyUnsupportedTitle,
+                    ),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _BodyInfoChip(
+                  icon: Icons.description_outlined,
+                  text: contentType,
+                  color: warningColor,
+                ),
+                _BodyInfoChip(
+                  icon: Icons.download_outlined,
+                  text: AliceConversionHelper.formatBytes(
+                    call.response?.size ?? 0,
+                  ),
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              context
+                  .i18n(
+                    AliceTranslationKey.callResponseBodyUnsupportedDescription,
+                  )
+                  .replaceAll(_contentType, contentType),
+              style: theme.textTheme.bodyMedium?.copyWith(height: 1.4),
+            ),
+            const SizedBox(height: 16),
+            if (showUnsupportedBody)
+              AliceCodeBlock(
+                text: AliceParser.formatBody(
+                  context: context,
+                  body: call.response?.body,
+                  contentType: contentType,
+                ),
+              )
+            else ...[
+              Text(
+                context.i18n(
+                  AliceTranslationKey.callResponseBodyUnsupportedWarning,
+                ),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 12),
+              FilledButton.tonalIcon(
+                onPressed: onShowUnsupportedBodyPressed,
+                icon: const Icon(Icons.article_outlined, size: 18),
+                label: Text(
+                  context.i18n(AliceTranslationKey.callResponseBodyUnknownShow),
+                ),
+              ),
+            ],
+          ],
         ),
-      );
-      return AliceCallListRow(
-        name: context.i18n(AliceTranslationKey.callResponseBody),
-        value: bodyContent,
-      );
-    } else {
-      return Column(
+      ),
+    );
+  }
+}
+
+/// Small rounded label with an icon.
+class _BodyInfoChip extends StatelessWidget {
+  const _BodyInfoChip({
+    required this.icon,
+    required this.text,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String text;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          AliceCallListRow(
-            name: context.i18n(AliceTranslationKey.callResponseBody),
-            value: context
-                .i18n(AliceTranslationKey.callResponseBodyUnknown)
-                .replaceAll(_contentType, contentType),
-          ),
-          TextButton(
-            onPressed: onShowUnsupportedBodyPressed,
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 4),
+          Flexible(
             child: Text(
-              context.i18n(AliceTranslationKey.callResponseBodyUnknownShow),
+              text,
+              textDirection: TextDirection.ltr,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
             ),
           ),
         ],
-      );
-    }
+      ),
+    );
   }
 }
