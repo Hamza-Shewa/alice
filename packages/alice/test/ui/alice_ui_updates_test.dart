@@ -1,3 +1,5 @@
+import 'package:alice/core/alice_core.dart';
+import 'package:alice/model/alice_configuration.dart';
 import 'package:alice/model/alice_http_call.dart';
 import 'package:alice/model/alice_http_error.dart';
 import 'package:alice/model/alice_http_request.dart';
@@ -45,6 +47,15 @@ Future<void> _pump(WidgetTester tester, Widget screen, {Locale? locale}) =>
       MaterialApp(locale: locale, home: Scaffold(body: screen)),
     );
 
+final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+final AliceCore _core = AliceCore(
+  configuration: AliceConfiguration(
+    showNotification: false,
+    showInspectorOnShake: false,
+    navigatorKey: _navigatorKey,
+  ),
+);
+
 void main() {
   tearDown(() => AliceLanguage.current.value = AliceLanguage.defaultCode);
 
@@ -60,7 +71,7 @@ void main() {
 
   testWidgets('settings sheet changes language and theme', (tester) async {
     addTearDown(() => AliceTheme.themeMode.value = ThemeMode.system);
-    await _pump(tester, const AliceSettingsButton());
+    await _pump(tester, AliceSettingsButton(core: _core));
 
     await tester.tap(find.byType(AliceSettingsButton));
     await tester.pumpAndSettle();
@@ -70,6 +81,19 @@ void main() {
     await tester.tap(find.text('Dark'));
     await tester.pumpAndSettle();
     expect(AliceTheme.themeMode.value, ThemeMode.dark);
+
+    // Selected segments are red, the others are not.
+    Color? backgroundOf(String label) {
+      final Material material = tester.widget(
+        find
+            .ancestor(of: find.text(label), matching: find.byType(Material))
+            .first,
+      );
+      return material.color;
+    }
+
+    expect(backgroundOf('Dark'), AliceTheme.lightRed);
+    expect(backgroundOf('Light'), isNot(AliceTheme.lightRed));
 
     await tester.tap(find.text('العربية'));
     await tester.pumpAndSettle();

@@ -1,6 +1,7 @@
 import 'package:alice/core/alice_http_status.dart';
 import 'package:alice/helper/alice_conversion_helper.dart';
 import 'package:alice/helper/alice_issue_analyzer.dart';
+import 'package:alice/helper/alice_watcher.dart';
 import 'package:alice/model/alice_http_call.dart';
 import 'package:alice/model/alice_translation.dart';
 import 'package:alice/ui/common/alice_call_badges.dart';
@@ -11,6 +12,7 @@ import 'package:alice/ui/common/alice_language.dart';
 import 'package:alice/ui/common/alice_scroll_behavior.dart';
 import 'package:alice/ui/common/alice_status_info_sheet.dart';
 import 'package:alice/ui/common/alice_theme.dart';
+import 'package:alice/ui/common/alice_watcher_widgets.dart';
 import 'package:alice/utils/alice_parser.dart';
 import 'package:alice/utils/num_comparison.dart';
 import 'package:flutter/material.dart';
@@ -42,42 +44,44 @@ class AliceCallResponseScreen extends StatelessWidget {
 
     final AliceIssue? issue = AliceIssueAnalyzer.analyze(call);
     final Map<String, String> headers = call.response?.headers ?? const {};
-    return ScrollConfiguration(
-      behavior: AliceScrollBehavior(),
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
-        children: [
-          if (issue != null) ...[
-            AliceIssueBanner(issue: issue),
+    return SelectionArea(
+      child: ScrollConfiguration(
+        behavior: AliceScrollBehavior(),
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+          children: [
+            if (issue != null) ...[
+              AliceIssueBanner(issue: issue),
+              const SizedBox(height: 12),
+            ],
+            _StatusSummary(call: call),
             const SizedBox(height: 12),
-          ],
-          _StatusSummary(call: call),
-          const SizedBox(height: 12),
-          AliceCollapsibleSection(
-            icon: Icons.list_alt,
-            title: aliceStripColon(
-              context.i18n(AliceTranslationKey.callResponseHeaders),
-            ),
-            count: headers.length,
-            initiallyExpanded: headers.length <= 8,
-            action:
-                headers.isEmpty
-                    ? null
-                    : AliceCopyIconButton(
-                      text: headers.entries
-                          .map((e) => '${e.key}: ${e.value}')
-                          .join('\n'),
-                    ),
-            child: AliceKeyValueList(
-              values: headers,
-              emptyText: context.i18n(
-                AliceTranslationKey.callResponseHeadersEmpty,
+            AliceCollapsibleSection(
+              icon: Icons.list_alt,
+              title: aliceStripColon(
+                context.i18n(AliceTranslationKey.callResponseHeaders),
+              ),
+              count: headers.length,
+              initiallyExpanded: headers.length <= 8,
+              action:
+                  headers.isEmpty
+                      ? null
+                      : AliceCopyIconButton(
+                        text: headers.entries
+                            .map((e) => '${e.key}: ${e.value}')
+                            .join('\n'),
+                      ),
+              child: AliceKeyValueList(
+                values: headers,
+                emptyText: context.i18n(
+                  AliceTranslationKey.callResponseHeadersEmpty,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 12),
-          _BodyDataColumn(call: call),
-        ],
+            const SizedBox(height: 12),
+            _BodyDataColumn(call: call),
+          ],
+        ),
       ),
     );
   }
@@ -107,6 +111,7 @@ class _StatusSummary extends StatelessWidget {
       context: context,
       headers: call.response?.headers,
     );
+    final AliceWatchResult? watch = AliceWatcher.instance.evaluate(call);
 
     return AliceOutlinedCard(
       child: Column(
@@ -138,6 +143,10 @@ class _StatusSummary extends StatelessWidget {
               ],
             ),
           ),
+          if (watch != null) ...[
+            const SizedBox(height: 12),
+            AliceWatchResultBox(result: watch),
+          ],
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
@@ -375,14 +384,11 @@ class _TextBody extends StatelessWidget {
     return AliceCollapsibleSection(
       icon: Icons.data_object,
       title: _bodyTitle(context),
-      child: AliceCodeBlock(
-        text: AliceParser.formatBody(
+      child: AliceFormattedBodyBlock(
+        body: call.response?.body,
+        contentType: AliceParser.getContentType(
           context: context,
-          body: call.response?.body,
-          contentType: AliceParser.getContentType(
-            context: context,
-            headers: call.response?.headers,
-          ),
+          headers: call.response?.headers,
         ),
       ),
     );
@@ -492,12 +498,9 @@ class _UnknownBody extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             if (showUnsupportedBody)
-              AliceCodeBlock(
-                text: AliceParser.formatBody(
-                  context: context,
-                  body: call.response?.body,
-                  contentType: contentType,
-                ),
+              AliceFormattedBodyBlock(
+                body: call.response?.body,
+                contentType: contentType,
               )
             else ...[
               Text(

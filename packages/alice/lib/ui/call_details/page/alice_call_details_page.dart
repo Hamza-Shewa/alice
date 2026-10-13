@@ -65,7 +65,7 @@ class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
               return Scaffold(
                 appBar: AliceAppBar(
                   actions: [
-                    const AliceSettingsButton(),
+                    AliceSettingsButton(core: widget.core),
                     IconButton(
                       icon: const Icon(Icons.copy_all),
                       tooltip: context.i18n(

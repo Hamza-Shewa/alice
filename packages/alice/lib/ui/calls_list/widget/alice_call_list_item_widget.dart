@@ -1,10 +1,12 @@
 import 'package:alice/helper/alice_conversion_helper.dart';
 import 'package:alice/helper/alice_issue_analyzer.dart';
 import 'package:alice/helper/alice_url_validator.dart';
+import 'package:alice/helper/alice_watcher.dart';
 import 'package:alice/model/alice_http_call.dart';
 import 'package:alice/ui/common/alice_call_badges.dart';
 import 'package:alice/ui/common/alice_issue_widgets.dart';
 import 'package:alice/ui/common/alice_theme.dart';
+import 'package:alice/ui/common/alice_watcher_widgets.dart';
 import 'package:alice/ui/common/alice_url_issue_banner.dart';
 import 'package:flutter/material.dart';
 
@@ -31,6 +33,7 @@ class AliceCallListItemWidget extends StatelessWidget {
     final bool hasUrlIssues = urlIssues.isNotEmpty;
     final Color urlIssueColor = getUrlIssueColor(context);
     final AliceIssue? issue = AliceIssueAnalyzer.analyze(call);
+    final AliceWatchResult? watch = AliceWatcher.instance.evaluate(call);
 
     return InkWell(
       onTap: () => itemClickAction.call(call),
@@ -61,7 +64,21 @@ class AliceCallListItemWidget extends StatelessWidget {
                     child: _Endpoint(call: call, hasUrlIssues: hasUrlIssues),
                   ),
                   const SizedBox(width: 10),
-                  AliceStatusPill(call: call),
+                  ConstrainedBox(
+                    // The chip ellipsizes, so a long label can't squeeze the
+                    // endpoint away on narrow screens.
+                    constraints: const BoxConstraints(maxWidth: 140),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        AliceStatusPill(call: call),
+                        if (watch != null) ...[
+                          const SizedBox(height: 4),
+                          AliceWatchChip(result: watch),
+                        ],
+                      ],
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 6),

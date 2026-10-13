@@ -100,7 +100,7 @@ class _AliceCallsListPageState extends State<AliceCallsListPage>
           actions:
               isLoggerTab
                   ? <Widget>[
-                    const AliceSettingsButton(),
+                    AliceSettingsButton(core: widget.core),
                     IconButton(
                       icon: const Icon(Icons.terminal),
                       tooltip: context.i18n(
@@ -118,7 +118,7 @@ class _AliceCallsListPageState extends State<AliceCallsListPage>
                     ),
                   ]
                   : <Widget>[
-                    const AliceSettingsButton(),
+                    AliceSettingsButton(core: widget.core),
                     IconButton(
                       icon: Icon(_searchEnabled ? Icons.close : Icons.search),
                       tooltip:

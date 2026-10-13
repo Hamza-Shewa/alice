@@ -32,34 +32,38 @@ class AliceCallErrorScreen extends StatelessWidget {
             ? error.toString()
             : context.i18n(AliceTranslationKey.callErrorScreenErrorEmpty);
 
-    return ScrollConfiguration(
-      behavior: AliceScrollBehavior(),
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
-        children: [
-          AliceDetailSection(
-            title: aliceStripColon(
-              context.i18n(AliceTranslationKey.callErrorScreenError),
-            ),
-            children: [
-              if (error != null)
-                AliceGroup(
-                  title: context.i18n(AliceTranslationKey.callErrorScreenType),
-                  child: _ErrorTypeChip(type: error.runtimeType.toString()),
-                ),
-              AliceCodeBlock(text: message, isError: true),
-            ],
-          ),
-          if (stackTrace != null) ...[
-            const SizedBox(height: 20),
+    return SelectionArea(
+      child: ScrollConfiguration(
+        behavior: AliceScrollBehavior(),
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+          children: [
             AliceDetailSection(
               title: aliceStripColon(
-                context.i18n(AliceTranslationKey.callErrorScreenStacktrace),
+                context.i18n(AliceTranslationKey.callErrorScreenError),
               ),
-              children: [AliceCodeBlock(text: stackTrace.toString())],
+              children: [
+                if (error != null)
+                  AliceGroup(
+                    title: context.i18n(
+                      AliceTranslationKey.callErrorScreenType,
+                    ),
+                    child: _ErrorTypeChip(type: error.runtimeType.toString()),
+                  ),
+                AliceCodeBlock(text: message, isError: true),
+              ],
             ),
+            if (stackTrace != null) ...[
+              const SizedBox(height: 20),
+              AliceDetailSection(
+                title: aliceStripColon(
+                  context.i18n(AliceTranslationKey.callErrorScreenStacktrace),
+                ),
+                children: [AliceCodeBlock(text: stackTrace.toString())],
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

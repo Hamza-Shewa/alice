@@ -4,6 +4,7 @@ import 'package:alice/ui/call_details/page/alice_call_details_page.dart';
 import 'package:alice/ui/calls_list/page/alice_calls_list_page.dart';
 import 'package:alice/ui/common/alice_theme.dart';
 import 'package:alice/ui/stats/alice_stats_page.dart';
+import 'package:alice/ui/watcher/alice_watcher_page.dart';
 import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
 
@@ -28,6 +29,11 @@ class AliceNavigation {
   /// Navigates to stats page.
   static Future<void> navigateToStats({required AliceCore core}) {
     return _navigateToPage(core: core, child: AliceStatsPage(core));
+  }
+
+  /// Navigates to response watcher page.
+  static Future<void> navigateToWatcher({required AliceCore core}) {
+    return _navigateToPage(core: core, child: AliceWatcherPage(core: core));
   }
 
   /// Common helper method which checks whether context is available for

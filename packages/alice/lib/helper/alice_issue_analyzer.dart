@@ -1,4 +1,5 @@
 import 'package:alice/helper/alice_url_validator.dart';
+import 'package:alice/helper/alice_watcher.dart';
 import 'package:alice/model/alice_http_call.dart';
 import 'package:alice/model/alice_translation.dart';
 
@@ -82,6 +83,23 @@ class AliceIssueAnalyzer {
         origin: AliceIssueOrigin.network,
         reason: AliceTranslationKey.issueReasonNetwork,
         details: error == null ? null : _shorten(error),
+      );
+    }
+    final AliceWatchResult? watch = AliceWatcher.instance.evaluate(call);
+    if (watch != null && watch.outcome != AliceWatchOutcome.success) {
+      // The HTTP status is fine, but the watched field reports a failure.
+      return AliceIssue(
+        origin:
+            watch.outcome == AliceWatchOutcome.serverDown
+                ? AliceIssueOrigin.backend
+                : AliceIssueOrigin.frontend,
+        reason:
+            watch.outcome == AliceWatchOutcome.serverDown
+                ? AliceTranslationKey.issueReasonWatchServerDown
+                : AliceTranslationKey.issueReasonWatchFailed,
+        details:
+            '${watch.path} = ${watch.value}'
+            '${watch.meaning.isEmpty ? '' : ' (${watch.meaning})'}',
       );
     }
     if (error != null) {

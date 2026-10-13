@@ -143,6 +143,29 @@ void main() {
     });
   });
 
+  group('scroll performance', () {
+    testWidgets('detail tabs use cheap, non-editable text', (tester) async {
+      tester.view.physicalSize = const Size(400, 3000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final AliceHttpCall call = _call();
+      call.request!.headers = {
+        for (int i = 0; i < 8; i++) 'header-$i': 'value-$i',
+      };
+
+      for (final Widget screen in [
+        AliceCallRequestScreen(call: call),
+        AliceCallResponseScreen(call: call),
+      ]) {
+        await _pump(tester, screen);
+        // SelectableText creates an EditableText each; with many headers
+        // that made scrolling stutter. One SelectionArea does the job.
+        expect(find.byType(EditableText), findsNothing);
+        expect(find.byType(SelectionArea), findsOneWidget);
+      }
+    });
+  });
+
   group('layout', () {
     final List<AliceLog> logs = [
       AliceLog(

@@ -1,5 +1,6 @@
 import 'package:alice/helper/alice_conversion_helper.dart';
 import 'package:alice/helper/alice_issue_analyzer.dart';
+import 'package:alice/helper/alice_watcher.dart';
 import 'package:alice/model/alice_form_data_file.dart';
 import 'package:alice/model/alice_from_data_field.dart';
 import 'package:alice/model/alice_http_call.dart';
@@ -10,6 +11,7 @@ import 'package:alice/ui/common/alice_context_ext.dart';
 import 'package:alice/ui/common/alice_detail_widgets.dart';
 import 'package:alice/ui/common/alice_issue_widgets.dart';
 import 'package:alice/ui/common/alice_scroll_behavior.dart';
+import 'package:alice/ui/common/alice_watcher_widgets.dart';
 import 'package:alice/utils/alice_parser.dart';
 import 'package:flutter/material.dart';
 
@@ -34,105 +36,104 @@ class AliceCallRequestScreen extends StatelessWidget {
       headers: request?.headers,
     );
 
-    return ScrollConfiguration(
-      behavior: AliceScrollBehavior(),
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
-        children: [
-          if (issue != null) ...[
-            AliceIssueBanner(issue: issue),
-            const SizedBox(height: 12),
-          ],
-          _RequestSummary(call: call, contentType: contentType),
-          if (queryParameters.isNotEmpty) ...[
+    return SelectionArea(
+      child: ScrollConfiguration(
+        behavior: AliceScrollBehavior(),
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+          children: [
+            if (issue != null) ...[
+              AliceIssueBanner(issue: issue),
+              const SizedBox(height: 12),
+            ],
+            _RequestSummary(call: call, contentType: contentType),
+            if (queryParameters.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              AliceCollapsibleSection(
+                icon: Icons.tune,
+                title: aliceStripColon(
+                  context.i18n(AliceTranslationKey.callRequestQueryParameters),
+                ),
+                count: queryParameters.length,
+                child: AliceKeyValueList(
+                  values: queryParameters.map(
+                    (String key, dynamic value) => MapEntry(key, '$value'),
+                  ),
+                ),
+              ),
+            ],
+            if (formFields.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              AliceCollapsibleSection(
+                icon: Icons.dynamic_form_outlined,
+                title: aliceStripColon(
+                  context.i18n(AliceTranslationKey.callRequestFormDataFields),
+                ),
+                count: formFields.length,
+                child: AliceKeyValueList(
+                  values: {
+                    for (final AliceFormDataField field in formFields)
+                      field.name: field.value,
+                  },
+                ),
+              ),
+            ],
+            if (formFiles.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              AliceCollapsibleSection(
+                icon: Icons.attach_file,
+                title: aliceStripColon(
+                  context.i18n(AliceTranslationKey.callRequestFormDataFiles),
+                ),
+                count: formFiles.length,
+                child: AliceKeyValueList(
+                  values: {
+                    for (final AliceFormDataFile file in formFiles)
+                      file.fileName ?? '-':
+                          '${file.contentType}, '
+                          '${AliceConversionHelper.formatBytes(file.length)}',
+                  },
+                ),
+              ),
+            ],
             const SizedBox(height: 12),
             AliceCollapsibleSection(
-              icon: Icons.tune,
+              icon: Icons.list_alt,
               title: aliceStripColon(
-                context.i18n(AliceTranslationKey.callRequestQueryParameters),
+                context.i18n(AliceTranslationKey.callRequestHeaders),
               ),
-              count: queryParameters.length,
+              count: headers.length,
+              initiallyExpanded: headers.length <= 8,
+              action:
+                  headers.isEmpty
+                      ? null
+                      : AliceCopyIconButton(
+                        text: headers.entries
+                            .map((e) => '${e.key}: ${e.value}')
+                            .join('\n'),
+                      ),
               child: AliceKeyValueList(
-                values: queryParameters.map(
+                values: headers.map(
                   (String key, dynamic value) => MapEntry(key, '$value'),
+                ),
+                emptyText: context.i18n(
+                  AliceTranslationKey.callRequestHeadersEmpty,
                 ),
               ),
             ),
-          ],
-          if (formFields.isNotEmpty) ...[
             const SizedBox(height: 12),
             AliceCollapsibleSection(
-              icon: Icons.dynamic_form_outlined,
+              icon: Icons.data_object,
               title: aliceStripColon(
-                context.i18n(AliceTranslationKey.callRequestFormDataFields),
+                context.i18n(AliceTranslationKey.callRequestBody),
               ),
-              count: formFields.length,
-              child: AliceKeyValueList(
-                values: {
-                  for (final AliceFormDataField field in formFields)
-                    field.name: field.value,
-                },
-              ),
-            ),
-          ],
-          if (formFiles.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            AliceCollapsibleSection(
-              icon: Icons.attach_file,
-              title: aliceStripColon(
-                context.i18n(AliceTranslationKey.callRequestFormDataFiles),
-              ),
-              count: formFiles.length,
-              child: AliceKeyValueList(
-                values: {
-                  for (final AliceFormDataFile file in formFiles)
-                    file.fileName ?? '-':
-                        '${file.contentType}, '
-                        '${AliceConversionHelper.formatBytes(file.length)}',
-                },
-              ),
-            ),
-          ],
-          const SizedBox(height: 12),
-          AliceCollapsibleSection(
-            icon: Icons.list_alt,
-            title: aliceStripColon(
-              context.i18n(AliceTranslationKey.callRequestHeaders),
-            ),
-            count: headers.length,
-            initiallyExpanded: headers.length <= 8,
-            action:
-                headers.isEmpty
-                    ? null
-                    : AliceCopyIconButton(
-                      text: headers.entries
-                          .map((e) => '${e.key}: ${e.value}')
-                          .join('\n'),
-                    ),
-            child: AliceKeyValueList(
-              values: headers.map(
-                (String key, dynamic value) => MapEntry(key, '$value'),
-              ),
-              emptyText: context.i18n(
-                AliceTranslationKey.callRequestHeadersEmpty,
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          AliceCollapsibleSection(
-            icon: Icons.data_object,
-            title: aliceStripColon(
-              context.i18n(AliceTranslationKey.callRequestBody),
-            ),
-            child: AliceCodeBlock(
-              text: AliceParser.formatBody(
-                context: context,
+              child: AliceFormattedBodyBlock(
                 body: request?.body,
                 contentType: contentType,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -150,6 +151,7 @@ class _RequestSummary extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     final Color muted = theme.colorScheme.onSurfaceVariant;
     final DateTime? time = call.request?.time;
+    final AliceWatchResult? watch = AliceWatcher.instance.evaluate(call);
     return AliceOutlinedCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,7 +161,7 @@ class _RequestSummary extends StatelessWidget {
               AliceMethodBadge(method: call.method, fontSize: 14),
               const SizedBox(width: 10),
               Expanded(
-                child: AliceLtrSelectableText(
+                child: AliceLtrText(
                   call.endpoint,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w600,
@@ -194,6 +196,7 @@ class _RequestSummary extends StatelessWidget {
                   text: contentType!,
                   color: muted,
                 ),
+              if (watch != null) AliceWatchChip(result: watch),
             ],
           ),
         ],

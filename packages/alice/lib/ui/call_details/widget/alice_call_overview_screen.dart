@@ -1,6 +1,7 @@
 import 'package:alice/helper/alice_conversion_helper.dart';
 import 'package:alice/helper/alice_issue_analyzer.dart';
 import 'package:alice/helper/alice_url_validator.dart';
+import 'package:alice/helper/alice_watcher.dart';
 import 'package:alice/model/alice_form_data_file.dart';
 import 'package:alice/model/alice_from_data_field.dart';
 import 'package:alice/model/alice_http_call.dart';
@@ -14,6 +15,7 @@ import 'package:alice/ui/common/alice_issue_widgets.dart';
 import 'package:alice/ui/common/alice_scroll_behavior.dart';
 import 'package:alice/ui/common/alice_status_info_sheet.dart';
 import 'package:alice/ui/common/alice_theme.dart';
+import 'package:alice/ui/common/alice_watcher_widgets.dart';
 import 'package:alice/ui/common/alice_url_issue_banner.dart';
 import 'package:alice/utils/alice_parser.dart';
 import 'package:flutter/material.dart';
@@ -34,147 +36,164 @@ class AliceCallOverviewScreen extends StatelessWidget {
       AliceTranslationKey.callOverviewPending,
     );
 
-    return ScrollConfiguration(
-      behavior: AliceScrollBehavior(),
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
-        children: [
-          if (urlIssues.isNotEmpty) ...[
-            AliceUrlIssueBanner(issues: urlIssues),
-            const SizedBox(height: 16),
-          ],
-          _SummaryCard(call: call, hasUrlIssues: urlIssues.isNotEmpty),
-          if (issue != null) ...[
+    return SelectionArea(
+      child: ScrollConfiguration(
+        behavior: AliceScrollBehavior(),
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+          children: [
+            if (urlIssues.isNotEmpty) ...[
+              AliceUrlIssueBanner(issues: urlIssues),
+              const SizedBox(height: 16),
+            ],
+            _SummaryCard(call: call, hasUrlIssues: urlIssues.isNotEmpty),
+            if (issue != null) ...[
+              const SizedBox(height: 12),
+              AliceIssueBanner(issue: issue),
+            ],
             const SizedBox(height: 12),
-            AliceIssueBanner(issue: issue),
-          ],
-          const SizedBox(height: 12),
-          // Stretch makes all tiles as tall as the tallest one.
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: _StatTile(
-                    icon: Icons.timer_outlined,
-                    label: _label(
-                      context,
-                      AliceTranslationKey.callOverviewDuration,
-                    ),
-                    value:
-                        call.loading
-                            ? pending
-                            : AliceConversionHelper.formatTime(call.duration),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _StatTile(
-                    icon: Icons.upload_outlined,
-                    label: _label(
-                      context,
-                      AliceTranslationKey.callOverviewBytesSent,
-                    ),
-                    value: AliceConversionHelper.formatBytes(
-                      call.request?.size ?? 0,
+            // Stretch makes all tiles as tall as the tallest one.
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: _StatTile(
+                      icon: Icons.timer_outlined,
+                      label: _label(
+                        context,
+                        AliceTranslationKey.callOverviewDuration,
+                      ),
+                      value:
+                          call.loading
+                              ? pending
+                              : AliceConversionHelper.formatTime(call.duration),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _StatTile(
-                    icon: Icons.download_outlined,
-                    label: _label(
-                      context,
-                      AliceTranslationKey.callOverviewBytesReceived,
-                    ),
-                    value: AliceConversionHelper.formatBytes(
-                      call.response?.size ?? 0,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _StatTile(
+                      icon: Icons.upload_outlined,
+                      label: _label(
+                        context,
+                        AliceTranslationKey.callOverviewBytesSent,
+                      ),
+                      value: AliceConversionHelper.formatBytes(
+                        call.request?.size ?? 0,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _StatTile(
+                      icon: Icons.download_outlined,
+                      label: _label(
+                        context,
+                        AliceTranslationKey.callOverviewBytesReceived,
+                      ),
+                      value: AliceConversionHelper.formatBytes(
+                        call.response?.size ?? 0,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          AliceInfoSection(
-            title: context.i18n(AliceTranslationKey.callOverviewTiming),
-            rows: [
-              AliceInfoRow(
-                label: _label(context, AliceTranslationKey.callOverviewStarted),
-                value:
-                    started != null
-                        ? AliceConversionHelper.formatDateTime(started)
-                        : pending,
-              ),
-              AliceInfoRow(
-                label: _label(
-                  context,
-                  AliceTranslationKey.callOverviewFinished,
-                ),
-                value:
-                    finished != null
-                        ? AliceConversionHelper.formatDateTime(finished)
-                        : pending,
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          AliceInfoSection(
-            title: context.i18n(AliceTranslationKey.callOverviewConnection),
-            rows: [
-              AliceInfoRow(
-                label: _label(context, AliceTranslationKey.callOverviewMethod),
-                value: call.method,
-              ),
-              AliceInfoRow(
-                label: _label(context, AliceTranslationKey.callOverviewServer),
-                value: call.server,
-                hasError: urlIssues.isNotEmpty,
-              ),
-              AliceInfoRow(
-                label: _label(
-                  context,
-                  AliceTranslationKey.callOverviewEndpoint,
-                ),
-                value: call.endpoint,
-                hasError: urlIssues.isNotEmpty,
-              ),
-              AliceInfoRow(
-                label: _label(context, AliceTranslationKey.callOverviewClient),
-                value: call.client.isEmpty ? '-' : call.client,
-              ),
-              AliceInfoRow(
-                label: _label(context, AliceTranslationKey.callOverviewSecure),
-                value: context.i18n(
-                  call.secure
-                      ? AliceTranslationKey.callsListYes
-                      : AliceTranslationKey.callsListNo,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          _RequestSection(call: call),
-          const SizedBox(height: 20),
-          _ResponseSection(call: call),
-          if (call.error != null) ...[
             const SizedBox(height: 20),
-            AliceDetailSection(
-              title: context.i18n(AliceTranslationKey.callDetailsError),
-              children: [
-                AliceCodeBlock(
-                  text: [
-                    '${call.error?.error}',
-                    if (call.error?.stackTrace != null)
-                      '${call.error?.stackTrace}',
-                  ].join('\n\n'),
-                  isError: true,
+            AliceInfoSection(
+              title: context.i18n(AliceTranslationKey.callOverviewTiming),
+              rows: [
+                AliceInfoRow(
+                  label: _label(
+                    context,
+                    AliceTranslationKey.callOverviewStarted,
+                  ),
+                  value:
+                      started != null
+                          ? AliceConversionHelper.formatDateTime(started)
+                          : pending,
+                ),
+                AliceInfoRow(
+                  label: _label(
+                    context,
+                    AliceTranslationKey.callOverviewFinished,
+                  ),
+                  value:
+                      finished != null
+                          ? AliceConversionHelper.formatDateTime(finished)
+                          : pending,
                 ),
               ],
             ),
+            const SizedBox(height: 20),
+            AliceInfoSection(
+              title: context.i18n(AliceTranslationKey.callOverviewConnection),
+              rows: [
+                AliceInfoRow(
+                  label: _label(
+                    context,
+                    AliceTranslationKey.callOverviewMethod,
+                  ),
+                  value: call.method,
+                ),
+                AliceInfoRow(
+                  label: _label(
+                    context,
+                    AliceTranslationKey.callOverviewServer,
+                  ),
+                  value: call.server,
+                  hasError: urlIssues.isNotEmpty,
+                ),
+                AliceInfoRow(
+                  label: _label(
+                    context,
+                    AliceTranslationKey.callOverviewEndpoint,
+                  ),
+                  value: call.endpoint,
+                  hasError: urlIssues.isNotEmpty,
+                ),
+                AliceInfoRow(
+                  label: _label(
+                    context,
+                    AliceTranslationKey.callOverviewClient,
+                  ),
+                  value: call.client.isEmpty ? '-' : call.client,
+                ),
+                AliceInfoRow(
+                  label: _label(
+                    context,
+                    AliceTranslationKey.callOverviewSecure,
+                  ),
+                  value: context.i18n(
+                    call.secure
+                        ? AliceTranslationKey.callsListYes
+                        : AliceTranslationKey.callsListNo,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            _RequestSection(call: call),
+            const SizedBox(height: 20),
+            _ResponseSection(call: call),
+            if (call.error != null) ...[
+              const SizedBox(height: 20),
+              AliceDetailSection(
+                title: context.i18n(AliceTranslationKey.callDetailsError),
+                children: [
+                  AliceCodeBlock(
+                    text: [
+                      '${call.error?.error}',
+                      if (call.error?.stackTrace != null)
+                        '${call.error?.stackTrace}',
+                    ].join('\n\n'),
+                    isError: true,
+                  ),
+                ],
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -250,12 +269,9 @@ class _RequestSection extends StatelessWidget {
           title: aliceStripColon(
             context.i18n(AliceTranslationKey.callRequestBody),
           ),
-          child: AliceCodeBlock(
-            text: AliceParser.formatBody(
-              context: context,
-              body: request?.body,
-              contentType: request?.contentType,
-            ),
+          child: AliceFormattedBodyBlock(
+            body: request?.body,
+            contentType: request?.contentType,
           ),
         ),
       ],
@@ -314,12 +330,9 @@ class _ResponseSection extends StatelessWidget {
                   ? Text(
                     context.i18n(AliceTranslationKey.callResponseBodyVideo),
                   )
-                  : AliceCodeBlock(
-                    text: AliceParser.formatBody(
-                      context: context,
-                      body: response?.body,
-                      contentType: contentType,
-                    ),
+                  : AliceFormattedBodyBlock(
+                    body: response?.body,
+                    contentType: contentType,
                   ),
         ),
       ],
@@ -348,6 +361,7 @@ class _SummaryCard extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     final Color urlIssueColor = getUrlIssueColor(context);
     final String url = _getUrl(call);
+    final AliceWatchResult? watch = AliceWatcher.instance.evaluate(call);
 
     return AliceOutlinedCard(
       child: Column(
@@ -357,6 +371,10 @@ class _SummaryCard extends StatelessWidget {
             children: [
               AliceMethodBadge(method: call.method, fontSize: 14),
               const Spacer(),
+              if (watch != null) ...[
+                Flexible(child: AliceWatchChip(result: watch)),
+                const SizedBox(width: 8),
+              ],
               if (call.loading)
                 AliceStatusPill(call: call, fontSize: 15)
               else
@@ -385,8 +403,12 @@ class _SummaryCard extends StatelessWidget {
                 ),
             ],
           ),
+          if (watch != null && watch.meaning.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            AliceWatchResultBox(result: watch),
+          ],
           const SizedBox(height: 14),
-          AliceLtrSelectableText(
+          AliceLtrText(
             url,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w600,

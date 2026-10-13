@@ -1,5 +1,7 @@
 import 'package:alice/model/alice_translation.dart';
 import 'package:alice/ui/common/alice_context_ext.dart';
+import 'package:alice/ui/common/alice_language.dart';
+import 'package:alice/utils/alice_parser.dart';
 import 'package:alice/ui/common/alice_url_issue_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -129,7 +131,7 @@ class AliceKeyValueList extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AliceLtrSelectableText(
+                AliceLtrText(
                   entry.key,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
@@ -137,10 +139,7 @@ class AliceKeyValueList extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                AliceLtrSelectableText(
-                  entry.value,
-                  style: theme.textTheme.bodyMedium,
-                ),
+                AliceLtrText(entry.value, style: theme.textTheme.bodyMedium),
               ],
             ),
           ),
@@ -201,7 +200,7 @@ class _AliceCodeBlockState extends State<AliceCodeBlock> {
                 padding: const EdgeInsetsDirectional.fromSTEB(12, 12, 44, 12),
                 child: SizedBox(
                   width: double.infinity,
-                  child: SelectableText(
+                  child: Text(
                     shownText,
                     // Code is always read left to right, also in RTL layouts.
                     textDirection: TextDirection.ltr,
@@ -282,11 +281,12 @@ Future<void> aliceCopyToClipboard(
     );
 }
 
-/// Selectable text for technical values (URLs, headers, bodies). It is always
-/// laid out left to right, also in right to left languages, and aligned to
-/// the reading start of the surrounding layout.
-class AliceLtrSelectableText extends StatelessWidget {
-  const AliceLtrSelectableText(this.text, {super.key, this.style});
+/// Text for technical values (URLs, headers, bodies). It is always laid out
+/// left to right, also in right to left languages, and aligned to the reading
+/// start of the surrounding layout. It is a plain [Text], so it is cheap to
+/// build; wrap the screen in a `SelectionArea` to make it selectable.
+class AliceLtrText extends StatelessWidget {
+  const AliceLtrText(this.text, {super.key, this.style});
 
   final String text;
   final TextStyle? style;
@@ -294,7 +294,7 @@ class AliceLtrSelectableText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
-    return SelectableText(
+    return Text(
       text,
       textDirection: TextDirection.ltr,
       textAlign: isRtl ? TextAlign.right : TextAlign.left,
@@ -317,15 +317,20 @@ class AliceOutlinedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      width: double.infinity,
-      padding: padding,
-      decoration: BoxDecoration(
-        color: colorScheme.onSurface.withValues(alpha: 0.03),
-        border: Border.all(color: colorScheme.onSurface.withValues(alpha: 0.1)),
-        borderRadius: BorderRadius.circular(12),
+    // Own layer: cards are static while scrolling, so they are painted once.
+    return RepaintBoundary(
+      child: Container(
+        width: double.infinity,
+        padding: padding,
+        decoration: BoxDecoration(
+          color: colorScheme.onSurface.withValues(alpha: 0.03),
+          border: Border.all(
+            color: colorScheme.onSurface.withValues(alpha: 0.1),
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: child,
       ),
-      child: child,
     );
   }
 }
@@ -440,7 +445,7 @@ class AliceInfoRow extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: AliceLtrSelectableText(
+            child: AliceLtrText(
               value,
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
@@ -564,5 +569,49 @@ class _AliceCollapsibleSectionState extends State<AliceCollapsibleSection> {
         ],
       ),
     );
+  }
+}
+
+/// Code block with a formatted HTTP body. Formatting a body (JSON decode and
+/// pretty print) is expensive, so the result is cached until the body, its
+/// content type or the language changes.
+class AliceFormattedBodyBlock extends StatefulWidget {
+  const AliceFormattedBodyBlock({
+    super.key,
+    required this.body,
+    required this.contentType,
+  });
+
+  final dynamic body;
+  final String? contentType;
+
+  @override
+  State<AliceFormattedBodyBlock> createState() =>
+      _AliceFormattedBodyBlockState();
+}
+
+class _AliceFormattedBodyBlockState extends State<AliceFormattedBodyBlock> {
+  String? _text;
+  dynamic _body;
+  String? _contentType;
+  String? _language;
+
+  @override
+  Widget build(BuildContext context) {
+    final String language = AliceLanguage.current.value;
+    if (_text == null ||
+        !identical(_body, widget.body) ||
+        _contentType != widget.contentType ||
+        _language != language) {
+      _body = widget.body;
+      _contentType = widget.contentType;
+      _language = language;
+      _text = AliceParser.formatBody(
+        context: context,
+        body: widget.body,
+        contentType: widget.contentType,
+      );
+    }
+    return AliceCodeBlock(text: _text!);
   }
 }

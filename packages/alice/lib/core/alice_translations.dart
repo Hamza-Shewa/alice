@@ -269,6 +269,40 @@ class AliceTranslations {
         AliceTranslationKey.logKindError: "Error",
         AliceTranslationKey.logKindWarning: "Warning",
         AliceTranslationKey.logKindInfo: "Info",
+        AliceTranslationKey.watcher: "Response watcher",
+        AliceTranslationKey.watcherSubtitle:
+            "Use a field of the response as the status code",
+        AliceTranslationKey.watcherDescription:
+            "Some backends always answer with HTTP 200 and report the real "
+            "result in a field of the response, for example \"type\": 2. "
+            "Watch that field and tell Alice what each value means. Alice "
+            "then shows the result next to the status code.",
+        AliceTranslationKey.watcherFieldName: "Field name",
+        AliceTranslationKey.watcherFieldHint: "For example type or data.status",
+        AliceTranslationKey.watcherUseAsStatus: "Use as status code",
+        AliceTranslationKey.watcherUseAsStatusHint:
+            "Show the result next to the HTTP status and use it to detect "
+            "failures.",
+        AliceTranslationKey.watcherValues: "Values",
+        AliceTranslationKey.watcherValue: "Value",
+        AliceTranslationKey.watcherMeaning: "Meaning",
+        AliceTranslationKey.watcherAddValue: "Add value",
+        AliceTranslationKey.watcherAddField: "Add field",
+        AliceTranslationKey.watcherDelete: "Delete",
+        AliceTranslationKey.watcherReset: "Reset to default",
+        AliceTranslationKey.watcherResetConfirm:
+            "Replace all watched fields with the default ones?",
+        AliceTranslationKey.watcherNoFields: "No watched fields yet",
+        AliceTranslationKey.watcherNoValues: "No values yet",
+        AliceTranslationKey.watcherOutcomeSuccess: "Success",
+        AliceTranslationKey.watcherOutcomeFailed: "Failed",
+        AliceTranslationKey.watcherOutcomeServerDown: "Server is down",
+        AliceTranslationKey.issueReasonWatchFailed:
+            "The response reports a failure although the HTTP status is fine: "
+            "[error]",
+        AliceTranslationKey.issueReasonWatchServerDown:
+            "The response reports that the server is down although the HTTP "
+            "status is fine: [error]",
         AliceTranslationKey.callErrorScreenType: "Type",
         AliceTranslationKey.callResponseBodyUnsupportedTitle:
             "Unsupported content",
@@ -535,6 +569,37 @@ class AliceTranslations {
         AliceTranslationKey.logKindError: "خطأ",
         AliceTranslationKey.logKindWarning: "تحذير",
         AliceTranslationKey.logKindInfo: "معلومة",
+        AliceTranslationKey.watcher: "مراقب الاستجابة",
+        AliceTranslationKey.watcherSubtitle:
+            "استخدم حقلاً من الاستجابة كرمز للحالة",
+        AliceTranslationKey.watcherDescription:
+            "بعض الخوادم ترد دائماً بـ HTTP 200 وتضع النتيجة الحقيقية في حقل "
+            "داخل الاستجابة، مثل \"type\": 2. راقب هذا الحقل وحدد معنى كل "
+            "قيمة، وسيعرض Alice النتيجة بجانب رمز الحالة.",
+        AliceTranslationKey.watcherFieldName: "اسم الحقل",
+        AliceTranslationKey.watcherFieldHint: "مثل type أو data.status",
+        AliceTranslationKey.watcherUseAsStatus: "استخدام كرمز للحالة",
+        AliceTranslationKey.watcherUseAsStatusHint:
+            "عرض النتيجة بجانب حالة HTTP واستخدامها لاكتشاف الأخطاء.",
+        AliceTranslationKey.watcherValues: "القيم",
+        AliceTranslationKey.watcherValue: "القيمة",
+        AliceTranslationKey.watcherMeaning: "المعنى",
+        AliceTranslationKey.watcherAddValue: "إضافة قيمة",
+        AliceTranslationKey.watcherAddField: "إضافة حقل",
+        AliceTranslationKey.watcherDelete: "حذف",
+        AliceTranslationKey.watcherReset: "استعادة الافتراضي",
+        AliceTranslationKey.watcherResetConfirm:
+            "استبدال كل حقول المراقبة بالحقول الافتراضية؟",
+        AliceTranslationKey.watcherNoFields: "لا توجد حقول مراقبة بعد",
+        AliceTranslationKey.watcherNoValues: "لا توجد قيم بعد",
+        AliceTranslationKey.watcherOutcomeSuccess: "نجاح",
+        AliceTranslationKey.watcherOutcomeFailed: "فشل",
+        AliceTranslationKey.watcherOutcomeServerDown: "الخادم متوقف",
+        AliceTranslationKey.issueReasonWatchFailed:
+            "تشير الاستجابة إلى فشل رغم أن حالة HTTP سليمة: [error]",
+        AliceTranslationKey.issueReasonWatchServerDown:
+            "تشير الاستجابة إلى أن الخادم متوقف رغم أن حالة HTTP سليمة: "
+            "[error]",
         AliceTranslationKey.callErrorScreenType: "النوع",
         AliceTranslationKey.callResponseBodyUnsupportedTitle: "محتوى غير مدعوم",
         AliceTranslationKey.callResponseBodyUnsupportedDescription:

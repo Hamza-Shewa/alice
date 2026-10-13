@@ -132,17 +132,19 @@ class _AliceLogListWidgetState extends State<AliceLogListWidget> {
                           ),
                         ),
                       )
-                      : ScrollConfiguration(
-                        behavior: AliceScrollBehavior(),
-                        child: ListView.builder(
-                          controller: widget.scrollController,
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          itemCount: filtered.length,
-                          itemBuilder:
-                              (context, i) => _AliceLogEntryWidget(
-                                filtered[i].$1,
-                                filtered[i].$2,
-                              ),
+                      : SelectionArea(
+                        child: ScrollConfiguration(
+                          behavior: AliceScrollBehavior(),
+                          child: ListView.builder(
+                            controller: widget.scrollController,
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            itemCount: filtered.length,
+                            itemBuilder:
+                                (context, i) => _AliceLogEntryWidget(
+                                  filtered[i].$1,
+                                  filtered[i].$2,
+                                ),
+                          ),
                         ),
                       ),
             ),
@@ -289,7 +291,7 @@ class _AliceLogEntryWidget extends StatelessWidget {
               ),
               if (info.url != null) ...[
                 const SizedBox(height: 4),
-                AliceLtrSelectableText(
+                AliceLtrText(
                   info.url!,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: kindColor,
@@ -480,7 +482,7 @@ class _CollapsibleMessageState extends State<_CollapsibleMessage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SelectableText(
+        Text(
           shown,
           textDirection: TextDirection.ltr,
           textAlign: TextAlign.left,

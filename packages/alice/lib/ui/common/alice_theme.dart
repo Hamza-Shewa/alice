@@ -51,6 +51,23 @@ class AliceTheme {
               ? const ColorScheme.dark(primary: AliceTheme.lightRed)
               : const ColorScheme.light(primary: AliceTheme.lightRed),
       dividerColor: Colors.transparent,
+      segmentedButtonTheme: SegmentedButtonThemeData(
+        style: ButtonStyle(
+          // Selected segments use the same red as the rest of Alice.
+          backgroundColor: WidgetStateProperty.resolveWith(
+            (Set<WidgetState> states) =>
+                states.contains(WidgetState.selected) ? lightRed : null,
+          ),
+          foregroundColor: WidgetStateProperty.resolveWith(
+            (Set<WidgetState> states) =>
+                states.contains(WidgetState.selected) ? white : null,
+          ),
+          iconColor: WidgetStateProperty.resolveWith(
+            (Set<WidgetState> states) =>
+                states.contains(WidgetState.selected) ? white : null,
+          ),
+        ),
+      ),
       buttonTheme: const ButtonThemeData(
         buttonColor: lightRed,
         textTheme: ButtonTextTheme.primary,

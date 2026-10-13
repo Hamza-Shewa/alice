@@ -1,8 +1,9 @@
-import 'dart:async' show FutureOr, StreamSubscription;
+import 'dart:async' show FutureOr, StreamSubscription, unawaited;
 
 import 'package:alice/core/alice_storage.dart';
 import 'package:alice/core/alice_utils.dart';
 import 'package:alice/helper/alice_export_helper.dart';
+import 'package:alice/helper/alice_watcher.dart';
 import 'package:alice/core/alice_notification.dart';
 import 'package:alice/helper/operating_system.dart';
 import 'package:alice/model/alice_configuration.dart';
@@ -35,6 +36,7 @@ class AliceCore {
   AliceCore({required AliceConfiguration configuration}) {
     _configuration = configuration;
     _subscribeToCallChanges();
+    unawaited(AliceWatcher.instance.load());
     if (_configuration.showNotification) {
       _notification = AliceNotification();
       _notification?.configure(

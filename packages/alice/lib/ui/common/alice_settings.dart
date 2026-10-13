@@ -1,6 +1,9 @@
+import 'package:alice/core/alice_core.dart';
+import 'package:alice/helper/alice_watcher.dart';
 import 'package:alice/model/alice_translation.dart';
 import 'package:alice/ui/common/alice_context_ext.dart';
 import 'package:alice/ui/common/alice_language.dart';
+import 'package:alice/ui/common/alice_navigation.dart';
 import 'package:alice/ui/common/alice_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -12,12 +15,14 @@ mixin AliceSettingsListenerMixin<T extends StatefulWidget> on State<T> {
     super.initState();
     AliceLanguage.current.addListener(_onSettingsChanged);
     AliceTheme.themeMode.addListener(_onSettingsChanged);
+    AliceWatcher.instance.addListener(_onSettingsChanged);
   }
 
   @override
   void dispose() {
     AliceLanguage.current.removeListener(_onSettingsChanged);
     AliceTheme.themeMode.removeListener(_onSettingsChanged);
+    AliceWatcher.instance.removeListener(_onSettingsChanged);
     super.dispose();
   }
 
@@ -30,20 +35,25 @@ mixin AliceSettingsListenerMixin<T extends StatefulWidget> on State<T> {
 
 /// App bar button which opens Alice settings.
 class AliceSettingsButton extends StatelessWidget {
-  const AliceSettingsButton({super.key});
+  const AliceSettingsButton({super.key, required this.core});
+
+  final AliceCore core;
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.settings_outlined),
       tooltip: context.i18n(AliceTranslationKey.settings),
-      onPressed: () => showAliceSettings(context),
+      onPressed: () => showAliceSettings(context, core: core),
     );
   }
 }
 
 /// Shows bottom sheet where user can change language and theme of Alice.
-Future<void> showAliceSettings(BuildContext context) {
+Future<void> showAliceSettings(
+  BuildContext context, {
+  required AliceCore core,
+}) {
   return showModalBottomSheet<void>(
     context: context,
     showDragHandle: true,
@@ -61,7 +71,7 @@ Future<void> showAliceSettings(BuildContext context) {
                     brightness: AliceTheme.resolveBrightness(context),
                   ),
                   // Not const, so the sheet is rebuilt when a setting changes.
-                  child: _AliceSettingsSheet(),
+                  child: _AliceSettingsSheet(core: core),
                 ),
               ),
         ),
@@ -70,7 +80,9 @@ Future<void> showAliceSettings(BuildContext context) {
 
 class _AliceSettingsSheet extends StatelessWidget {
   // ignore: prefer_const_constructors_in_immutables
-  _AliceSettingsSheet();
+  _AliceSettingsSheet({required this.core});
+
+  final AliceCore core;
 
   @override
   Widget build(BuildContext context) {
@@ -139,6 +151,8 @@ class _AliceSettingsSheet extends StatelessWidget {
                     (Set<ThemeMode> value) =>
                         AliceTheme.themeMode.value = value.first,
               ),
+              const SizedBox(height: 20),
+              _WatcherTile(core: core),
             ],
           ),
         ),
@@ -169,6 +183,59 @@ class _SettingTitle extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Opens the response watcher page.
+class _WatcherTile extends StatelessWidget {
+  const _WatcherTile({required this.core});
+
+  final AliceCore core;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return Material(
+      color: theme.colorScheme.onSurface.withValues(alpha: 0.04),
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          Navigator.of(context).pop();
+          AliceNavigation.navigateToWatcher(core: core);
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Icon(Icons.visibility_outlined, color: theme.colorScheme.primary),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      context.i18n(AliceTranslationKey.watcher),
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      context.i18n(AliceTranslationKey.watcherSubtitle),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+        ),
       ),
     );
   }
