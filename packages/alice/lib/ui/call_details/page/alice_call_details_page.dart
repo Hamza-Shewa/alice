@@ -9,6 +9,7 @@ import 'package:alice/ui/call_details/widget/alice_call_error_screen.dart';
 import 'package:alice/ui/call_details/widget/alice_call_overview_screen.dart';
 import 'package:alice/ui/call_details/widget/alice_call_request_screen.dart';
 import 'package:alice/ui/call_details/widget/alice_call_response_screen.dart';
+import 'package:alice/ui/common/alice_app_bar.dart';
 import 'package:alice/ui/common/alice_context_ext.dart';
 import 'package:alice/ui/common/alice_language.dart';
 import 'package:alice/ui/common/alice_page.dart';
@@ -53,7 +54,7 @@ class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
               return DefaultTabController(
                 length: 4,
                 child: Scaffold(
-                  appBar: AppBar(
+                  appBar: AliceAppBar(
                     actions: [
                       const AliceLanguageButton(),
                       IconButton(

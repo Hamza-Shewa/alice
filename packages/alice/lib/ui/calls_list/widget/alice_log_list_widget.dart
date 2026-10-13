@@ -16,10 +16,15 @@ class AliceLogListWidget extends StatefulWidget {
   const AliceLogListWidget({
     required this.logsStream,
     required this.scrollController,
+    this.initialLogs,
     super.key,
   });
 
   final Stream<List<AliceLog>>? logsStream;
+
+  /// Logs displayed until the stream emits, so the list doesn't flash a
+  /// loading indicator when it is opened.
+  final List<AliceLog>? initialLogs;
   final ScrollController? scrollController;
 
   @override
@@ -34,6 +39,7 @@ class _AliceLogListWidgetState extends State<AliceLogListWidget> {
   Widget build(BuildContext context) {
     return StreamBuilder<List<AliceLog>>(
       stream: widget.logsStream,
+      initialData: widget.initialLogs,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.none ||
             snapshot.connectionState == ConnectionState.waiting) {

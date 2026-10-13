@@ -16,11 +16,24 @@ class AliceTheme {
   static const Color darkGreen = Color(0xff00804a);
   static const Color darkOrange = Color(0xffa85c00);
 
-  /// Returns general theme data.
-  static ThemeData getTheme() {
+  static final ThemeData _lightTheme = _buildTheme(Brightness.light);
+  static final ThemeData _darkTheme = _buildTheme(Brightness.dark);
+
+  /// Returns general theme data. Themes are created once so rebuilding a page
+  /// doesn't swap the theme instance. When [brightness] is null, the platform
+  /// brightness is used.
+  static ThemeData getTheme({Brightness? brightness}) =>
+      (brightness ?? _platformBrightness) == Brightness.dark
+          ? _darkTheme
+          : _lightTheme;
+
+  static ThemeData _buildTheme(Brightness brightness) {
     return ThemeData(
       useMaterial3: true,
-      colorScheme: AliceTheme._getColorScheme(),
+      colorScheme:
+          brightness == Brightness.dark
+              ? const ColorScheme.dark(primary: AliceTheme.lightRed)
+              : const ColorScheme.light(primary: AliceTheme.lightRed),
       dividerColor: Colors.transparent,
       buttonTheme: const ButtonThemeData(
         buttonColor: lightRed,
@@ -29,16 +42,9 @@ class AliceTheme {
     );
   }
 
-  /// Checks whether is dark mode enabled.
-  static bool get _isDarkMode =>
-      SchedulerBinding.instance.platformDispatcher.platformBrightness ==
-      Brightness.dark;
-
-  /// Returns color scheme based on dark mode.
-  static ColorScheme _getColorScheme() =>
-      _isDarkMode
-          ? const ColorScheme.dark(primary: AliceTheme.lightRed)
-          : const ColorScheme.light(primary: AliceTheme.lightRed);
+  /// Returns brightness of the platform.
+  static Brightness get _platformBrightness =>
+      SchedulerBinding.instance.platformDispatcher.platformBrightness;
 
   /// Returns color which represents HTTP [status]. Brighter colors are used in
   /// dark mode and darker ones in light mode to keep text readable.

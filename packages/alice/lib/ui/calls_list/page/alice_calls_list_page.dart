@@ -10,6 +10,7 @@ import 'package:alice/ui/calls_list/model/alice_calls_list_sort_option.dart';
 import 'package:alice/ui/calls_list/model/alice_calls_list_tab_item.dart';
 import 'package:alice/ui/calls_list/widget/alice_inspector_screen.dart';
 import 'package:alice/ui/calls_list/widget/alice_sort_dialog.dart';
+import 'package:alice/ui/common/alice_app_bar.dart';
 import 'package:alice/ui/common/alice_context_ext.dart';
 import 'package:alice/ui/common/alice_language.dart';
 import 'package:alice/ui/common/alice_dialog.dart';
@@ -82,7 +83,7 @@ class _AliceCallsListPageState extends State<AliceCallsListPage>
     return AlicePage(
       core: aliceCore,
       child: Scaffold(
-        appBar: AppBar(
+        appBar: AliceAppBar(
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             tooltip: MaterialLocalizations.of(context).backButtonTooltip,

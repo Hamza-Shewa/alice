@@ -40,6 +40,7 @@ class _AliceInspectorScreenState extends State<AliceInspectorScreen>
 
     return StreamBuilder<List<AliceHttpCall>>(
       stream: widget.aliceCore.callsStream,
+      initialData: widget.aliceCore.getCalls(),
       builder: (context, AsyncSnapshot<List<AliceHttpCall>> snapshot) {
         // Copy the list so filtering and sorting never mutate stored calls.
         final List<AliceHttpCall> allCalls = [...?snapshot.data];

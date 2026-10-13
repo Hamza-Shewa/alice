@@ -2,6 +2,7 @@ import 'package:alice/core/alice_core.dart';
 import 'package:alice/helper/alice_conversion_helper.dart';
 import 'package:alice/model/alice_http_call.dart';
 import 'package:alice/model/alice_translation.dart';
+import 'package:alice/ui/common/alice_app_bar.dart';
 import 'package:alice/ui/common/alice_context_ext.dart';
 import 'package:alice/ui/common/alice_page.dart';
 import 'package:alice/ui/widget/alice_stats_row.dart';
@@ -19,7 +20,7 @@ class AliceStatsPage extends StatelessWidget {
     return AlicePage(
       core: aliceCore,
       child: Scaffold(
-        appBar: AppBar(
+        appBar: AliceAppBar(
           title: Text(
             '${context.i18n(AliceTranslationKey.alice)} - '
             '${context.i18n(AliceTranslationKey.statsTitle)}',
