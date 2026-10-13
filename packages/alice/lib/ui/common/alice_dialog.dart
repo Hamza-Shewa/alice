@@ -18,7 +18,9 @@ class AliceGeneralDialog {
     context: context,
     builder: (BuildContext context) {
       return Theme(
-        data: AliceTheme.getTheme(),
+        data: AliceTheme.getTheme(
+          brightness: AliceTheme.resolveBrightness(context),
+        ),
         child: AlertDialog(
           title: Text(title),
           content: Text(description),

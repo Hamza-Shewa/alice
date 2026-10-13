@@ -1,4 +1,5 @@
 import 'package:alice/helper/alice_conversion_helper.dart';
+import 'package:alice/helper/alice_issue_analyzer.dart';
 import 'package:alice/helper/alice_url_validator.dart';
 import 'package:alice/model/alice_form_data_file.dart';
 import 'package:alice/model/alice_from_data_field.dart';
@@ -9,6 +10,7 @@ import 'package:alice/model/alice_translation.dart';
 import 'package:alice/ui/common/alice_call_badges.dart';
 import 'package:alice/ui/common/alice_context_ext.dart';
 import 'package:alice/ui/common/alice_detail_widgets.dart';
+import 'package:alice/ui/common/alice_issue_widgets.dart';
 import 'package:alice/ui/common/alice_scroll_behavior.dart';
 import 'package:alice/ui/common/alice_status_info_sheet.dart';
 import 'package:alice/ui/common/alice_theme.dart';
@@ -25,6 +27,7 @@ class AliceCallOverviewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<AliceUrlIssue> urlIssues = AliceUrlValidator.validateCall(call);
+    final AliceIssue? issue = AliceIssueAnalyzer.analyze(call);
     final DateTime? started = call.request?.time;
     final DateTime? finished = call.loading ? null : call.response?.time;
     final String pending = context.i18n(
@@ -41,6 +44,10 @@ class AliceCallOverviewScreen extends StatelessWidget {
             const SizedBox(height: 16),
           ],
           _SummaryCard(call: call, hasUrlIssues: urlIssues.isNotEmpty),
+          if (issue != null) ...[
+            const SizedBox(height: 12),
+            AliceIssueBanner(issue: issue),
+          ],
           const SizedBox(height: 12),
           // Stretch makes all tiles as tall as the tallest one.
           IntrinsicHeight(
@@ -90,17 +97,17 @@ class AliceCallOverviewScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          _Section(
+          AliceInfoSection(
             title: context.i18n(AliceTranslationKey.callOverviewTiming),
             rows: [
-              _InfoRow(
+              AliceInfoRow(
                 label: _label(context, AliceTranslationKey.callOverviewStarted),
                 value:
                     started != null
                         ? AliceConversionHelper.formatDateTime(started)
                         : pending,
               ),
-              _InfoRow(
+              AliceInfoRow(
                 label: _label(
                   context,
                   AliceTranslationKey.callOverviewFinished,
@@ -113,19 +120,19 @@ class AliceCallOverviewScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          _Section(
+          AliceInfoSection(
             title: context.i18n(AliceTranslationKey.callOverviewConnection),
             rows: [
-              _InfoRow(
+              AliceInfoRow(
                 label: _label(context, AliceTranslationKey.callOverviewMethod),
                 value: call.method,
               ),
-              _InfoRow(
+              AliceInfoRow(
                 label: _label(context, AliceTranslationKey.callOverviewServer),
                 value: call.server,
                 hasError: urlIssues.isNotEmpty,
               ),
-              _InfoRow(
+              AliceInfoRow(
                 label: _label(
                   context,
                   AliceTranslationKey.callOverviewEndpoint,
@@ -133,11 +140,11 @@ class AliceCallOverviewScreen extends StatelessWidget {
                 value: call.endpoint,
                 hasError: urlIssues.isNotEmpty,
               ),
-              _InfoRow(
+              AliceInfoRow(
                 label: _label(context, AliceTranslationKey.callOverviewClient),
                 value: call.client.isEmpty ? '-' : call.client,
               ),
-              _InfoRow(
+              AliceInfoRow(
                 label: _label(context, AliceTranslationKey.callOverviewSecure),
                 value: context.i18n(
                   call.secure
@@ -396,7 +403,7 @@ class _SummaryCard extends StatelessWidget {
             runSpacing: 8,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              _InfoChip(
+              AliceInfoChip(
                 icon: call.secure ? Icons.lock_outline : Icons.lock_open,
                 text: call.secure ? 'HTTPS' : 'HTTP',
                 color: AliceTheme.getStatusColor(
@@ -405,7 +412,7 @@ class _SummaryCard extends StatelessWidget {
                 ),
               ),
               if (call.client.isNotEmpty)
-                _InfoChip(
+                AliceInfoChip(
                   icon: Icons.settings_ethernet,
                   text: call.client,
                   color: theme.colorScheme.onSurfaceVariant,
@@ -440,45 +447,6 @@ class _CopyButton extends StatelessWidget {
             url,
             context.i18n(AliceTranslationKey.callOverviewCopied),
           ),
-    );
-  }
-}
-
-/// Small rounded label with an icon.
-class _InfoChip extends StatelessWidget {
-  const _InfoChip({
-    required this.icon,
-    required this.text,
-    required this.color,
-  });
-
-  final IconData icon;
-  final String text;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: color),
-          const SizedBox(width: 4),
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: color,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -526,86 +494,6 @@ class _StatTile extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.bodySmall?.copyWith(color: mutedColor),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Titled group of label/value rows.
-class _Section extends StatelessWidget {
-  const _Section({required this.title, required this.rows});
-
-  final String title;
-  final List<_InfoRow> rows;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final Color dividerColor = theme.colorScheme.onSurface.withValues(
-      alpha: 0.08,
-    );
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AliceSectionTitle(title: title),
-        AliceOutlinedCard(
-          padding: EdgeInsets.zero,
-          child: Column(
-            children: [
-              for (int index = 0; index < rows.length; index++) ...[
-                if (index > 0) Divider(height: 1, color: dividerColor),
-                rows[index],
-              ],
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// Single label/value row. Value can be selected and copied.
-class _InfoRow extends StatelessWidget {
-  const _InfoRow({
-    required this.label,
-    required this.value,
-    this.hasError = false,
-  });
-
-  final String label;
-  final String value;
-  final bool hasError;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final Color errorColor = getUrlIssueColor(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 110,
-            child: Text(
-              label,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: AliceLtrSelectableText(
-              value,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: hasError ? errorColor : theme.colorScheme.onSurface,
-                fontFeatures: const [FontFeature.tabularFigures()],
-              ),
-            ),
           ),
         ],
       ),

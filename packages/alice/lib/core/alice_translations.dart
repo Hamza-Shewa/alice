@@ -9,7 +9,6 @@ class AliceTranslations {
   static List<AliceTranslationData> _initialise() {
     List<AliceTranslationData> translations = [];
     translations.add(_buildEnTranslations());
-    translations.add(_buildPlTranslations());
     translations.add(_buildArTranslations());
     return translations;
   }
@@ -227,6 +226,49 @@ class AliceTranslations {
         AliceTranslationKey.parserFailed: "Failed to parse: ",
         AliceTranslationKey.unknown: "Unknown",
         AliceTranslationKey.language: "Language",
+        AliceTranslationKey.settings: "Settings",
+        AliceTranslationKey.theme: "Theme",
+        AliceTranslationKey.themeSystem: "System",
+        AliceTranslationKey.themeLight: "Light",
+        AliceTranslationKey.themeDark: "Dark",
+        AliceTranslationKey.issueFrontend: "Frontend issue",
+        AliceTranslationKey.issueBackend: "Backend issue",
+        AliceTranslationKey.issueNetwork: "Network issue",
+        AliceTranslationKey.issueReasonMalformedUrl:
+            "The request URL is malformed, so the request can't reach the "
+            "backend. Fix the URL in the app.",
+        AliceTranslationKey.issueReasonClientError:
+            "The backend rejected the request (HTTP [status]). Check the "
+            "data, headers and parameters the app sends.",
+        AliceTranslationKey.issueReasonNotFound:
+            "The endpoint was not found (HTTP [status]). Check the URL and "
+            "path used by the app.",
+        AliceTranslationKey.issueReasonAuth:
+            "The request is not authorized (HTTP [status]). Check the token "
+            "the app sends and the permissions of the user.",
+        AliceTranslationKey.issueReasonServerError:
+            "The backend failed to handle the request (HTTP [status]). "
+            "Report it to the backend team.",
+        AliceTranslationKey.issueReasonGateway:
+            "The backend or a gateway in front of it is unavailable (HTTP "
+            "[status]). Report it to the backend team.",
+        AliceTranslationKey.issueReasonNetwork:
+            "No valid response was received. Check the connection, DNS, "
+            "certificates and timeouts. [error]",
+        AliceTranslationKey.issueReasonAppError:
+            "The app failed while building the request or handling the "
+            "response: [error]",
+        AliceTranslationKey.logsFilterAll: "All",
+        AliceTranslationKey.logsFilterRequests: "Requests",
+        AliceTranslationKey.logsFilterResponses: "Responses",
+        AliceTranslationKey.logsFilterErrors: "Errors",
+        AliceTranslationKey.logsFilterWarnings: "Warnings",
+        AliceTranslationKey.logsFilterEmpty: "No logs match this filter",
+        AliceTranslationKey.logKindRequest: "Request",
+        AliceTranslationKey.logKindResponse: "Response",
+        AliceTranslationKey.logKindError: "Error",
+        AliceTranslationKey.logKindWarning: "Warning",
+        AliceTranslationKey.logKindInfo: "Info",
         AliceTranslationKey.callErrorScreenType: "Type",
         AliceTranslationKey.callResponseBodyUnsupportedTitle:
             "Unsupported content",
@@ -236,237 +278,6 @@ class AliceTranslations {
         AliceTranslationKey.callResponseBodyUnsupportedWarning:
             "You can try to show the body as raw text, but it may be "
             "unreadable.",
-      },
-    );
-  }
-
-  /// Builds [AliceTranslationData] for polish language.
-  static AliceTranslationData _buildPlTranslations() {
-    return AliceTranslationData(
-      languageCode: "pl",
-      values: {
-        AliceTranslationKey.alice: "Alice",
-        AliceTranslationKey.callDetails: "Połączenie HTTP - detale",
-        AliceTranslationKey.emailSubject: "Raport ALice",
-        AliceTranslationKey.callDetailsRequest: "Żądanie",
-        AliceTranslationKey.callDetailsResponse: "Odpowiedź",
-        AliceTranslationKey.callDetailsOverview: "Przegląd",
-        AliceTranslationKey.callDetailsError: "Błąd",
-        AliceTranslationKey.callDetailsEmpty: "Błąd ładowania danych",
-        AliceTranslationKey.callErrorScreenErrorEmpty: "Brak błędów",
-        AliceTranslationKey.callErrorScreenError: "Błąd:",
-        AliceTranslationKey.callErrorScreenStacktrace: "Ślad stosu:",
-        AliceTranslationKey.callErrorScreenEmpty: "Brak danych do wyświetlenia",
-        AliceTranslationKey.callOverviewMethod: "Metoda:",
-        AliceTranslationKey.callOverviewServer: "Serwer:",
-        AliceTranslationKey.callOverviewEndpoint: "Endpoint:",
-        AliceTranslationKey.callOverviewStarted: "Rozpoczęto:",
-        AliceTranslationKey.callOverviewFinished: "Zakończono:",
-        AliceTranslationKey.callOverviewDuration: "Czas trwania:",
-        AliceTranslationKey.callOverviewBytesSent: "Bajty wysłane:",
-        AliceTranslationKey.callOverviewBytesReceived: "Bajty odebrane:",
-        AliceTranslationKey.callOverviewClient: "Klient:",
-        AliceTranslationKey.callOverviewSecure: "Połączenie zabezpieczone:",
-        AliceTranslationKey.callRequestStarted: "Ropoczęto:",
-        AliceTranslationKey.callRequestBytesSent: "Bajty wysłane:",
-        AliceTranslationKey.callRequestContentType: "Typ zawartości:",
-        AliceTranslationKey.callRequestBody: "Body:",
-        AliceTranslationKey.callRequestBodyEmpty: "Body jest puste",
-        AliceTranslationKey.callRequestFormDataFields: "Pola forumlarza:",
-        AliceTranslationKey.callRequestFormDataFiles: "Pliki formularza:",
-        AliceTranslationKey.callRequestHeaders: "Headery:",
-        AliceTranslationKey.callRequestHeadersEmpty: "Headery są puste",
-        AliceTranslationKey.callRequestQueryParameters: "Parametry query",
-        AliceTranslationKey.callRequestQueryParametersEmpty:
-            "Parametry query są puste",
-        AliceTranslationKey.callResponseWaitingForResponse:
-            "Oczekiwanie na odpowiedź...",
-        AliceTranslationKey.callResponseError: "Błąd",
-        AliceTranslationKey.callResponseReceived: "Otrzymano:",
-        AliceTranslationKey.callResponseBytesReceived: "Bajty odebrane:",
-        AliceTranslationKey.callResponseStatus: "Status:",
-        AliceTranslationKey.callResponseHeaders: "Headery:",
-        AliceTranslationKey.callResponseHeadersEmpty: "Headery są puste",
-        AliceTranslationKey.callResponseBodyImage: "Body: Obraz",
-        AliceTranslationKey.callResponseBody: "Body:",
-        AliceTranslationKey.callResponseTooLargeToShow: "Za duże aby pokazać",
-        AliceTranslationKey.callResponseBodyShow: "Pokaż body",
-        AliceTranslationKey.callResponseLargeBodyShowWarning:
-            'Uwaga! Może zająć trochę czasu, zanim uda się wyrenderować output.',
-        AliceTranslationKey.callResponseBodyVideo: 'Body: Video',
-        AliceTranslationKey.callResponseBodyVideoWebBrowser:
-            'Otwórz video w przeglądarce',
-        AliceTranslationKey.callResponseHeadersUnknown: "Nieznane",
-        AliceTranslationKey.callResponseBodyUnknown:
-            'Nieznane body. Alice'
-            ' może renderować video/image/text. Odpowiedź ma typ zawartości:'
-            "[contentType], który nie może być obsłużony.Jeżeli chcesz, możesz "
-            "spróbować wyrenderować body jako tekst, ale może to się nie udać.",
-        AliceTranslationKey.callResponseBodyUnknownShow:
-            "Pokaż nieobsługiwane body",
-        AliceTranslationKey.callsListInspector: "Inspektor",
-        AliceTranslationKey.callsListLogger: "Logger",
-        AliceTranslationKey.callsListDeleteLogsDialogTitle: "Usuń logi",
-        AliceTranslationKey.callsListDeleteLogsDialogDescription:
-            "Czy chcesz usunąc logi?",
-        AliceTranslationKey.callsListYes: "Tak",
-        AliceTranslationKey.callsListNo: "Nie",
-        AliceTranslationKey.callsListDeleteCallsDialogTitle: "Usuń połączenia",
-        AliceTranslationKey.callsListDeleteCallsDialogDescription:
-            "Czy chcesz usunąć zapisane połaczenia HTTP?",
-        AliceTranslationKey.callsListSearchHint: "Szukaj połączenia HTTP...",
-        AliceTranslationKey.callsListSort: "Sortuj",
-        AliceTranslationKey.callsListDelete: "Usuń",
-        AliceTranslationKey.callsListStats: "Statystyki",
-        AliceTranslationKey.callsListSave: "Zapis",
-        AliceTranslationKey.logsEmpty: "Brak rezultatów",
-        AliceTranslationKey.callsListSearch: "Szukaj",
-        AliceTranslationKey.callsListClearSearch: "Wyczyść wyszukiwanie",
-        AliceTranslationKey.callsListEmpty: "Brak połączeń HTTP",
-        AliceTranslationKey.callsListEmptyDescription:
-            "Żądania wysyłane przez aplikację pojawią się tutaj.",
-        AliceTranslationKey.callsListNoResults:
-            "Brak połączeń pasujących do \"[query]\"",
-        AliceTranslationKey.callsListRawLogs: "Przełącz surowe logi",
-        AliceTranslationKey.callsListScrollTop: "Przewiń na górę",
-        AliceTranslationKey.callsListScrollBottom: "Przewiń na dół",
-        AliceTranslationKey.urlIssueTitle: "Nieprawidłowy URL",
-        AliceTranslationKey.urlIssueSuggestion: "Czy chodziło o:",
-        AliceTranslationKey.urlIssueMore: "+[count] więcej problemów",
-        AliceTranslationKey.urlIssuePortWithDot:
-            "Port oddzielony kropką '.' zamiast ':'",
-        AliceTranslationKey.urlIssueMissingSlashAfterPort:
-            "Brak '/' między portem a ścieżką",
-        AliceTranslationKey.urlIssueMissingSlashAfterHost:
-            "Brak '/' między adresem IP a ścieżką",
-        AliceTranslationKey.urlIssueMissingSlashAfterVersion:
-            "Brak '/' po wersji API",
-        AliceTranslationKey.urlIssueInvalidIp: "Adres IP jest nieprawidłowy",
-        AliceTranslationKey.urlIssueDoubleSlash: "Ścieżka zawiera '//'",
-        AliceTranslationKey.urlIssueWhitespace: "URL zawiera białe znaki",
-        AliceTranslationKey.urlIssueMissingScheme:
-            "URL nie zawiera schematu http:// lub https://",
-        AliceTranslationKey.callOverviewTiming: "Czas",
-        AliceTranslationKey.callOverviewConnection: "Połączenie",
-        AliceTranslationKey.callOverviewCopyUrl: "Kopiuj URL",
-        AliceTranslationKey.callOverviewCopied: "Skopiowano URL do schowka",
-        AliceTranslationKey.callOverviewPending: "Oczekiwanie…",
-        AliceTranslationKey.callOverviewCopyAll:
-            "Kopiuj wszystkie dane żądania",
-        AliceTranslationKey.callOverviewCopiedAll:
-            "Skopiowano dane żądania do schowka",
-        AliceTranslationKey.callOverviewCopy: "Kopiuj",
-        AliceTranslationKey.callOverviewCopiedValue: "Skopiowano do schowka",
-        AliceTranslationKey.callOverviewShowMore: "Pokaż więcej",
-        AliceTranslationKey.callOverviewShowLess: "Pokaż mniej",
-        AliceTranslationKey.statusCategoryInformational: "Informacyjny",
-        AliceTranslationKey.statusCategorySuccess: "Sukces",
-        AliceTranslationKey.statusCategoryRedirection: "Przekierowanie",
-        AliceTranslationKey.statusCategoryClientError: "Błąd klienta",
-        AliceTranslationKey.statusCategoryServerError: "Błąd serwera",
-        AliceTranslationKey.statusCategoryFailed: "Brak odpowiedzi",
-        AliceTranslationKey.statusUnknownDescription:
-            "Brak opisu dla tego kodu statusu.",
-        AliceTranslationKey.statusTapHint: "Co oznacza ten status?",
-        AliceTranslationKey.logsError: "Problem z wyświetleniem logów.",
-        AliceTranslationKey.logsItemError: "Błąd:",
-        AliceTranslationKey.logsItemStackTrace: "Ślad stosu:",
-        AliceTranslationKey.logsCopied: "Skopiowano do schowka.",
-        AliceTranslationKey.sortDialogTitle: "Wybierz filtr",
-        AliceTranslationKey.sortDialogAscending: 'Rosnąco',
-        AliceTranslationKey.sortDialogDescending: "Malejąco",
-        AliceTranslationKey.sortDialogAccept: "Akceptuj",
-        AliceTranslationKey.sortDialogCancel: "Anuluj",
-        AliceTranslationKey.sortDialogTime: "Czas utworzenia (domyślnie)",
-        AliceTranslationKey.sortDialogResponseTime: "Czas odpowiedzi",
-        AliceTranslationKey.sortDialogResponseCode: "Status odpowiedzi",
-        AliceTranslationKey.sortDialogResponseSize: "Rozmiar odpowiedzi",
-        AliceTranslationKey.sortDialogEndpoint: "Endpoint",
-        AliceTranslationKey.statsTitle: "Statystyki",
-        AliceTranslationKey.statsTotalRequests: "Razem żądań:",
-        AliceTranslationKey.statsPendingRequests: "Oczekujące żądania:",
-        AliceTranslationKey.statsSuccessRequests: "Poprawne żądania:",
-        AliceTranslationKey.statsRedirectionRequests: "Żądania przekierowania:",
-        AliceTranslationKey.statsErrorRequests: "Błędne żądania:",
-        AliceTranslationKey.statsBytesSent: "Bajty wysłane:",
-        AliceTranslationKey.statsBytesReceived: "Bajty otrzymane:",
-        AliceTranslationKey.statsAverageRequestTime: "Średni czas żądania:",
-        AliceTranslationKey.statsMaxRequestTime: "Maksymalny czas żądania:",
-        AliceTranslationKey.statsMinRequestTime: "Minimalny czas żądania:",
-        AliceTranslationKey.statsGetRequests: "Żądania GET:",
-        AliceTranslationKey.statsPostRequests: "Żądania POST:",
-        AliceTranslationKey.statsDeleteRequests: "Żądania DELETE:",
-        AliceTranslationKey.statsPutRequests: "Żądania PUT:",
-        AliceTranslationKey.statsPatchRequests: "Żądania PATCH:",
-        AliceTranslationKey.statsSecuredRequests: "Żądania zabezpieczone:",
-        AliceTranslationKey.statsUnsecuredRequests: "Żądania niezabezpieczone:",
-        AliceTranslationKey.notificationLoading: "Oczekujące:",
-        AliceTranslationKey.notificationSuccess: "Poprawne:",
-        AliceTranslationKey.notificationRedirect: "Przekierowanie:",
-        AliceTranslationKey.notificationError: "Błąd:",
-        AliceTranslationKey.notificationTotalRequests:
-            "Alice (razem [callCount] połączeń HTTP)",
-        AliceTranslationKey.saveDialogPermissionErrorTitle: "Błąd pozwolenia",
-        AliceTranslationKey.saveDialogPermissionErrorDescription:
-            "Pozwolenie nieprzyznane. Nie można zapisać logów.",
-        AliceTranslationKey.saveDialogEmptyErrorTitle:
-            "Pusta historia połaczeń",
-        AliceTranslationKey.saveDialogEmptyErrorDescription:
-            "Nie ma połączeń do zapisania.",
-        AliceTranslationKey.saveDialogFileSaveErrorTitle: "Błąd zapisu",
-        AliceTranslationKey.saveDialogFileSaveErrorDescription:
-            "Nie można zapisać danych do pliku.",
-        AliceTranslationKey.saveSuccessTitle: "Logi zapisane",
-        AliceTranslationKey.saveSuccessDescription: "Zapisano logi w [path].",
-        AliceTranslationKey.saveSuccessView: "Otwórz plik",
-        AliceTranslationKey.saveHeaderTitle: "Alice - Inspektor HTTP",
-        AliceTranslationKey.saveHeaderAppName: "Nazwa aplikacji:",
-        AliceTranslationKey.saveHeaderPackage: "Paczka:",
-        AliceTranslationKey.saveHeaderVersion: "Wersja:",
-        AliceTranslationKey.saveHeaderBuildNumber: "Numer buildu:",
-        AliceTranslationKey.saveHeaderGenerated: "Wygenerowano:",
-        AliceTranslationKey.saveLogId: "Id:",
-        AliceTranslationKey.saveLogGeneralData: "Ogólne informacje",
-        AliceTranslationKey.saveLogServer: "Serwer:",
-        AliceTranslationKey.saveLogMethod: "Metoda:",
-        AliceTranslationKey.saveLogEndpoint: "Endpoint:",
-        AliceTranslationKey.saveLogClient: "Klient:",
-        AliceTranslationKey.saveLogDuration: "Czas trwania:",
-        AliceTranslationKey.saveLogSecured: "Połączenie zabezpieczone:",
-        AliceTranslationKey.saveLogCompleted: "Zakończono:",
-        AliceTranslationKey.saveLogRequest: "Żądanie",
-        AliceTranslationKey.saveLogRequestTime: "Czas żądania:",
-        AliceTranslationKey.saveLogRequestContentType:
-            "Typ zawartości żądania:",
-        AliceTranslationKey.saveLogRequestCookies: "Ciasteczka żądania:",
-        AliceTranslationKey.saveLogRequestHeaders: "Heady żądania",
-        AliceTranslationKey.saveLogRequestQueryParams:
-            "Parametry query żądania",
-        AliceTranslationKey.saveLogRequestSize: "Rozmiar żądania:",
-        AliceTranslationKey.saveLogRequestBody: "Body żądania:",
-        AliceTranslationKey.saveLogResponse: "Odpowiedź",
-        AliceTranslationKey.saveLogResponseTime: "Czas odpowiedzi:",
-        AliceTranslationKey.saveLogResponseStatus: "Status odpowiedzi:",
-        AliceTranslationKey.saveLogResponseSize: "Rozmiar odpowiedzi:",
-        AliceTranslationKey.saveLogResponseHeaders: "Headery odpowiedzi:",
-        AliceTranslationKey.saveLogResponseBody: "Body odpowiedzi:",
-        AliceTranslationKey.saveLogError: "Błąd",
-        AliceTranslationKey.saveLogStackTrace: "Ślad stosu",
-        AliceTranslationKey.saveLogCurl: "Curl",
-        AliceTranslationKey.accept: "Akceptuj",
-        AliceTranslationKey.parserFailed: "Problem z parsowaniem: ",
-        AliceTranslationKey.unknown: "Nieznane",
-        AliceTranslationKey.language: "Język",
-        AliceTranslationKey.callErrorScreenType: "Typ",
-        AliceTranslationKey.callResponseBodyUnsupportedTitle:
-            "Nieobsługiwana treść",
-        AliceTranslationKey.callResponseBodyUnsupportedDescription:
-            "Alice potrafi wyświetlić treść JSON, XML, tekstową, obrazy i "
-            "wideo. Ta odpowiedź ma Content-Type [contentType], którego nie "
-            "można wyświetlić.",
-        AliceTranslationKey.callResponseBodyUnsupportedWarning:
-            "Możesz spróbować wyświetlić treść jako surowy tekst, ale może "
-            "być nieczytelna.",
       },
     );
   }
@@ -683,6 +494,47 @@ class AliceTranslations {
         AliceTranslationKey.parserFailed: "فشل التحليل: ",
         AliceTranslationKey.unknown: "غير معروف",
         AliceTranslationKey.language: "اللغة",
+        AliceTranslationKey.settings: "الإعدادات",
+        AliceTranslationKey.theme: "المظهر",
+        AliceTranslationKey.themeSystem: "النظام",
+        AliceTranslationKey.themeLight: "فاتح",
+        AliceTranslationKey.themeDark: "داكن",
+        AliceTranslationKey.issueFrontend: "مشكلة في التطبيق",
+        AliceTranslationKey.issueBackend: "مشكلة في الخادم",
+        AliceTranslationKey.issueNetwork: "مشكلة في الشبكة",
+        AliceTranslationKey.issueReasonMalformedUrl:
+            "عنوان الطلب غير صحيح، لذلك لا يمكن أن يصل إلى الخادم. "
+            "صحّح العنوان في التطبيق.",
+        AliceTranslationKey.issueReasonClientError:
+            "رفض الخادم الطلب (HTTP [status]). تحقق من البيانات والترويسات "
+            "والمعاملات التي يرسلها التطبيق.",
+        AliceTranslationKey.issueReasonNotFound:
+            "لم يتم العثور على نقطة النهاية (HTTP [status]). تحقق من العنوان "
+            "والمسار المستخدم في التطبيق.",
+        AliceTranslationKey.issueReasonAuth:
+            "الطلب غير مصرّح به (HTTP [status]). تحقق من الرمز الذي يرسله "
+            "التطبيق وصلاحيات المستخدم.",
+        AliceTranslationKey.issueReasonServerError:
+            "فشل الخادم في معالجة الطلب (HTTP [status]). أبلغ فريق الخادم.",
+        AliceTranslationKey.issueReasonGateway:
+            "الخادم أو البوابة التي أمامه غير متاحة (HTTP [status]). أبلغ "
+            "فريق الخادم.",
+        AliceTranslationKey.issueReasonNetwork:
+            "لم يتم استلام استجابة صالحة. تحقق من الاتصال وخدمة DNS "
+            "والشهادات ومهلات الانتظار. [error]",
+        AliceTranslationKey.issueReasonAppError:
+            "فشل التطبيق أثناء بناء الطلب أو معالجة الاستجابة: [error]",
+        AliceTranslationKey.logsFilterAll: "الكل",
+        AliceTranslationKey.logsFilterRequests: "الطلبات",
+        AliceTranslationKey.logsFilterResponses: "الاستجابات",
+        AliceTranslationKey.logsFilterErrors: "الأخطاء",
+        AliceTranslationKey.logsFilterWarnings: "التحذيرات",
+        AliceTranslationKey.logsFilterEmpty: "لا توجد سجلات مطابقة",
+        AliceTranslationKey.logKindRequest: "طلب",
+        AliceTranslationKey.logKindResponse: "استجابة",
+        AliceTranslationKey.logKindError: "خطأ",
+        AliceTranslationKey.logKindWarning: "تحذير",
+        AliceTranslationKey.logKindInfo: "معلومة",
         AliceTranslationKey.callErrorScreenType: "النوع",
         AliceTranslationKey.callResponseBodyUnsupportedTitle: "محتوى غير مدعوم",
         AliceTranslationKey.callResponseBodyUnsupportedDescription:

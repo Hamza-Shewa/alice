@@ -30,7 +30,11 @@ class AliceAppBar extends StatelessWidget implements PreferredSizeWidget {
       tag: heroTag,
       flightShuttleBuilder: _buildShuttle,
       child: AppBar(
-        leading: leading,
+        // Explicit, because the bar is also built outside of its route while
+        // it flies between pages.
+        leading:
+            leading ?? (Navigator.canPop(context) ? const BackButton() : null),
+        automaticallyImplyLeading: false,
         title: title,
         actions: actions,
         bottom: bottom,
@@ -39,8 +43,10 @@ class AliceAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   /// Builds widget which is displayed while the app bar is flying between
-  /// pages. App bars have different heights (tabs differ) so a plain surface
-  /// is used, which can be resized freely without overflowing.
+  /// pages. It cross-fades the app bar of the source page into the app bar of
+  /// the destination page, so the content never disappears during the flight.
+  /// Each bar is laid out with its own height and clipped, because heights of
+  /// the bars differ (tabs differ) and a resized bar would overflow.
   static Widget _buildShuttle(
     BuildContext flightContext,
     Animation<double> animation,
@@ -48,14 +54,49 @@ class AliceAppBar extends StatelessWidget implements PreferredSizeWidget {
     BuildContext fromHeroContext,
     BuildContext toHeroContext,
   ) {
-    final ThemeData theme = Theme.of(toHeroContext);
-    final Color color =
-        theme.appBarTheme.backgroundColor ?? theme.colorScheme.surface;
+    final ThemeData toTheme = Theme.of(toHeroContext);
+    final Animation<double> fadeOut = CurvedAnimation(
+      parent: animation,
+      curve: const Interval(0, 0.6, curve: Curves.easeOut),
+    ).drive(Tween<double>(begin: 1, end: 0));
+    final Animation<double> fadeIn = CurvedAnimation(
+      parent: animation,
+      curve: const Interval(0.3, 1, curve: Curves.easeIn),
+    );
+
     return Material(
-      color: color,
-      surfaceTintColor: theme.colorScheme.surfaceTint,
-      elevation: theme.appBarTheme.elevation ?? 0,
-      child: const SizedBox.expand(),
+      // Opaque base, so the page below never shines through the fading bars.
+      color: toTheme.appBarTheme.backgroundColor ?? toTheme.colorScheme.surface,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          FadeTransition(opacity: fadeOut, child: _buildBar(fromHeroContext)),
+          FadeTransition(opacity: fadeIn, child: _buildBar(toHeroContext)),
+        ],
+      ),
+    );
+  }
+
+  /// Builds the app bar of [heroContext] outside of its page.
+  static Widget _buildBar(BuildContext heroContext) {
+    final Hero hero = heroContext.widget as Hero;
+    final AppBar appBar = hero.child as AppBar;
+    // Same height which Scaffold gives to the app bar.
+    final double height =
+        appBar.preferredSize.height + MediaQuery.paddingOf(heroContext).top;
+    return Theme(
+      data: Theme.of(heroContext),
+      child: Directionality(
+        textDirection: Directionality.of(heroContext),
+        child: ClipRect(
+          child: OverflowBox(
+            alignment: AlignmentDirectional.topStart,
+            minHeight: height,
+            maxHeight: height,
+            child: hero.child,
+          ),
+        ),
+      ),
     );
   }
 }

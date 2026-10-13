@@ -42,10 +42,7 @@ class AliceNavigation {
     }
     return Navigator.push<void>(
       context,
-      AliceRoute<void>(
-        theme: AliceTheme.getTheme(brightness: Theme.of(context).brightness),
-        builder: (_) => child,
-      ),
+      AliceRoute<void>(builder: (_) => child),
     );
   }
 }
@@ -55,9 +52,7 @@ class AliceNavigation {
 /// the new page in, which lets the page of the host app shine through and
 /// flashes its background color when it differs from Alice colors.
 class AliceRoute<T> extends MaterialPageRoute<T> {
-  AliceRoute({required this.theme, required super.builder});
-
-  final ThemeData theme;
+  AliceRoute({required super.builder});
 
   @override
   Widget buildTransitions(
@@ -67,7 +62,9 @@ class AliceRoute<T> extends MaterialPageRoute<T> {
     Widget child,
   ) {
     return Theme(
-      data: theme,
+      data: AliceTheme.getTheme(
+        brightness: AliceTheme.resolveBrightness(context),
+      ),
       child: Builder(
         builder:
             (BuildContext context) =>

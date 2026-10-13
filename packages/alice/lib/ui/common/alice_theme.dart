@@ -1,3 +1,5 @@
+import 'package:alice/helper/alice_issue_analyzer.dart';
+import 'package:alice/helper/alice_log_classifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -15,6 +17,20 @@ class AliceTheme {
   static const Color darkRed = Color(0xffc62828);
   static const Color darkGreen = Color(0xff00804a);
   static const Color darkOrange = Color(0xffa85c00);
+
+  /// Theme mode selected by user. System follows the host app.
+  static final ValueNotifier<ThemeMode> themeMode = ValueNotifier(
+    ThemeMode.system,
+  );
+
+  /// Returns brightness which Alice should use. Unless user selected light or
+  /// dark mode it follows the theme of the host app found at [hostContext].
+  static Brightness resolveBrightness(BuildContext hostContext) =>
+      switch (themeMode.value) {
+        ThemeMode.light => Brightness.light,
+        ThemeMode.dark => Brightness.dark,
+        ThemeMode.system => Theme.of(hostContext).brightness,
+      };
 
   static final ThemeData _lightTheme = _buildTheme(Brightness.light);
   static final ThemeData _darkTheme = _buildTheme(Brightness.dark);
@@ -59,6 +75,32 @@ class AliceTheme {
         isDark ? orange : darkOrange,
       int status when status >= 400 && status < 600 => isDark ? red : darkRed,
       _ => neutral,
+    };
+  }
+
+  /// Returns color which marks the side responsible for a failed call.
+  static Color getIssueColor(BuildContext context, AliceIssueOrigin origin) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    return switch (origin) {
+      AliceIssueOrigin.frontend =>
+        isDark ? const Color(0xff4dd0e1) : const Color(0xff00838f),
+      AliceIssueOrigin.backend =>
+        isDark ? const Color(0xffce93d8) : const Color(0xff8e24aa),
+      AliceIssueOrigin.network =>
+        isDark ? const Color(0xff90a4ae) : const Color(0xff546e7a),
+    };
+  }
+
+  /// Returns color of a log entry detected as [info].
+  static Color getLogKindColor(BuildContext context, AliceLogInfo info) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    return switch (info.kind) {
+      AliceLogKind.request =>
+        isDark ? const Color(0xff64b5f6) : const Color(0xff1565c0),
+      AliceLogKind.response => getStatusColor(context, info.status ?? 200),
+      AliceLogKind.error => isDark ? red : darkRed,
+      AliceLogKind.warning => isDark ? orange : darkOrange,
+      AliceLogKind.info => Theme.of(context).colorScheme.onSurfaceVariant,
     };
   }
 

@@ -67,6 +67,10 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 150));
     expect(tester.takeException(), isNull);
+    // While flying, the bar still shows content of both pages (cross-fade),
+    // it must not be an empty surface.
+    expect(find.text('Alice - HTTP Call Details'), findsOneWidget);
+    expect(find.text('Alice'), findsOneWidget);
     await tester.pumpAndSettle();
     expect(find.byType(AliceAppBar), findsOneWidget);
     expect(find.byType(TabBar), findsOneWidget);
@@ -75,8 +79,11 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 150));
     expect(tester.takeException(), isNull);
+    expect(find.text('Alice - HTTP Call Details'), findsOneWidget);
+    expect(find.text('Alice'), findsOneWidget);
     await tester.pumpAndSettle();
     expect(find.byType(AliceAppBar), findsOneWidget);
+    expect(find.text('Alice'), findsOneWidget);
   });
 
   testWidgets('new page is opaque during the transition', (tester) async {

@@ -1,6 +1,7 @@
 import 'package:alice/model/alice_translation.dart';
 import 'package:alice/ui/calls_list/model/alice_calls_list_sort_option.dart';
 import 'package:alice/ui/common/alice_context_ext.dart';
+import 'package:alice/ui/common/alice_theme.dart';
 import 'package:flutter/material.dart';
 
 /// Dialog which can be used to sort alice calls.
@@ -19,7 +20,9 @@ class AliceSortDialog extends StatelessWidget {
     AliceCallsListSortOption currentSortOption = sortOption;
     bool currentSortAscending = sortAscending;
     return Theme(
-      data: ThemeData(brightness: Brightness.light),
+      data: AliceTheme.getTheme(
+        brightness: AliceTheme.resolveBrightness(context),
+      ),
       child: StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(

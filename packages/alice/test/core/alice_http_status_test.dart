@@ -5,7 +5,7 @@ void main() {
   group('AliceHttpStatus', () {
     test('should return english info by default', () {
       expect(
-        AliceHttpStatus.get(status: 404, languageCode: 'pl')?.name,
+        AliceHttpStatus.get(status: 404, languageCode: 'xx')?.name,
         'Not Found',
       );
     });

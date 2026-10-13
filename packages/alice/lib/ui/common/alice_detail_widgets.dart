@@ -329,3 +329,240 @@ class AliceOutlinedCard extends StatelessWidget {
     );
   }
 }
+
+/// Small rounded label with an icon.
+class AliceInfoChip extends StatelessWidget {
+  const AliceInfoChip({
+    super.key,
+    required this.icon,
+    required this.text,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String text;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Titled group of label/value rows.
+class AliceInfoSection extends StatelessWidget {
+  const AliceInfoSection({super.key, required this.title, required this.rows});
+
+  final String title;
+  final List<AliceInfoRow> rows;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final Color dividerColor = theme.colorScheme.onSurface.withValues(
+      alpha: 0.08,
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AliceSectionTitle(title: title),
+        AliceOutlinedCard(
+          padding: EdgeInsets.zero,
+          child: Column(
+            children: [
+              for (int index = 0; index < rows.length; index++) ...[
+                if (index > 0) Divider(height: 1, color: dividerColor),
+                rows[index],
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Single label/value row. Value can be selected and copied.
+class AliceInfoRow extends StatelessWidget {
+  const AliceInfoRow({
+    super.key,
+    required this.label,
+    required this.value,
+    this.hasError = false,
+  });
+
+  final String label;
+  final String value;
+  final bool hasError;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final Color errorColor = getUrlIssueColor(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 110,
+            child: Text(
+              label,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: AliceLtrSelectableText(
+              value,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: hasError ? errorColor : theme.colorScheme.onSurface,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Card with a title, an optional counter and an optional action, whose
+/// content can be collapsed. Used for long lists such as headers.
+class AliceCollapsibleSection extends StatefulWidget {
+  const AliceCollapsibleSection({
+    super.key,
+    required this.title,
+    required this.child,
+    this.icon,
+    this.count,
+    this.action,
+    this.initiallyExpanded = true,
+  });
+
+  final String title;
+  final Widget child;
+  final IconData? icon;
+
+  /// Number displayed next to the title, for example number of headers.
+  final int? count;
+
+  /// Widget displayed at the end of the header, for example a copy button.
+  final Widget? action;
+  final bool initiallyExpanded;
+
+  @override
+  State<AliceCollapsibleSection> createState() =>
+      _AliceCollapsibleSectionState();
+}
+
+class _AliceCollapsibleSectionState extends State<AliceCollapsibleSection> {
+  late bool _expanded = widget.initiallyExpanded;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final Color muted = theme.colorScheme.onSurfaceVariant;
+    return AliceOutlinedCard(
+      padding: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () => setState(() => _expanded = !_expanded),
+            child: Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(14, 6, 6, 6),
+              child: Row(
+                children: [
+                  if (widget.icon != null) ...[
+                    Icon(widget.icon, size: 18, color: muted),
+                    const SizedBox(width: 8),
+                  ],
+                  Flexible(
+                    child: Text(
+                      widget.title,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  if (widget.count != null) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.08,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '${widget.count}',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                  const Spacer(),
+                  if (widget.action != null) widget.action!,
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: AnimatedRotation(
+                      turns: _expanded ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 200),
+                      child: Icon(Icons.expand_more, color: muted),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 200),
+            alignment: Alignment.topCenter,
+            child:
+                _expanded
+                    ? Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+                      child: widget.child,
+                    )
+                    : const SizedBox(width: double.infinity),
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -6,6 +6,8 @@ import 'package:alice/ui/call_details/widget/alice_call_error_screen.dart';
 import 'package:alice/ui/call_details/widget/alice_call_overview_screen.dart';
 import 'package:alice/ui/call_details/widget/alice_call_response_screen.dart';
 import 'package:alice/ui/common/alice_language.dart';
+import 'package:alice/ui/common/alice_settings.dart';
+import 'package:alice/ui/common/alice_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -56,16 +58,24 @@ void main() {
     expect(find.text('TIMING'), findsOneWidget);
   });
 
-  testWidgets('language button switches the language', (tester) async {
-    await _pump(tester, const AliceLanguageButton());
+  testWidgets('settings sheet changes language and theme', (tester) async {
+    addTearDown(() => AliceTheme.themeMode.value = ThemeMode.system);
+    await _pump(tester, const AliceSettingsButton());
 
-    await tester.tap(find.byType(AliceLanguageButton));
+    await tester.tap(find.byType(AliceSettingsButton));
     await tester.pumpAndSettle();
+    expect(find.text('Language'), findsOneWidget);
+    expect(find.text('Polski'), findsNothing);
+
+    await tester.tap(find.text('Dark'));
+    await tester.pumpAndSettle();
+    expect(AliceTheme.themeMode.value, ThemeMode.dark);
+
     await tester.tap(find.text('العربية'));
     await tester.pumpAndSettle();
-
     expect(AliceLanguage.current.value, 'ar');
     expect(AliceLanguage.textDirection, TextDirection.rtl);
+    expect(find.text('الإعدادات'), findsOneWidget);
   });
 
   testWidgets('stat tiles have the same height', (tester) async {

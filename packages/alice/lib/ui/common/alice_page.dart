@@ -16,7 +16,9 @@ class AlicePage extends StatelessWidget {
       textDirection:
           core.configuration.directionality ?? AliceLanguage.textDirection,
       child: Theme(
-        data: AliceTheme.getTheme(brightness: Theme.of(context).brightness),
+        data: AliceTheme.getTheme(
+          brightness: AliceTheme.resolveBrightness(context),
+        ),
         child: child,
       ),
     );

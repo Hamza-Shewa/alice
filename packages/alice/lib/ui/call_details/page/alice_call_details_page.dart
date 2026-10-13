@@ -11,7 +11,7 @@ import 'package:alice/ui/call_details/widget/alice_call_request_screen.dart';
 import 'package:alice/ui/call_details/widget/alice_call_response_screen.dart';
 import 'package:alice/ui/common/alice_app_bar.dart';
 import 'package:alice/ui/common/alice_context_ext.dart';
-import 'package:alice/ui/common/alice_language.dart';
+import 'package:alice/ui/common/alice_settings.dart';
 import 'package:alice/ui/common/alice_page.dart';
 import 'package:alice/ui/common/alice_theme.dart';
 import 'package:collection/collection.dart' show IterableExtension;
@@ -35,8 +35,19 @@ class AliceCallDetailsPage extends StatefulWidget {
 
 /// State of call details page.
 class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
-    with SingleTickerProviderStateMixin, AliceLanguageListenerMixin {
+    with SingleTickerProviderStateMixin, AliceSettingsListenerMixin {
+  late final TabController _tabController = TabController(
+    length: AliceCallDetailsTabItem.values.length,
+    vsync: this,
+  );
+
   AliceHttpCall get call => widget.call;
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,56 +62,55 @@ class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
               (AliceHttpCall snapshotCall) => snapshotCall.id == widget.call.id,
             );
             if (call != null) {
-              return DefaultTabController(
-                length: 4,
-                child: Scaffold(
-                  appBar: AliceAppBar(
-                    actions: [
-                      const AliceLanguageButton(),
-                      IconButton(
-                        icon: const Icon(Icons.copy_all),
-                        tooltip: context.i18n(
-                          AliceTranslationKey.callOverviewCopyAll,
-                        ),
-                        onPressed: () => _copyCall(call),
+              return Scaffold(
+                appBar: AliceAppBar(
+                  actions: [
+                    const AliceSettingsButton(),
+                    IconButton(
+                      icon: const Icon(Icons.copy_all),
+                      tooltip: context.i18n(
+                        AliceTranslationKey.callOverviewCopyAll,
                       ),
-                    ],
-                    bottom: TabBar(
-                      indicatorColor: AliceTheme.lightRed,
-                      tabs:
-                          AliceCallDetailsTabItem.values.map((item) {
-                            return Tab(
-                              icon: _getTabIcon(item: item),
-                              text: _getTabName(item: item),
-                            );
-                          }).toList(),
+                      onPressed: () => _copyCall(call),
                     ),
-                    title: Text(
-                      '${context.i18n(AliceTranslationKey.alice)} -'
-                      ' ${context.i18n(AliceTranslationKey.callDetails)}',
-                    ),
+                  ],
+                  bottom: TabBar(
+                    controller: _tabController,
+                    indicatorColor: AliceTheme.lightRed,
+                    tabs:
+                        AliceCallDetailsTabItem.values.map((item) {
+                          return Tab(
+                            icon: _getTabIcon(item: item),
+                            text: _getTabName(item: item),
+                          );
+                        }).toList(),
                   ),
-                  body: TabBarView(
-                    children: [
-                      AliceCallOverviewScreen(call: widget.call),
-                      AliceCallRequestScreen(call: widget.call),
-                      AliceCallResponseScreen(call: widget.call),
-                      AliceCallErrorScreen(call: widget.call),
-                    ],
+                  title: Text(
+                    '${context.i18n(AliceTranslationKey.alice)} -'
+                    ' ${context.i18n(AliceTranslationKey.callDetails)}',
                   ),
-                  floatingActionButton:
-                      widget.core.configuration.showShareButton
-                          ? FloatingActionButton(
-                            backgroundColor: AliceTheme.lightRed,
-                            key: const Key('share_key'),
-                            onPressed: _shareCall,
-                            child: const Icon(
-                              Icons.share,
-                              color: AliceTheme.white,
-                            ),
-                          )
-                          : null,
                 ),
+                body: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    AliceCallOverviewScreen(call: widget.call),
+                    AliceCallRequestScreen(call: widget.call),
+                    AliceCallResponseScreen(call: widget.call),
+                    AliceCallErrorScreen(call: widget.call),
+                  ],
+                ),
+                floatingActionButton:
+                    widget.core.configuration.showShareButton
+                        ? FloatingActionButton(
+                          backgroundColor: AliceTheme.lightRed,
+                          key: const Key('share_key'),
+                          onPressed: _shareCall,
+                          child: const Icon(
+                            Icons.share,
+                            color: AliceTheme.white,
+                          ),
+                        )
+                        : null,
               );
             }
           }

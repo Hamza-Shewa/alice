@@ -43,24 +43,6 @@ void main() {
       },
     );
 
-    test("should return translated key for other languages", () {
-      expect(
-        AliceTranslations.get(
-          languageCode: "pl",
-          key: AliceTranslationKey.logsEmpty,
-        ),
-        "Brak rezultatów",
-      );
-
-      expect(
-        AliceTranslations.get(
-          languageCode: "pl",
-          key: AliceTranslationKey.saveLogRequest,
-        ),
-        "Żądanie",
-      );
-    });
-
     test("should return arabic translation", () {
       expect(
         AliceTranslations.get(
@@ -74,7 +56,7 @@ void main() {
     test("should fall back to english for missing key", () {
       expect(
         AliceTranslations.get(
-          languageCode: "pl",
+          languageCode: "xx",
           key: AliceTranslationKey.alice,
         ),
         "Alice",
