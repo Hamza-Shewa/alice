@@ -9,14 +9,14 @@ import 'package:alice/ui/call_details/model/alice_menu_item.dart';
 import 'package:alice/ui/calls_list/model/alice_calls_list_sort_option.dart';
 import 'package:alice/ui/calls_list/model/alice_calls_list_tab_item.dart';
 import 'package:alice/ui/calls_list/widget/alice_inspector_screen.dart';
+import 'package:alice/ui/calls_list/widget/alice_logs_screen.dart';
 import 'package:alice/ui/calls_list/widget/alice_sort_dialog.dart';
 import 'package:alice/ui/common/alice_app_bar.dart';
 import 'package:alice/ui/common/alice_context_ext.dart';
-import 'package:alice/ui/common/alice_settings.dart';
 import 'package:alice/ui/common/alice_dialog.dart';
 import 'package:alice/ui/common/alice_navigation.dart';
 import 'package:alice/ui/common/alice_page.dart';
-import 'package:alice/ui/calls_list/widget/alice_logs_screen.dart';
+import 'package:alice/ui/common/alice_settings.dart';
 import 'package:alice/ui/common/alice_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:open_filex/open_filex.dart';
@@ -39,7 +39,7 @@ class _AliceCallsListPageState extends State<AliceCallsListPage>
       TextEditingController();
   final List<AliceCallsListTabItem> _tabItems = AliceCallsListTabItem.values;
   final ScrollController _scrollController = ScrollController();
-  late final TabController? _tabController;
+  late final TabController _tabController;
 
   AliceCallsListSortOption _sortOption = AliceCallsListSortOption.time;
   bool _sortAscending = false;
@@ -59,17 +59,17 @@ class _AliceCallsListPageState extends State<AliceCallsListPage>
       initialIndex: _tabItems.first.index,
     );
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _tabController?.addListener(() {
+    _tabController.addListener(() {
+      if (mounted && _selectedIndex != _tabController.index) {
         _onTabChanged(_tabController.index);
-      });
+      }
     });
   }
 
   @override
   void dispose() {
     _queryTextEditingController.dispose();
-    _tabController?.dispose();
+    _tabController.dispose();
     _scrollController.dispose();
 
     super.dispose();
@@ -101,14 +101,15 @@ class _AliceCallsListPageState extends State<AliceCallsListPage>
               isLoggerTab
                   ? <Widget>[
                     AliceSettingsButton(core: widget.core),
-                    IconButton(
-                      icon: const Icon(Icons.terminal),
-                      tooltip: context.i18n(
-                        AliceTranslationKey.callsListRawLogs,
+                    if (OperatingSystem.isAndroid)
+                      IconButton(
+                        icon: const Icon(Icons.terminal),
+                        tooltip: context.i18n(
+                          AliceTranslationKey.callsListRawLogs,
+                        ),
+                        isSelected: isAndroidRawLogsEnabled,
+                        onPressed: _onLogsChangePressed,
                       ),
-                      isSelected: isAndroidRawLogsEnabled,
-                      onPressed: _onLogsChangePressed,
-                    ),
                     IconButton(
                       icon: const Icon(Icons.delete_outline),
                       tooltip: context.i18n(

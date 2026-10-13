@@ -80,8 +80,9 @@ class AliceLogClassifier {
   );
 
   static final RegExp _networkWords = RegExp(
-    r'time ?out|timed out|socket|connection|network|host lookup|dns|'
-    r'handshake|certificate|unreachable',
+    r'time ?out|timed out|socket|connection (?:refused|closed|reset|error|'
+    r'failed)|network (?:error|unreachable)|host lookup|dns|handshake|'
+    r'certificate|unreachable|no route|failed to connect',
     caseSensitive: false,
   );
 
@@ -111,8 +112,7 @@ class AliceLogClassifier {
     }
 
     final bool isErrorLevel = log.level.index >= DiagnosticLevel.error.index;
-    final bool hasErrorWords = _errorWords.hasMatch(text);
-    if (isErrorLevel || log.error != null || hasErrorWords) {
+    if (isErrorLevel || log.error != null) {
       return AliceLogInfo(
         kind: AliceLogKind.error,
         url: url,
@@ -126,6 +126,14 @@ class AliceLogClassifier {
         kind: AliceLogKind.request,
         method: _firstGroupText(request)?.toUpperCase(),
         url: url,
+      );
+    }
+
+    if (_errorWords.hasMatch(text)) {
+      return AliceLogInfo(
+        kind: AliceLogKind.error,
+        url: url,
+        origin: _networkWords.hasMatch(text) ? AliceIssueOrigin.network : null,
       );
     }
 

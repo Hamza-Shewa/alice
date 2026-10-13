@@ -1,10 +1,10 @@
 import 'dart:async' show FutureOr, StreamSubscription, unawaited;
 
+import 'package:alice/core/alice_notification.dart';
 import 'package:alice/core/alice_storage.dart';
 import 'package:alice/core/alice_utils.dart';
 import 'package:alice/helper/alice_export_helper.dart';
 import 'package:alice/helper/alice_watcher.dart';
-import 'package:alice/core/alice_notification.dart';
 import 'package:alice/helper/operating_system.dart';
 import 'package:alice/model/alice_configuration.dart';
 import 'package:alice/model/alice_export_result.dart';
@@ -71,9 +71,13 @@ class AliceCore {
   /// Called when calls has been updated
   Future<void> _onCallsChanged(List<AliceHttpCall>? calls) async {
     if (calls != null && calls.isNotEmpty) {
+      final BuildContext? context = getContext();
+      if (context == null) {
+        return;
+      }
       final AliceStats stats = _configuration.aliceStorage.getStats();
-      _notification?.showStatsNotification(
-        context: getContext()!,
+      await _notification?.showStatsNotification(
+        context: context,
         stats: stats,
       );
     }

@@ -96,10 +96,9 @@ class _AliceWatcherPageState extends State<AliceWatcherPage>
     );
   }
 
-  /// Saves the change and refreshes the page.
+  /// Saves the change and refreshes the page via [AliceSettingsListenerMixin].
   void _onChanged() {
     _watcher.changed();
-    setState(() {});
   }
 
   Future<void> _confirmReset(BuildContext context) {
@@ -109,10 +108,7 @@ class _AliceWatcherPageState extends State<AliceWatcherPage>
       description: context.i18n(AliceTranslationKey.watcherResetConfirm),
       firstButtonTitle: context.i18n(AliceTranslationKey.callsListNo),
       secondButtonTitle: context.i18n(AliceTranslationKey.callsListYes),
-      secondButtonAction: () {
-        _watcher.reset();
-        setState(() {});
-      },
+      secondButtonAction: _watcher.reset,
     );
   }
 

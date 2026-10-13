@@ -1,8 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:alice/core/alice_core.dart';
-import 'package:alice/helper/alice_watcher.dart';
 import 'package:alice/helper/alice_export_helper.dart';
+import 'package:alice/helper/alice_watcher.dart';
 import 'package:alice/model/alice_http_call.dart';
 import 'package:alice/model/alice_translation.dart';
 import 'package:alice/ui/call_details/model/alice_call_details_tab.dart';
@@ -12,9 +12,9 @@ import 'package:alice/ui/call_details/widget/alice_call_request_screen.dart';
 import 'package:alice/ui/call_details/widget/alice_call_response_screen.dart';
 import 'package:alice/ui/common/alice_app_bar.dart';
 import 'package:alice/ui/common/alice_context_ext.dart';
-import 'package:alice/ui/common/alice_settings.dart';
 import 'package:alice/ui/common/alice_language.dart';
 import 'package:alice/ui/common/alice_page.dart';
+import 'package:alice/ui/common/alice_settings.dart';
 import 'package:alice/ui/common/alice_theme.dart';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
@@ -67,16 +67,18 @@ class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
         initialData: [widget.call],
         builder: (context, AsyncSnapshot<List<AliceHttpCall>> callsSnapshot) {
           if (callsSnapshot.hasData && !callsSnapshot.hasError) {
-            final AliceHttpCall? call = callsSnapshot.data?.firstWhereOrNull(
-              (AliceHttpCall snapshotCall) => snapshotCall.id == widget.call.id,
-            );
-            if (call != null) {
+            final AliceHttpCall? currentCall =
+                callsSnapshot.data?.firstWhereOrNull(
+                  (AliceHttpCall snapshotCall) =>
+                      snapshotCall.id == widget.call.id,
+                );
+            if (currentCall != null) {
               final Object signature = (
-                call.loading,
-                identityHashCode(call.response),
-                identityHashCode(call.error),
-                call.duration,
-                call.response?.status,
+                currentCall.loading,
+                identityHashCode(currentCall.response),
+                identityHashCode(currentCall.error),
+                currentCall.duration,
+                currentCall.response?.status,
                 AliceLanguage.current.value,
                 AliceTheme.themeMode.value,
                 AliceWatcher.instance.version,
@@ -94,7 +96,7 @@ class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
                       tooltip: context.i18n(
                         AliceTranslationKey.callOverviewCopyAll,
                       ),
-                      onPressed: () => _copyCall(call),
+                      onPressed: () => _copyCall(currentCall),
                     ),
                   ],
                   bottom: TabBar(
@@ -116,10 +118,10 @@ class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
                 body: TabBarView(
                   controller: _tabController,
                   children: [
-                    AliceCallOverviewScreen(call: widget.call),
-                    AliceCallRequestScreen(call: widget.call),
-                    AliceCallResponseScreen(call: widget.call),
-                    AliceCallErrorScreen(call: widget.call),
+                    AliceCallOverviewScreen(call: currentCall),
+                    AliceCallRequestScreen(call: currentCall),
+                    AliceCallResponseScreen(call: currentCall),
+                    AliceCallErrorScreen(call: currentCall),
                   ],
                 ),
                 floatingActionButton:
@@ -127,7 +129,7 @@ class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
                         ? FloatingActionButton(
                           backgroundColor: AliceTheme.lightRed,
                           key: const Key('share_key'),
-                          onPressed: _shareCall,
+                          onPressed: () => _shareCall(currentCall),
                           child: const Icon(
                             Icons.share,
                             color: AliceTheme.white,
@@ -146,10 +148,10 @@ class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
     );
   }
 
-  /// Called when share button has been pressed. It encodes the [widget.call]
+  /// Called when share button has been pressed. It encodes the [call]
   /// and tries to invoke system action to share it.
-  void _shareCall() async {
-    await AliceExportHelper.shareCall(context: context, call: widget.call);
+  Future<void> _shareCall(AliceHttpCall call) async {
+    await AliceExportHelper.shareCall(context: context, call: call);
   }
 
   /// Copies everything related to [call] (general data, request and

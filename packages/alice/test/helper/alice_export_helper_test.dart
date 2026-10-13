@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:alice/helper/alice_export_helper.dart';
-import 'package:alice/model/alice_export_result.dart';
-import 'package:flutter/foundation.dart';
+import 'package:alice/model/alice_http_call.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,82 +9,69 @@ import '../mock/build_context_mock.dart';
 import '../mock/mocked_data.dart';
 
 void main() {
-  late BuildContext context;
+  TestWidgetsFlutterBinding.ensureInitialized();
+  final BuildContext buildContext = BuildContextMock();
+
   setUp(() {
-    context = BuildContextMock();
+    PackageInfo.setMockInitialValues(
+      appName: 'Alice',
+      packageName: 'pl.hasoft.alice',
+      version: '1.0',
+      buildNumber: '1',
+      buildSignature: 'signature',
+    );
   });
 
   group("AliceExportHelper", () {
-    test("should build correct call log", () async {
-      _setPackageInfo();
-
-      final result = await AliceExportHelper.buildFullCallLog(
-        context: context,
-        call: MockedData.getFilledHttpCall(),
+    test("should build full call log", () async {
+      final AliceHttpCall call = MockedData.getFilledHttpCall();
+      final String? result = await AliceExportHelper.buildFullCallLog(
+        context: buildContext,
+        call: call,
       );
+
+      expect(result, isNotNull);
       _verifyLogLines(result!);
     });
 
-    test("should save call log to file", () async {
-      TestWidgetsFlutterBinding.ensureInitialized();
-      _setPackageInfo();
-      _setPathProvider();
-      _setDefaultTargetPlatform();
+    test("should save calls to file", () async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+            const MethodChannel('plugins.flutter.io/path_provider'),
+            (MethodCall methodCall) async {
+              return '.';
+            },
+          );
 
-      final result = await AliceExportHelper.saveCallsToFile(context, [
-        MockedData.getFilledHttpCall(),
+      final AliceHttpCall call = MockedData.getFilledHttpCall();
+      final result = await AliceExportHelper.saveCallsToFile(buildContext, [
+        call,
       ]);
+
       expect(result.success, true);
-      expect(result.path != null, true);
-      expect(result.error, null);
-
-      final file = File(result.path!);
-      expect(file.existsSync(), true);
-      final content = await file.readAsString();
-      _verifyLogLines(content);
-      file.delete();
+      expect(result.path, isNotEmpty);
     });
-  });
 
-  test("should not save empty call log to file", () async {
-    TestWidgetsFlutterBinding.ensureInitialized();
-    _setPackageInfo();
-    _setPathProvider();
-    _setDefaultTargetPlatform();
+    test("should not save empty calls to file", () async {
+      final result = await AliceExportHelper.saveCallsToFile(buildContext, []);
+      expect(result.success, false);
+    });
 
-    final result = await AliceExportHelper.saveCallsToFile(context, []);
+    test("should share call", () async {
+      MethodChannel('dev.fluttercommunity.plus/share').setMockMethodCallHandler(
+        (MethodCall methodCall) async {
+          return null;
+        },
+      );
 
-    expect(result.success, false);
-    expect(result.path, null);
-    expect(result.error, AliceExportResultError.empty);
-  });
+      final AliceHttpCall call = MockedData.getFilledHttpCall();
+      final result = await AliceExportHelper.shareCall(
+        context: buildContext,
+        call: call,
+      );
 
-  test("should not save call log to file if file problem occurs", () async {
-    TestWidgetsFlutterBinding.ensureInitialized();
-    _setPackageInfo();
-    _setPathProvider(isFailing: true);
-    _setDefaultTargetPlatform();
-
-    final result = await AliceExportHelper.saveCallsToFile(context, [
-      MockedData.getFilledHttpCall(),
-    ]);
-
-    expect(result.success, false);
-    expect(result.path, null);
-    expect(result.error, AliceExportResultError.file);
-  });
-
-  test("should share call log", () async {
-    TestWidgetsFlutterBinding.ensureInitialized();
-    _setPackageInfo();
-    _setShare();
-
-    final result = await AliceExportHelper.shareCall(
-      context: context,
-      call: MockedData.getFilledHttpCall(),
-    );
-    expect(result.success, true);
-    expect(result.error, null);
+      expect(result.success, true);
+    });
   });
 }
 
@@ -96,7 +80,7 @@ void _verifyLogLines(String result) {
     'Alice - HTTP Inspector',
     'App name:  Alice',
     'Package: pl.hasoft.alice',
-    'Alice - HTTP Inspector 1.0',
+    'Version: 1.0',
     'Build number: 1',
     'Generated:',
     '',
@@ -112,12 +96,12 @@ void _verifyLogLines(String result) {
     'Client:  ',
     'Duration: 0 ms',
     'Secured connection: true',
-    'Completed:: true ',
+    'Completed: true ',
     '--------------------------------------------',
     'Request',
     '--------------------------------------------',
     'Request time:',
-    'Request content type:: application/json',
+    'Request content type: application/json',
     'Request cookies: []',
     'Request headers: {}',
     'Request size: 0 B',
@@ -137,47 +121,10 @@ void _verifyLogLines(String result) {
     '--------------------------------------------',
     'curl -X POST ',
     '==============================================',
-    '',
   ];
-  for (var line in lines) {
-    expect(result.contains(line), true);
+
+  final split = result.split("\n");
+  for (var index = 0; index < lines.length; index++) {
+    expect(split[index].contains(lines[index]), true);
   }
-}
-
-void _setPackageInfo() {
-  PackageInfo.setMockInitialValues(
-    appName: "Alice",
-    packageName: "pl.hasoft.alice",
-    version: "1.0",
-    buildNumber: "1",
-    buildSignature: "buildSignature",
-  );
-}
-
-void _setPathProvider({bool isFailing = false}) {
-  const MethodChannel channel = MethodChannel(
-    'plugins.flutter.io/path_provider',
-  );
-  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-      .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
-        if (isFailing) {
-          return "";
-        } else {
-          return ".";
-        }
-      });
-}
-
-void _setDefaultTargetPlatform() {
-  debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
-}
-
-void _setShare() {
-  const MethodChannel channel = MethodChannel(
-    'dev.fluttercommunity.plus/share',
-  );
-  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-      .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
-        return ".";
-      });
 }

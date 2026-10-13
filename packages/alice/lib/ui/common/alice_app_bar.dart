@@ -89,11 +89,17 @@ class AliceAppBar extends StatelessWidget implements PreferredSizeWidget {
       child: Directionality(
         textDirection: Directionality.of(heroContext),
         child: ClipRect(
-          child: OverflowBox(
-            alignment: AlignmentDirectional.topStart,
-            minHeight: height,
-            maxHeight: height,
-            child: hero.child,
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              return OverflowBox(
+                alignment: AlignmentDirectional.topStart,
+                minWidth: constraints.maxWidth,
+                maxWidth: constraints.maxWidth,
+                minHeight: height,
+                maxHeight: height,
+                child: hero.child,
+              );
+            },
           ),
         ),
       ),

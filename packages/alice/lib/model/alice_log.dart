@@ -15,8 +15,7 @@ class AliceLog with EquatableMixin {
          "`DiagnosticLevel.off` is a '[special] level indicating that no "
          "diagnostics should be shown' and should not be used as a value.",
        ),
-       assert(timestamp == null || !timestamp.isUtc, 'Invalid timestamp'),
-       timestamp = timestamp ?? DateTime.now();
+       timestamp = (timestamp ?? DateTime.now()).toLocal();
 
   final DiagnosticLevel level;
   final DateTime timestamp;

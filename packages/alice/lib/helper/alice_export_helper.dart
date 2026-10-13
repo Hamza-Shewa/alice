@@ -131,7 +131,7 @@ class AliceExportHelper {
     return '${context.i18n(AliceTranslationKey.saveHeaderTitle)}\n'
         '${context.i18n(AliceTranslationKey.saveHeaderAppName)}  ${packageInfo.appName}\n'
         '${context.i18n(AliceTranslationKey.saveHeaderPackage)} ${packageInfo.packageName}\n'
-        '${context.i18n(AliceTranslationKey.saveHeaderTitle)} ${packageInfo.version}\n'
+        '${context.i18n(AliceTranslationKey.saveHeaderVersion)} ${packageInfo.version}\n'
         '${context.i18n(AliceTranslationKey.saveHeaderBuildNumber)} ${packageInfo.buildNumber}\n'
         '${context.i18n(AliceTranslationKey.saveHeaderGenerated)} ${DateTime.now().toIso8601String()}\n'
         '\n';
@@ -157,12 +157,12 @@ class AliceExportHelper {
           '${context.i18n(AliceTranslationKey.saveLogClient)} ${call.client} \n',
           '${context.i18n(AliceTranslationKey.saveLogDuration)} ${AliceConversionHelper.formatTime(call.duration)}\n',
           '${context.i18n(AliceTranslationKey.saveLogSecured)} ${call.secure}\n',
-          '${context.i18n(AliceTranslationKey.saveLogCompleted)}: ${!call.loading} \n',
+          '${context.i18n(AliceTranslationKey.saveLogCompleted)} ${!call.loading} \n',
           '--------------------------------------------\n',
           '${context.i18n(AliceTranslationKey.saveLogRequest)}\n',
           '--------------------------------------------\n',
           '${context.i18n(AliceTranslationKey.saveLogRequestTime)} ${call.request?.time}\n',
-          '${context.i18n(AliceTranslationKey.saveLogRequestContentType)}: ${call.request?.contentType}\n',
+          '${context.i18n(AliceTranslationKey.saveLogRequestContentType)} ${call.request?.contentType}\n',
           '${context.i18n(AliceTranslationKey.saveLogRequestCookies)} ${_encoder.convert(call.request?.cookies)}\n',
           '${context.i18n(AliceTranslationKey.saveLogRequestHeaders)} ${_encoder.convert(call.request?.headers)}\n',
         ]);

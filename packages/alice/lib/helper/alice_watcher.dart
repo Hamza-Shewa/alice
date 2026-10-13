@@ -148,24 +148,17 @@ class AliceWatcher extends ChangeNotifier {
   final Expando<_CachedResult> _cache = Expando<_CachedResult>();
   int _version = 0;
   bool _loaded = false;
-  bool _savePending = false;
+  Timer? _saveDebounceTimer;
 
   /// Changes every time [fields] change. Used to refresh cached screens.
   int get version => _version;
 
-  /// Call after any change of [fields]. Notifies listeners and saves.
+  /// Call after any change of [fields]. Notifies listeners and debounces save.
   void changed() {
     _version++;
     notifyListeners();
-    if (!_savePending) {
-      // Changes made in the same frame (typing, several edits) are written
-      // together.
-      _savePending = true;
-      scheduleMicrotask(() {
-        _savePending = false;
-        _save();
-      });
-    }
+    _saveDebounceTimer?.cancel();
+    _saveDebounceTimer = Timer(const Duration(milliseconds: 300), _save);
   }
 
   /// Replaces watched fields with the default ones.

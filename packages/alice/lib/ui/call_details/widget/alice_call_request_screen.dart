@@ -31,10 +31,11 @@ class AliceCallRequestScreen extends StatelessWidget {
         request?.queryParameters ?? const {};
     final List<AliceFormDataField> formFields = request?.formDataFields ?? [];
     final List<AliceFormDataFile> formFiles = request?.formDataFiles ?? [];
-    final String? contentType = AliceParser.getContentType(
-      context: context,
-      headers: request?.headers,
-    );
+    final String? rawContentType = request?.contentType;
+    final String? contentType =
+        (rawContentType != null && rawContentType.trim().isNotEmpty)
+            ? rawContentType
+            : AliceParser.tryGetContentType(request?.headers);
 
     return SelectionArea(
       child: ScrollConfiguration(
