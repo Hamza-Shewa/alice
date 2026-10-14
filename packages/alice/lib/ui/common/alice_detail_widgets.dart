@@ -149,6 +149,9 @@ class AliceKeyValueList extends StatelessWidget {
 }
 
 /// Monospace block for bodies and errors, with copy and show more actions.
+///
+/// An expanded block is kept alive inside lazy lists, so it doesn't collapse
+/// and lay out its text again after scrolling out of view and back.
 class AliceCodeBlock extends StatefulWidget {
   const AliceCodeBlock({super.key, required this.text, this.isError = false});
 
@@ -159,13 +162,17 @@ class AliceCodeBlock extends StatefulWidget {
   State<AliceCodeBlock> createState() => _AliceCodeBlockState();
 }
 
-class _AliceCodeBlockState extends State<AliceCodeBlock> {
+class _AliceCodeBlockState extends State<AliceCodeBlock>
+    with AutomaticKeepAliveClientMixin {
   static const int _collapsedLines = 15;
   static const int _collapsedChars = 1500;
 
   bool _expanded = false;
   late String _collapsedPreview;
   late bool _isLong;
+
+  @override
+  bool get wantKeepAlive => _expanded;
 
   @override
   void initState() {
@@ -202,8 +209,14 @@ class _AliceCodeBlockState extends State<AliceCodeBlock> {
     _collapsedPreview = _isLong ? '${text.substring(0, cutIndex)}\n…' : text;
   }
 
+  void _toggleExpanded() {
+    setState(() => _expanded = !_expanded);
+    updateKeepAlive();
+  }
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final ThemeData theme = Theme.of(context);
     final bool isLong = _isLong;
     final String shownText =
@@ -257,7 +270,7 @@ class _AliceCodeBlockState extends State<AliceCodeBlock> {
           ),
           if (isLong)
             TextButton(
-              onPressed: () => setState(() => _expanded = !_expanded),
+              onPressed: _toggleExpanded,
               child: Text(
                 context.i18n(
                   _expanded
@@ -604,7 +617,8 @@ class _AliceCollapsibleSectionState extends State<AliceCollapsibleSection> {
 
 /// Code block with a formatted HTTP body. Formatting a body (JSON decode and
 /// pretty print) is expensive, so the result is cached until the body, its
-/// content type or the language changes.
+/// content type or the language changes. The block is kept alive inside lazy
+/// lists, so scrolling it out of view and back doesn't format it again.
 class AliceFormattedBodyBlock extends StatefulWidget {
   const AliceFormattedBodyBlock({
     super.key,
@@ -620,14 +634,19 @@ class AliceFormattedBodyBlock extends StatefulWidget {
       _AliceFormattedBodyBlockState();
 }
 
-class _AliceFormattedBodyBlockState extends State<AliceFormattedBodyBlock> {
+class _AliceFormattedBodyBlockState extends State<AliceFormattedBodyBlock>
+    with AutomaticKeepAliveClientMixin {
   String? _text;
   dynamic _body;
   String? _contentType;
   String? _language;
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     final String language = AliceLanguage.current.value;
     if (_text == null ||
         !identical(_body, widget.body) ||
