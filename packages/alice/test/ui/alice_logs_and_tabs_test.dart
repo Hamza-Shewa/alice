@@ -7,7 +7,6 @@ import 'package:alice/ui/call_details/widget/alice_call_response_screen.dart';
 import 'package:alice/ui/calls_list/widget/alice_call_list_item_widget.dart';
 import 'package:alice/ui/calls_list/widget/alice_log_list_widget.dart';
 import 'package:alice/ui/common/alice_language.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

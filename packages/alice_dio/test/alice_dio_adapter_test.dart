@@ -176,13 +176,22 @@ void main() {
 
     test("should handle form data", () async {
       final name = '${DateTime.now().microsecondsSinceEpoch}.png';
-      final file = File(name);
+      // Create the file in a temporary folder, so the test leaves no files
+      // behind.
+      final directory = Directory.systemTemp.createTempSync('alice_dio_test');
+      addTearDown(() => directory.deleteSync(recursive: true));
+      final file = File('${directory.path}/$name');
       file.createSync();
 
       var formData = FormData.fromMap({
         'name': 'Alice',
         'surname': 'test',
-        'image': MultipartFile.fromFileSync(file.path),
+        // Dio infers the content type from the file name in newer versions,
+        // so set it explicitly.
+        'image': MultipartFile.fromFileSync(
+          file.path,
+          contentType: DioMediaType('application', 'octet-stream'),
+        ),
       });
 
       dioAdapter.onPost(

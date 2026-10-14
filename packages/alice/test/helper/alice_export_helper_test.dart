@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:alice/helper/alice_export_helper.dart';
 import 'package:alice/model/alice_http_call.dart';
 import 'package:flutter/material.dart';
@@ -35,11 +37,16 @@ void main() {
     });
 
     test("should save calls to file", () async {
+      // Save to a temporary folder, so the test leaves no files behind.
+      final Directory directory = Directory.systemTemp.createTempSync(
+        'alice_export_test',
+      );
+      addTearDown(() => directory.deleteSync(recursive: true));
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(
             const MethodChannel('plugins.flutter.io/path_provider'),
             (MethodCall methodCall) async {
-              return '.';
+              return directory.path;
             },
           );
 
@@ -58,11 +65,13 @@ void main() {
     });
 
     test("should share call", () async {
-      MethodChannel('dev.fluttercommunity.plus/share').setMockMethodCallHandler(
-        (MethodCall methodCall) async {
-          return null;
-        },
-      );
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+            const MethodChannel('dev.fluttercommunity.plus/share'),
+            (MethodCall methodCall) async {
+              return null;
+            },
+          );
 
       final AliceHttpCall call = MockedData.getFilledHttpCall();
       final result = await AliceExportHelper.shareCall(
