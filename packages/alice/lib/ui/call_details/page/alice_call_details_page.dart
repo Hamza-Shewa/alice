@@ -67,8 +67,8 @@ class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
         initialData: [widget.call],
         builder: (context, AsyncSnapshot<List<AliceHttpCall>> callsSnapshot) {
           if (callsSnapshot.hasData && !callsSnapshot.hasError) {
-            final AliceHttpCall? currentCall =
-                callsSnapshot.data?.firstWhereOrNull(
+            final AliceHttpCall? currentCall = callsSnapshot.data
+                ?.firstWhereOrNull(
                   (AliceHttpCall snapshotCall) =>
                       snapshotCall.id == widget.call.id,
                 );

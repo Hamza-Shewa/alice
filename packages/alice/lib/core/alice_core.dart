@@ -80,10 +80,7 @@ class AliceCore {
         return;
       }
       final AliceStats stats = _configuration.aliceStorage.getStats();
-      await notification.showStatsNotification(
-        context: context,
-        stats: stats,
-      );
+      await notification.showStatsNotification(context: context, stats: stats);
     }
   }
 
