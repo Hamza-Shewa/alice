@@ -214,6 +214,12 @@ class _RequestSection extends StatelessWidget {
     final AliceHttpRequest? request = call.request;
     final List<AliceFormDataField> formFields = request?.formDataFields ?? [];
     final List<AliceFormDataFile> formFiles = request?.formDataFiles ?? [];
+    final String? rawContentType = request?.contentType;
+    final String? contentType =
+        (rawContentType != null && rawContentType.trim().isNotEmpty)
+            ? rawContentType
+            : AliceParser.tryGetContentType(request?.headers);
+
     return AliceDetailSection(
       title: context.i18n(AliceTranslationKey.callDetailsRequest),
       children: [
@@ -271,7 +277,7 @@ class _RequestSection extends StatelessWidget {
           ),
           child: AliceFormattedBodyBlock(
             body: request?.body,
-            contentType: request?.contentType,
+            contentType: contentType,
           ),
         ),
       ],
@@ -280,13 +286,22 @@ class _RequestSection extends StatelessWidget {
 }
 
 /// Section with response headers and body.
-class _ResponseSection extends StatelessWidget {
+class _ResponseSection extends StatefulWidget {
   const _ResponseSection({required this.call});
 
   final AliceHttpCall call;
 
   @override
+  State<_ResponseSection> createState() => _ResponseSectionState();
+}
+
+class _ResponseSectionState extends State<_ResponseSection> {
+  static const int _largeOutputSize = 100000;
+  bool _showLargeBody = false;
+
+  @override
   Widget build(BuildContext context) {
+    final AliceHttpCall call = widget.call;
     final AliceHttpResponse? response = call.response;
     if (call.loading) {
       return AliceDetailSection(
@@ -303,6 +318,9 @@ class _ResponseSection extends StatelessWidget {
       headers: response?.headers,
     );
     final String lowerContentType = contentType?.toLowerCase() ?? '';
+    final int bodyLength = response?.body?.toString().length ?? 0;
+    final bool isLargeBody = bodyLength > _largeOutputSize;
+
     return AliceDetailSection(
       title: context.i18n(AliceTranslationKey.callDetailsResponse),
       children: [
@@ -329,6 +347,29 @@ class _ResponseSection extends StatelessWidget {
                   : lowerContentType.contains('video')
                   ? Text(
                     context.i18n(AliceTranslationKey.callResponseBodyVideo),
+                  )
+                  : (isLargeBody && !_showLargeBody)
+                  ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AliceInfoChip(
+                        icon: Icons.scale_outlined,
+                        text:
+                            '${context.i18n(AliceTranslationKey.callResponseTooLargeToShow)}'
+                            ' (${AliceConversionHelper.formatBytes(bodyLength)})',
+                        color: AliceTheme.getStatusColor(context, 300),
+                      ),
+                      const SizedBox(height: 10),
+                      FilledButton.tonalIcon(
+                        onPressed: () => setState(() => _showLargeBody = true),
+                        icon: const Icon(Icons.article_outlined, size: 18),
+                        label: Text(
+                          context.i18n(
+                            AliceTranslationKey.callResponseBodyShow,
+                          ),
+                        ),
+                      ),
+                    ],
                   )
                   : AliceFormattedBodyBlock(
                     body: response?.body,

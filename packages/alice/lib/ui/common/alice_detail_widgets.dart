@@ -164,21 +164,51 @@ class _AliceCodeBlockState extends State<AliceCodeBlock> {
   static const int _collapsedChars = 1500;
 
   bool _expanded = false;
+  late String _collapsedPreview;
+  late bool _isLong;
+
+  @override
+  void initState() {
+    super.initState();
+    _computePreview();
+  }
+
+  @override
+  void didUpdateWidget(covariant AliceCodeBlock oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.text != widget.text) {
+      _computePreview();
+    }
+  }
+
+  void _computePreview() {
+    final String text = widget.text;
+    final int maxScan =
+        text.length > _collapsedChars ? _collapsedChars : text.length;
+    int newlineCount = 0;
+    int cutIndex = maxScan;
+
+    for (int i = 0; i < maxScan; i++) {
+      if (text.codeUnitAt(i) == 0x0A) {
+        newlineCount++;
+        if (newlineCount >= _collapsedLines) {
+          cutIndex = i;
+          break;
+        }
+      }
+    }
+
+    _isLong = newlineCount >= _collapsedLines || text.length > _collapsedChars;
+    _collapsedPreview = _isLong ? '${text.substring(0, cutIndex)}\n…' : text;
+  }
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final List<String> lines = widget.text.split('\n');
-    final bool isLong =
-        lines.length > _collapsedLines || widget.text.length > _collapsedChars;
-    String shownText = widget.text;
-    if (isLong && !_expanded) {
-      shownText = lines.take(_collapsedLines).join('\n');
-      if (shownText.length > _collapsedChars) {
-        shownText = shownText.substring(0, _collapsedChars);
-      }
-      shownText += '\n…';
-    }
+    final bool isLong = _isLong;
+    final String shownText =
+        (isLong && !_expanded) ? _collapsedPreview : widget.text;
+
     final Color errorColor = getUrlIssueColor(context);
 
     return Container(
