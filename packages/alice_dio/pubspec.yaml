@@ -3,6 +3,7 @@ description: "Alice + Dio integration. It contains plugin for Alice which allows
 version: 1.0.7
 repository: https://github.com/jhomlala/alice
 homepage: https://github.com/jhomlala/alice
+publish_to: none
 topics:
   - http
   - inspector
@@ -16,10 +17,7 @@ environment:
 
 dependencies:
   alice:
-    git:
-      url: https://github.com/Hamza-Shewa/alice.git
-      path: packages/alice
-      ref: feat/uiux-updates
+    path: ../alice
   dio: ^5.11.0
   flutter:
     sdk: flutter

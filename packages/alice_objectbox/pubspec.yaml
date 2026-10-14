@@ -3,6 +3,7 @@ description: "Alice + ObjectBox integration. It contains a plugin for Alice whic
 version: 1.0.5
 repository: https://github.com/jhomlala/alice
 homepage: https://github.com/jhomlala/alice
+publish_to: none
 topics:
   - http
   - inspector
@@ -17,7 +18,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  alice: ^1.0.0
+  alice:
+    path: ../alice
   json_annotation: ^4.9.0
   meta: ^1.16.0
   objectbox: ^4.3.0

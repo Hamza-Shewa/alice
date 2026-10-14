@@ -3,6 +3,7 @@ description: "Alice + HTTP integration. It contains plugin for Alice which allow
 version: 1.0.7
 repository: https://github.com/jhomlala/alice
 homepage: https://github.com/jhomlala/alice
+publish_to: none
 topics:
   - http
   - inspector
@@ -14,7 +15,8 @@ environment:
   flutter: ">=3.29.0"
 
 dependencies:
-  alice: ^1.0.0
+  alice:
+    path: ../alice
   http: ^1.4.0
 
 dev_dependencies:
