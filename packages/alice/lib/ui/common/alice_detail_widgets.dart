@@ -1,8 +1,8 @@
 import 'package:alice/model/alice_translation.dart';
 import 'package:alice/ui/common/alice_context_ext.dart';
 import 'package:alice/ui/common/alice_language.dart';
-import 'package:alice/utils/alice_parser.dart';
 import 'package:alice/ui/common/alice_url_issue_banner.dart';
+import 'package:alice/utils/alice_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

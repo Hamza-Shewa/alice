@@ -15,10 +15,11 @@ import 'package:alice/ui/common/alice_issue_widgets.dart';
 import 'package:alice/ui/common/alice_scroll_behavior.dart';
 import 'package:alice/ui/common/alice_status_info_sheet.dart';
 import 'package:alice/ui/common/alice_theme.dart';
-import 'package:alice/ui/common/alice_watcher_widgets.dart';
 import 'package:alice/ui/common/alice_url_issue_banner.dart';
+import 'package:alice/ui/common/alice_watcher_widgets.dart';
 import 'package:alice/utils/alice_parser.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 /// Screen which displays call overview data, for example method, server.
 class AliceCallOverviewScreen extends StatelessWidget {
@@ -40,6 +41,7 @@ class AliceCallOverviewScreen extends StatelessWidget {
       child: ScrollConfiguration(
         behavior: AliceScrollBehavior(),
         child: ListView(
+          scrollCacheExtent: ScrollCacheExtent.viewport(5),
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
           children: [
             if (urlIssues.isNotEmpty) ...[
