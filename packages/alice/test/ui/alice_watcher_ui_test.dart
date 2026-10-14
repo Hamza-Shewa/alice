@@ -52,8 +52,12 @@ void main() {
     watcher.reset();
   });
 
-  Future<void> pump(WidgetTester tester, Widget child) =>
-      tester.pumpWidget(MaterialApp(home: Scaffold(body: child)));
+  Future<void> pump(WidgetTester tester, Widget child) async {
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: child)));
+    // Watcher changes are saved after a debounce. Let the save timer fire, so
+    // no timer is pending when the test ends.
+    await tester.pump(const Duration(milliseconds: 300));
+  }
 
   void useTypeAsStatus() {
     watcher.fields.single.useAsStatus = true;

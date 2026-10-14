@@ -105,6 +105,39 @@ void main() {
         AliceTranslationKey.issueReasonMalformedUrl,
       );
     });
+
+    test('malformed url explains a client error', () {
+      expect(
+        AliceIssueAnalyzer.analyze(
+          _call(status: 404, uri: 'https://a.com/v1login'),
+        )?.reason,
+        AliceTranslationKey.issueReasonMalformedUrl,
+      );
+    });
+
+    test('url which looks wrong does not fail a successful call', () {
+      expect(
+        AliceIssueAnalyzer.analyze(
+          _call(status: 200, uri: 'https://cdn.a.com/assets//img.png'),
+        ),
+        isNull,
+      );
+      expect(
+        AliceIssueAnalyzer.analyze(
+          _call(status: 302, uri: 'https://a.com/v1login'),
+        ),
+        isNull,
+      );
+    });
+
+    test('url which looks wrong does not hide a server error', () {
+      expect(
+        AliceIssueAnalyzer.analyze(
+          _call(status: 500, uri: 'https://a.com/v1login'),
+        )?.origin,
+        AliceIssueOrigin.backend,
+      );
+    });
   });
 
   group('AliceLogClassifier', () {
