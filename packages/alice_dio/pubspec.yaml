@@ -17,7 +17,10 @@ environment:
 
 dependencies:
   alice:
-    path: ../alice
+    git:
+      url: https://github.com/Hamza-Shewa/alice.git
+      ref: master
+      path: packages/alice
   dio: ^5.11.0
   flutter:
     sdk: flutter
