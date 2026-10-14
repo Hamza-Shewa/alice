@@ -19,7 +19,6 @@ import 'package:alice/ui/common/alice_url_issue_banner.dart';
 import 'package:alice/ui/common/alice_watcher_widgets.dart';
 import 'package:alice/utils/alice_parser.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 /// Screen which displays call overview data, for example method, server.
 class AliceCallOverviewScreen extends StatelessWidget {
@@ -40,165 +39,183 @@ class AliceCallOverviewScreen extends StatelessWidget {
     return SelectionArea(
       child: ScrollConfiguration(
         behavior: AliceScrollBehavior(),
-        child: ListView(
-          scrollCacheExtent: ScrollCacheExtent.viewport(5),
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
-          children: [
-            if (urlIssues.isNotEmpty) ...[
-              AliceUrlIssueBanner(issues: urlIssues),
-              const SizedBox(height: 16),
-            ],
-            _SummaryCard(call: call, hasUrlIssues: urlIssues.isNotEmpty),
-            if (issue != null) ...[
-              const SizedBox(height: 12),
-              AliceIssueBanner(issue: issue),
-            ],
-            const SizedBox(height: 12),
-            // Stretch makes all tiles as tall as the tallest one.
-            IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+        // Lays out a few screens around the visible area ahead of time, so
+        // sections are ready before they scroll in.
+        child: LayoutBuilder(
+          builder:
+              (BuildContext context, BoxConstraints constraints) => ListView(
+                // `scrollCacheExtent` replaces this from Flutter 3.44, but
+                // Alice still supports Flutter 3.29.
+                // ignore: deprecated_member_use
+                cacheExtent:
+                    constraints.maxHeight.isFinite
+                        ? constraints.maxHeight * _cacheViewports
+                        : null,
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
                 children: [
-                  Expanded(
-                    child: _StatTile(
-                      icon: Icons.timer_outlined,
-                      label: _label(
-                        context,
-                        AliceTranslationKey.callOverviewDuration,
-                      ),
-                      value:
-                          call.loading
-                              ? pending
-                              : AliceConversionHelper.formatTime(call.duration),
+                  if (urlIssues.isNotEmpty) ...[
+                    AliceUrlIssueBanner(issues: urlIssues),
+                    const SizedBox(height: 16),
+                  ],
+                  _SummaryCard(call: call, hasUrlIssues: urlIssues.isNotEmpty),
+                  if (issue != null) ...[
+                    const SizedBox(height: 12),
+                    AliceIssueBanner(issue: issue),
+                  ],
+                  const SizedBox(height: 12),
+                  // Stretch makes all tiles as tall as the tallest one.
+                  IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          child: _StatTile(
+                            icon: Icons.timer_outlined,
+                            label: _label(
+                              context,
+                              AliceTranslationKey.callOverviewDuration,
+                            ),
+                            value:
+                                call.loading
+                                    ? pending
+                                    : AliceConversionHelper.formatTime(
+                                      call.duration,
+                                    ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _StatTile(
+                            icon: Icons.upload_outlined,
+                            label: _label(
+                              context,
+                              AliceTranslationKey.callOverviewBytesSent,
+                            ),
+                            value: AliceConversionHelper.formatBytes(
+                              call.request?.size ?? 0,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _StatTile(
+                            icon: Icons.download_outlined,
+                            label: _label(
+                              context,
+                              AliceTranslationKey.callOverviewBytesReceived,
+                            ),
+                            value: AliceConversionHelper.formatBytes(
+                              call.response?.size ?? 0,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _StatTile(
-                      icon: Icons.upload_outlined,
-                      label: _label(
-                        context,
-                        AliceTranslationKey.callOverviewBytesSent,
+                  const SizedBox(height: 20),
+                  AliceInfoSection(
+                    title: context.i18n(AliceTranslationKey.callOverviewTiming),
+                    rows: [
+                      AliceInfoRow(
+                        label: _label(
+                          context,
+                          AliceTranslationKey.callOverviewStarted,
+                        ),
+                        value:
+                            started != null
+                                ? AliceConversionHelper.formatDateTime(started)
+                                : pending,
                       ),
-                      value: AliceConversionHelper.formatBytes(
-                        call.request?.size ?? 0,
+                      AliceInfoRow(
+                        label: _label(
+                          context,
+                          AliceTranslationKey.callOverviewFinished,
+                        ),
+                        value:
+                            finished != null
+                                ? AliceConversionHelper.formatDateTime(finished)
+                                : pending,
                       ),
-                    ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _StatTile(
-                      icon: Icons.download_outlined,
-                      label: _label(
-                        context,
-                        AliceTranslationKey.callOverviewBytesReceived,
-                      ),
-                      value: AliceConversionHelper.formatBytes(
-                        call.response?.size ?? 0,
-                      ),
+                  const SizedBox(height: 20),
+                  AliceInfoSection(
+                    title: context.i18n(
+                      AliceTranslationKey.callOverviewConnection,
                     ),
+                    rows: [
+                      AliceInfoRow(
+                        label: _label(
+                          context,
+                          AliceTranslationKey.callOverviewMethod,
+                        ),
+                        value: call.method,
+                      ),
+                      AliceInfoRow(
+                        label: _label(
+                          context,
+                          AliceTranslationKey.callOverviewServer,
+                        ),
+                        value: call.server,
+                        hasError: urlIssues.isNotEmpty,
+                      ),
+                      AliceInfoRow(
+                        label: _label(
+                          context,
+                          AliceTranslationKey.callOverviewEndpoint,
+                        ),
+                        value: call.endpoint,
+                        hasError: urlIssues.isNotEmpty,
+                      ),
+                      AliceInfoRow(
+                        label: _label(
+                          context,
+                          AliceTranslationKey.callOverviewClient,
+                        ),
+                        value: call.client.isEmpty ? '-' : call.client,
+                      ),
+                      AliceInfoRow(
+                        label: _label(
+                          context,
+                          AliceTranslationKey.callOverviewSecure,
+                        ),
+                        value: context.i18n(
+                          call.secure
+                              ? AliceTranslationKey.callsListYes
+                              : AliceTranslationKey.callsListNo,
+                        ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 20),
+                  _RequestSection(call: call),
+                  const SizedBox(height: 20),
+                  _ResponseSection(call: call),
+                  if (call.error != null) ...[
+                    const SizedBox(height: 20),
+                    AliceDetailSection(
+                      title: context.i18n(AliceTranslationKey.callDetailsError),
+                      children: [
+                        AliceCodeBlock(
+                          text: [
+                            '${call.error?.error}',
+                            if (call.error?.stackTrace != null)
+                              '${call.error?.stackTrace}',
+                          ].join('\n\n'),
+                          isError: true,
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
-            ),
-            const SizedBox(height: 20),
-            AliceInfoSection(
-              title: context.i18n(AliceTranslationKey.callOverviewTiming),
-              rows: [
-                AliceInfoRow(
-                  label: _label(
-                    context,
-                    AliceTranslationKey.callOverviewStarted,
-                  ),
-                  value:
-                      started != null
-                          ? AliceConversionHelper.formatDateTime(started)
-                          : pending,
-                ),
-                AliceInfoRow(
-                  label: _label(
-                    context,
-                    AliceTranslationKey.callOverviewFinished,
-                  ),
-                  value:
-                      finished != null
-                          ? AliceConversionHelper.formatDateTime(finished)
-                          : pending,
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            AliceInfoSection(
-              title: context.i18n(AliceTranslationKey.callOverviewConnection),
-              rows: [
-                AliceInfoRow(
-                  label: _label(
-                    context,
-                    AliceTranslationKey.callOverviewMethod,
-                  ),
-                  value: call.method,
-                ),
-                AliceInfoRow(
-                  label: _label(
-                    context,
-                    AliceTranslationKey.callOverviewServer,
-                  ),
-                  value: call.server,
-                  hasError: urlIssues.isNotEmpty,
-                ),
-                AliceInfoRow(
-                  label: _label(
-                    context,
-                    AliceTranslationKey.callOverviewEndpoint,
-                  ),
-                  value: call.endpoint,
-                  hasError: urlIssues.isNotEmpty,
-                ),
-                AliceInfoRow(
-                  label: _label(
-                    context,
-                    AliceTranslationKey.callOverviewClient,
-                  ),
-                  value: call.client.isEmpty ? '-' : call.client,
-                ),
-                AliceInfoRow(
-                  label: _label(
-                    context,
-                    AliceTranslationKey.callOverviewSecure,
-                  ),
-                  value: context.i18n(
-                    call.secure
-                        ? AliceTranslationKey.callsListYes
-                        : AliceTranslationKey.callsListNo,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            _RequestSection(call: call),
-            const SizedBox(height: 20),
-            _ResponseSection(call: call),
-            if (call.error != null) ...[
-              const SizedBox(height: 20),
-              AliceDetailSection(
-                title: context.i18n(AliceTranslationKey.callDetailsError),
-                children: [
-                  AliceCodeBlock(
-                    text: [
-                      '${call.error?.error}',
-                      if (call.error?.stackTrace != null)
-                        '${call.error?.stackTrace}',
-                    ].join('\n\n'),
-                    isError: true,
-                  ),
-                ],
-              ),
-            ],
-          ],
         ),
       ),
     );
   }
+
+  /// Number of viewport heights laid out around the visible area.
+  static const double _cacheViewports = 5;
 
   /// Returns translated label without trailing colon.
   static String _label(BuildContext context, AliceTranslationKey key) =>
