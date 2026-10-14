@@ -67,8 +67,11 @@ class AliceUrlValidator {
   );
   static final RegExp _portGluedToPathRegExp = RegExp(r'^(\d+)([^\d].*)$');
   static final RegExp _numericHostRegExp = RegExp(r'^[\d.]+$');
+
+  /// A version glued to a word, e.g. `v1login`. Segments which contain more
+  /// digits are versions themselves, e.g. `v1p1beta1` used by Google APIs.
   static final RegExp _versionGluedRegExp = RegExp(
-    r'(^|\/)(v\d+)(?!(?:alpha|beta|rc)\d*(?:\/|$))([a-zA-Z][^\/]*)',
+    r'(^|\/)(v\d+)(?!(?:alpha|beta|rc)\d*(?:\/|$))([a-zA-Z][^\/\d]*)(?=\/|$)',
   );
   static final RegExp _whitespaceRegExp = RegExp(r'\s');
 

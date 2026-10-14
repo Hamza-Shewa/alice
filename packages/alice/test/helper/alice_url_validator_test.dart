@@ -62,6 +62,19 @@ void main() {
       ]);
     });
 
+    test('should accept versions with more digits after the version', () {
+      expect(
+        AliceUrlValidator.validate(
+          'https://speech.googleapis.com/v1p1beta1/speech:recognize',
+        ),
+        isEmpty,
+      );
+      expect(
+        AliceUrlValidator.validate('https://example.com/v2alpha1/users'),
+        isEmpty,
+      );
+    });
+
     test('should detect invalid IP address', () {
       expect(types('http://192.168.1/api'), [AliceUrlIssueType.invalidIp]);
       expect(types('http://192.168.1.300/api'), [AliceUrlIssueType.invalidIp]);

@@ -47,15 +47,23 @@ class AliceIssueAnalyzer {
     if (call.loading) {
       return null;
     }
-    if (AliceUrlValidator.validateCall(call).isNotEmpty) {
+
+    final int? status = call.response?.status;
+    final String? error = call.error?.error?.toString();
+    // -1 or 0 are used when the call failed without a valid response.
+    final bool hasNoResponse = status == null || status < 100;
+    final bool isClientError = status != null && status >= 400 && status < 500;
+
+    // A URL which looks wrong explains only a call which didn't reach the
+    // endpoint. A call which got a successful response reached it, so the
+    // URL heuristics must not turn it into a failure.
+    if ((hasNoResponse || isClientError) &&
+        AliceUrlValidator.validateCall(call).isNotEmpty) {
       return const AliceIssue(
         origin: AliceIssueOrigin.frontend,
         reason: AliceTranslationKey.issueReasonMalformedUrl,
       );
     }
-
-    final int? status = call.response?.status;
-    final String? error = call.error?.error?.toString();
 
     if (status != null && status >= 500 && status < 600) {
       return AliceIssue(
@@ -70,8 +78,7 @@ class AliceIssueAnalyzer {
     if (status != null && status >= 400 && status < 500) {
       return _analyzeClientError(status);
     }
-    if (status == null || status < 100) {
-      // No valid response: -1 or 0 are used when the call failed.
+    if (hasNoResponse) {
       if (error != null && !_networkErrorRegExp.hasMatch(error)) {
         return AliceIssue(
           origin: AliceIssueOrigin.frontend,
