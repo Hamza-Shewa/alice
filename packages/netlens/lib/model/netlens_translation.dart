@@ -293,6 +293,7 @@ enum NetLensTranslationKey {
   timelineEmpty,
   timelineSummary,
   statsSectionSlowest,
+  statsEndpointCall,
   statsEndpointCalls,
   statsEndpointFailures,
 }

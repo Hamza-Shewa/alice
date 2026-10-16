@@ -523,7 +523,11 @@ class _EndpointTimingRow extends StatelessWidget {
             metric('max', timing.max),
             Text(
               context
-                  .i18n(NetLensTranslationKey.statsEndpointCalls)
+                  .i18n(
+                    timing.count == 1
+                        ? NetLensTranslationKey.statsEndpointCall
+                        : NetLensTranslationKey.statsEndpointCalls,
+                  )
                   .replaceAll('[count]', '${timing.count}'),
               style: labelStyle,
             ),

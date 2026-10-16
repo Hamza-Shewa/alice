@@ -10,6 +10,20 @@ topics:
   - chopper
   - interceptor
 
+screenshots:
+  - description: Calls list with quick filters, status and GraphQL badges
+    path: screenshots/1_calls.png
+  - description: Response body in the collapsible JSON viewer
+    path: screenshots/2_json_viewer.png
+  - description: Request with the API key and password hidden
+    path: screenshots/3_request_redacted.png
+  - description: Editing a call before sending it again
+    path: screenshots/4_edit_and_resend.png
+  - description: Timeline of calls as a waterfall
+    path: screenshots/5_timeline.png
+  - description: Statistics with the slowest endpoints
+    path: screenshots/6_statistics.png
+
 environment:
   sdk: ">=3.7.0 <4.0.0"
   flutter: ">=3.29.0"

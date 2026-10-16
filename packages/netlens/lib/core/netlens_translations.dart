@@ -369,6 +369,7 @@ class NetLensTranslations {
         NetLensTranslationKey.timelineSummary:
             "[count] calls over [duration], up to [concurrency] at once",
         NetLensTranslationKey.statsSectionSlowest: "Slowest endpoints",
+        NetLensTranslationKey.statsEndpointCall: "1 call",
         NetLensTranslationKey.statsEndpointCalls: "[count] calls",
         NetLensTranslationKey.statsEndpointFailures: "[count] failed",
       },
@@ -722,6 +723,7 @@ class NetLensTranslations {
         NetLensTranslationKey.timelineSummary:
             "[count] طلب خلال [duration]، وحتى [concurrency] في الوقت نفسه",
         NetLensTranslationKey.statsSectionSlowest: "أبطأ نقاط النهاية",
+        NetLensTranslationKey.statsEndpointCall: "طلب واحد",
         NetLensTranslationKey.statsEndpointCalls: "عدد الطلبات: [count]",
         NetLensTranslationKey.statsEndpointFailures: "فشل: [count]",
       },
