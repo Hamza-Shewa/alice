@@ -110,15 +110,28 @@ Future<void> _pumpScreen(WidgetTester tester, Widget screen) async {
   await tester.pumpWidget(MaterialApp(home: Scaffold(body: screen)));
 }
 
-/// Scrolls through the whole screen and expands every collapsed code block on
-/// the way, so the full bodies are laid out. Returns to the top afterwards.
+/// Scrolls through the whole screen, switches JSON bodies to the raw text and
+/// expands every collapsed code block on the way, so the full bodies are laid out. Returns to the top afterwards.
 Future<void> _expandBodies(WidgetTester tester) async {
   final ScrollPosition position = _position(tester);
   while (true) {
     // Only buttons on screen: expanded blocks which scrolled away are kept
     // alive, but they can't be tapped.
     final Finder showMore = find.text('Show more').hitTestable();
-    if (showMore.evaluate().isNotEmpty) {
+    final Finder treeViewer = find.byWidgetPredicate(
+      (Widget widget) =>
+          widget is SegmentedButton &&
+          widget.selected.first.toString().endsWith('tree'),
+    );
+    final Finder showRaw = find.descendant(
+      of: treeViewer,
+      matching: find.text('Raw').hitTestable(),
+    );
+    if (showRaw.evaluate().isNotEmpty) {
+      // JSON bodies start in the tree; the raw text is the large layout.
+      await tester.tap(showRaw.first);
+      await tester.pumpAndSettle();
+    } else if (showMore.evaluate().isNotEmpty) {
       await tester.tap(showMore.first);
       await tester.pumpAndSettle();
     } else if (position.pixels < position.maxScrollExtent) {

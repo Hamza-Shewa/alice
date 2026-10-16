@@ -9,4 +9,11 @@ class AliceCallDetailsMenuItem {
 }
 
 /// Definition of all call details menu item types.
-enum AliceCallDetailsMenuItemType { sort, delete, stats, save }
+enum AliceCallDetailsMenuItemType {
+  sort,
+  delete,
+  stats,
+  timeline,
+  save,
+  exportHar,
+}

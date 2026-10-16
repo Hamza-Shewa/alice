@@ -1,10 +1,12 @@
 import 'package:alice/core/alice_core.dart';
 import 'package:alice/helper/alice_call_statistics.dart';
 import 'package:alice/helper/alice_conversion_helper.dart';
+import 'package:alice/helper/alice_endpoint_statistics.dart';
 import 'package:alice/helper/alice_issue_analyzer.dart';
 import 'package:alice/model/alice_http_call.dart';
 import 'package:alice/model/alice_translation.dart';
 import 'package:alice/ui/common/alice_app_bar.dart';
+import 'package:alice/ui/common/alice_call_badges.dart';
 import 'package:alice/ui/common/alice_context_ext.dart';
 import 'package:alice/ui/common/alice_detail_widgets.dart';
 import 'package:alice/ui/common/alice_issue_widgets.dart';
@@ -48,9 +50,13 @@ class _AliceStatsPageState extends State<AliceStatsPage>
                   BuildContext context,
                   AsyncSnapshot<List<AliceHttpCall>> snapshot,
                 ) {
+                  final List<AliceHttpCall> calls =
+                      snapshot.data ?? widget.aliceCore.getCalls();
                   final AliceCallStatistics stats = AliceCallStatistics.from(
-                    snapshot.data ?? widget.aliceCore.getCalls(),
+                    calls,
                   );
+                  final List<AliceEndpointTiming> slowest =
+                      AliceEndpointStatistics.slowest(calls);
                   return ScrollConfiguration(
                     behavior: AliceScrollBehavior(),
                     child: ListView(
@@ -63,6 +69,10 @@ class _AliceStatsPageState extends State<AliceStatsPage>
                         _TrafficSection(stats: stats),
                         const SizedBox(height: 20),
                         _TimingSection(stats: stats),
+                        if (slowest.isNotEmpty) ...[
+                          const SizedBox(height: 20),
+                          _SlowestSection(timings: slowest),
+                        ],
                         if (stats.methods.isNotEmpty) ...[
                           const SizedBox(height: 20),
                           _MethodsSection(stats: stats),
@@ -432,6 +442,102 @@ class _TimingSection extends StatelessWidget {
               label: _label(context, AliceTranslationKey.statsMinRequestTime),
               value: AliceConversionHelper.formatTime(stats.minTime),
             ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// Endpoints with the longest response times: median, 95th percentile and
+/// longest call.
+class _SlowestSection extends StatelessWidget {
+  const _SlowestSection({required this.timings});
+
+  final List<AliceEndpointTiming> timings;
+
+  @override
+  Widget build(BuildContext context) {
+    return AliceDetailSection(
+      title: context.i18n(AliceTranslationKey.statsSectionSlowest),
+      children: [
+        for (final AliceEndpointTiming timing in timings)
+          _EndpointTimingRow(timing: timing),
+      ],
+    );
+  }
+}
+
+class _EndpointTimingRow extends StatelessWidget {
+  const _EndpointTimingRow({required this.timing});
+
+  final AliceEndpointTiming timing;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final Color muted = theme.colorScheme.onSurfaceVariant;
+    final TextStyle? valueStyle = theme.textTheme.bodySmall?.copyWith(
+      fontWeight: FontWeight.w700,
+      fontFeatures: const [FontFeature.tabularFigures()],
+    );
+    final TextStyle? labelStyle = theme.textTheme.bodySmall?.copyWith(
+      color: muted,
+    );
+    Widget metric(String label, int value) => Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(text: '$label ', style: labelStyle),
+          TextSpan(
+            text: AliceConversionHelper.formatTime(value),
+            style: valueStyle,
+          ),
+        ],
+      ),
+      textDirection: TextDirection.ltr,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            AliceMethodBadge(method: timing.method, fontSize: 10),
+            const SizedBox(width: 8),
+            Expanded(
+              child: AliceLtrText(
+                timing.path,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Wrap(
+          spacing: 14,
+          runSpacing: 4,
+          children: [
+            metric('p50', timing.p50),
+            metric('p95', timing.p95),
+            metric('max', timing.max),
+            Text(
+              context
+                  .i18n(AliceTranslationKey.statsEndpointCalls)
+                  .replaceAll('[count]', '${timing.count}'),
+              style: labelStyle,
+            ),
+            if (timing.failures > 0)
+              Text(
+                context
+                    .i18n(AliceTranslationKey.statsEndpointFailures)
+                    .replaceAll('[count]', '${timing.failures}'),
+                style: labelStyle?.copyWith(
+                  color: AliceTheme.getStatusColor(context, 500),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
           ],
         ),
       ],

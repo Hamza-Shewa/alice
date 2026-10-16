@@ -36,6 +36,18 @@ class _AliceJsonViewerState extends State<AliceJsonViewer> {
   Set<String> _matches = const {};
   int _rowLimit = _rowsPerPage;
 
+  /// The search field is shown on demand: a text field is costly in lists
+  /// which scroll, and most bodies are read without searching.
+  bool _searchVisible = false;
+
+  void _toggleSearch() {
+    setState(() => _searchVisible = !_searchVisible);
+    if (!_searchVisible) {
+      _searchController.clear();
+      _search('');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -82,7 +94,11 @@ class _AliceJsonViewerState extends State<AliceJsonViewer> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
+        Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 8,
+          runSpacing: 4,
           children: [
             SegmentedButton<_AliceJsonViewMode>(
               showSelectedIcon: false,
@@ -107,53 +123,71 @@ class _AliceJsonViewerState extends State<AliceJsonViewer> {
                   (Set<_AliceJsonViewMode> selection) =>
                       setState(() => _mode = selection.first),
             ),
-            const Spacer(),
-            if (_mode == _AliceJsonViewMode.tree) ...[
-              IconButton(
-                icon: const Icon(Icons.unfold_more, size: 20),
-                visualDensity: VisualDensity.compact,
-                tooltip: context.i18n(AliceTranslationKey.jsonExpandAll),
-                onPressed:
-                    () => setState(
-                      () =>
-                          _expanded = AliceJsonTree.allContainers(widget.json),
+            if (_mode == _AliceJsonViewMode.tree)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      _searchVisible ? Icons.search_off : Icons.search,
+                      size: 20,
                     ),
+                    visualDensity: VisualDensity.compact,
+                    tooltip: context.i18n(AliceTranslationKey.jsonSearchHint),
+                    isSelected: _searchVisible,
+                    onPressed: _toggleSearch,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.unfold_more, size: 20),
+                    visualDensity: VisualDensity.compact,
+                    tooltip: context.i18n(AliceTranslationKey.jsonExpandAll),
+                    onPressed:
+                        () => setState(
+                          () =>
+                              _expanded = AliceJsonTree.allContainers(
+                                widget.json,
+                              ),
+                        ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.unfold_less, size: 20),
+                    visualDensity: VisualDensity.compact,
+                    tooltip: context.i18n(AliceTranslationKey.jsonCollapseAll),
+                    onPressed: () => setState(() => _expanded = {}),
+                  ),
+                  AliceCopyIconButton(text: widget.rawText),
+                ],
               ),
-              IconButton(
-                icon: const Icon(Icons.unfold_less, size: 20),
-                visualDensity: VisualDensity.compact,
-                tooltip: context.i18n(AliceTranslationKey.jsonCollapseAll),
-                onPressed: () => setState(() => _expanded = {}),
-              ),
-              AliceCopyIconButton(text: widget.rawText),
-            ],
           ],
         ),
         const SizedBox(height: 8),
         if (_mode == _AliceJsonViewMode.raw)
           AliceCodeBlock(text: widget.rawText)
         else ...[
-          TextField(
-            controller: _searchController,
-            onChanged: _search,
-            textDirection: TextDirection.ltr,
-            style: theme.textTheme.bodyMedium,
-            decoration: InputDecoration(
-              isDense: true,
-              prefixIcon: const Icon(Icons.search, size: 20),
-              hintText: context.i18n(AliceTranslationKey.jsonSearchHint),
-              border: const OutlineInputBorder(),
-              suffixText:
-                  _searchController.text.trim().isEmpty
-                      ? null
-                      : _matches.isEmpty
-                      ? context.i18n(AliceTranslationKey.jsonNoMatches)
-                      : context
-                          .i18n(AliceTranslationKey.jsonMatches)
-                          .replaceAll('[count]', '${_matches.length}'),
+          if (_searchVisible) ...[
+            TextField(
+              controller: _searchController,
+              onChanged: _search,
+              autofocus: true,
+              textDirection: TextDirection.ltr,
+              style: theme.textTheme.bodyMedium,
+              decoration: InputDecoration(
+                isDense: true,
+                prefixIcon: const Icon(Icons.search, size: 20),
+                hintText: context.i18n(AliceTranslationKey.jsonSearchHint),
+                border: const OutlineInputBorder(),
+                suffixText:
+                    _searchController.text.trim().isEmpty
+                        ? null
+                        : _matches.isEmpty
+                        ? context.i18n(AliceTranslationKey.jsonNoMatches)
+                        : context
+                            .i18n(AliceTranslationKey.jsonMatches)
+                            .replaceAll('[count]', '${_matches.length}'),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
+            const SizedBox(height: 8),
+          ],
           _buildTree(context),
         ],
       ],
@@ -265,7 +299,7 @@ class _JsonRowWidget extends StatelessWidget {
                     ),
                     children: [
                       TextSpan(
-                        text: row.label,
+                        text: row.isMapEntry ? '"${row.label}"' : row.label,
                         style: TextStyle(
                           color: keyColor,
                           fontWeight: FontWeight.w600,

@@ -8,6 +8,7 @@ class AliceJsonRow {
     required this.label,
     required this.value,
     required this.isExpanded,
+    this.isMapEntry = true,
   });
 
   /// Path of the value, for example `$.data[0].name`.
@@ -20,6 +21,9 @@ class AliceJsonRow {
   final String label;
   final dynamic value;
   final bool isExpanded;
+
+  /// True for a value in a map, false for an item of a list.
+  final bool isMapEntry;
 
   /// Returns true when the value is a map or a list.
   bool get isContainer => value is Map || value is List;
@@ -89,6 +93,7 @@ class AliceJsonTree {
             label: '$key',
             value: child,
             isExpanded: isExpanded,
+            isMapEntry: key is! int,
           ),
         );
         if (isExpanded) {

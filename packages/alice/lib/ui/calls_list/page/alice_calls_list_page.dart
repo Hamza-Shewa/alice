@@ -242,8 +242,12 @@ class _AliceCallsListPageState extends State<AliceCallsListPage>
         _onRemovePressed();
       case AliceCallDetailsMenuItemType.stats:
         _onStatsPressed();
+      case AliceCallDetailsMenuItemType.timeline:
+        AliceNavigation.navigateToTimeline(core: aliceCore);
       case AliceCallDetailsMenuItemType.save:
         _saveToFile();
+      case AliceCallDetailsMenuItemType.exportHar:
+        _exportHar();
     }
   }
 
@@ -323,6 +327,28 @@ class _AliceCallsListPageState extends State<AliceCallsListPage>
         description: description,
       );
     }
+  }
+
+  /// Saves calls to a HAR file and opens the share sheet with it.
+  Future<void> _exportHar() async {
+    final AliceExportResult result = await aliceCore.saveCallsToHarFile();
+    if (!mounted || result.success) {
+      return;
+    }
+    final bool isEmpty = result.error == AliceExportResultError.empty;
+    AliceGeneralDialog.show(
+      context: context,
+      title: context.i18n(
+        isEmpty
+            ? AliceTranslationKey.saveDialogEmptyErrorTitle
+            : AliceTranslationKey.saveDialogFileSaveErrorTitle,
+      ),
+      description: context.i18n(
+        isEmpty
+            ? AliceTranslationKey.saveDialogEmptyErrorDescription
+            : AliceTranslationKey.saveDialogFileSaveErrorDescription,
+      ),
+    );
   }
 
   /// Called when clear search button has been pressed. Clears the query.
@@ -463,8 +489,12 @@ class _ContextMenuButton extends StatelessWidget {
         return context.i18n(AliceTranslationKey.callsListDelete);
       case AliceCallDetailsMenuItemType.stats:
         return context.i18n(AliceTranslationKey.callsListStats);
+      case AliceCallDetailsMenuItemType.timeline:
+        return context.i18n(AliceTranslationKey.callsListTimeline);
       case AliceCallDetailsMenuItemType.save:
         return context.i18n(AliceTranslationKey.callsListSave);
+      case AliceCallDetailsMenuItemType.exportHar:
+        return context.i18n(AliceTranslationKey.callsListExportHar);
     }
   }
 
@@ -477,8 +507,12 @@ class _ContextMenuButton extends StatelessWidget {
         return Icons.delete_outline;
       case AliceCallDetailsMenuItemType.stats:
         return Icons.insert_chart;
+      case AliceCallDetailsMenuItemType.timeline:
+        return Icons.view_timeline_outlined;
       case AliceCallDetailsMenuItemType.save:
         return Icons.save_outlined;
+      case AliceCallDetailsMenuItemType.exportHar:
+        return Icons.ios_share;
     }
   }
 }

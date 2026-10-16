@@ -72,9 +72,11 @@ void main() {
       expect(find.text('Frontend issue'), findsOneWidget);
       expect(find.text('Backend issue'), findsOneWidget);
       expect(find.text('Network issue'), findsOneWidget);
-      expect(find.text('GET'), findsOneWidget);
-      expect(find.text('POST'), findsOneWidget);
+      // Methods are listed in the methods and slowest endpoints sections.
+      expect(find.text('GET'), findsWidgets);
+      expect(find.text('POST'), findsNWidgets(2));
       expect(find.text('HTTPS'), findsOneWidget);
+      expect(find.text('SLOWEST ENDPOINTS'), findsOneWidget);
     });
 
     testWidgets('says when nothing failed and handles no calls', (

@@ -5,6 +5,7 @@ import 'package:alice/ui/calls_list/page/alice_calls_list_page.dart';
 import 'package:alice/ui/common/alice_theme.dart';
 import 'package:alice/ui/replay/alice_replay_page.dart';
 import 'package:alice/ui/stats/alice_stats_page.dart';
+import 'package:alice/ui/timeline/alice_timeline_page.dart';
 import 'package:alice/ui/watcher/alice_watcher_page.dart';
 import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
@@ -31,6 +32,15 @@ class AliceNavigation {
   /// Navigates to stats page.
   static Future<void> navigateToStats({required AliceCore core}) {
     return _navigateToPage(core: core, child: AliceStatsPage(core), fade: true);
+  }
+
+  /// Navigates to timeline page.
+  static Future<void> navigateToTimeline({required AliceCore core}) {
+    return _navigateToPage(
+      core: core,
+      child: AliceTimelinePage(core: core),
+      fade: true,
+    );
   }
 
   /// Navigates to page where [call] can be edited and sent again.
