@@ -1,0 +1,29 @@
+name: netlens_dio_example
+description: "A project to showcase dio and netlens integration."
+publish_to: 'none'
+
+version: 1.0.0+3
+
+environment:
+  sdk: ">=3.7.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  netlens:
+  netlens_dio:
+  path_provider:
+  path:
+  dio: ^5.8.0+1
+
+dev_dependencies:
+  flutter_lints: ^5.0.0
+
+dependency_overrides:
+  netlens:
+    path: ../../packages/netlens
+  netlens_dio:
+    path: ../../packages/netlens_dio
+
+flutter:
+  uses-material-design: true

@@ -3,37 +3,42 @@
 ## Dio
 
 ```dart
-/// Create Alice instance
-Alice alice = Alice();
+/// Create NetLens instance
+NetLens netLens = NetLens();
 
-/// Create Alice Dio Adapter
-AliceDioAdapter aliceDioAdapter = AliceDioAdapter();
+/// Create NetLens Dio Adapter
+NetLensDioAdapter netLensDioAdapter = NetLensDioAdapter();
 
-/// Add adapter to Alice
-alice.addAdapter(aliceDioAdapter);
+/// Add adapter to NetLens
+netLens.addAdapter(netLensDioAdapter);
 
 /// Create Dio instance
 Dio dio = Dio();
 
 /// Add interceptor to Dio
-dio.interceptors.add(aliceDioAdapter);
+dio.interceptors.add(netLensDioAdapter);
+
+/// Optional: resend calls from NetLens with this Dio, so they use its base
+/// options, interceptors and HTTP client adapter. Without it, a plain Dio is
+/// used.
+netLensDioAdapter.replayClient = dio;
 
 ```
 
 ## Chopper
 ```dart
-/// Create Alice instance
-Alice alice = Alice();
+/// Create NetLens instance
+NetLens netLens = NetLens();
 
-/// Create Alice Chopper Adapter
-AliceChopperAdapter aliceChopperAdapter = AliceChopperAdapter();
+/// Create NetLens Chopper Adapter
+NetLensChopperAdapter netLensChopperAdapter = NetLensChopperAdapter();
 
-///Add adapter to Alice
-alice.addAdapter(aliceChopperAdapter);
+///Add adapter to NetLens
+netLens.addAdapter(netLensChopperAdapter);
 
 /// Create chopper client
 ChopperClient chopperClient = ChopperClient(
-    interceptors: [_aliceChopperAdapter],
+    interceptors: [netLensChopperAdapter],
 );
 
 ```
@@ -41,21 +46,21 @@ ChopperClient chopperClient = ChopperClient(
 
 ## HTTP
 ```dart
-/// Create Alice instance
-Alice alice = Alice();
+/// Create NetLens instance
+NetLens netLens = NetLens();
 
-/// Create Alice Http Adapter
-AliceHttpAdapter aliceHttpAdapter = AliceHttpAdapter();
+/// Create NetLens Http Adapter
+NetLensHttpAdapter netLensHttpAdapter = NetLensHttpAdapter();
 
-///Add adapter to Alice
-alice.addAdapter(aliceHttpAdapter);
+///Add adapter to NetLens
+netLens.addAdapter(netLensHttpAdapter);
 ```
 
 Use extension to intercept HTTP call:
 ```dart
 http
     .post(Uri.tryParse('https://api.com')!, body: body)
-    .interceptWithAlice(aliceHttpAdapter, body: body);
+    .interceptWithNetLens(netLensHttpAdapter, body: body);
 ```
 
 Use adapter to handle HTTP call:
@@ -63,20 +68,20 @@ Use adapter to handle HTTP call:
 http
     .put(Uri.tryParse('https://api.com')!, body: body)
     .then((response) {
-      aliceHttpAdapter.onResponse(response, body: body);
+      netLensHttpAdapter.onResponse(response, body: body);
     });
 ```
 
 ## HTTP Client
 ```dart
-/// Create Alice instance
-Alice alice = Alice();
+/// Create NetLens instance
+NetLens netLens = NetLens();
 
-/// Create Alice Http Adapter
-AliceHttpClientAdapter aliceHttpClientAdapter = AliceHttpClientAdapter();
+/// Create NetLens Http Adapter
+NetLensHttpClientAdapter netLensHttpClientAdapter = NetLensHttpClientAdapter();
 
-///Add adapter to Alice
-alice.addAdapter(aliceHttpClientAdapter);
+///Add adapter to NetLens
+netLens.addAdapter(netLensHttpClientAdapter);
 
 /// Http Client instance
 HttpClient httpClient = HttpClient();
@@ -86,7 +91,7 @@ Use extension to intercept HTTP call:
 ```dart
 httpClient
     .getUrl(Uri.parse('https://api.com'))
-    .interceptWithAlice(aliceHttpClientAdapter);
+    .interceptWithNetLens(netLensHttpClientAdapter);
 ```
 
 Use adapter to handle HTTP call:
@@ -94,16 +99,44 @@ Use adapter to handle HTTP call:
 httpClient
     .getUrl(Uri.parse('https://api.com'))
     .then((request) async {
-      aliceHttpClientAdapter.onRequest(request);
+      netLensHttpClientAdapter.onRequest(request);
       var httpResponse = await request.close();
       var responseBody = await utf8.decoder.bind(httpResponse).join();
-      aliceHttpClientAdapter.onResponse(httpResponse, request, body: responseBody);
+      netLensHttpClientAdapter.onResponse(httpResponse, request, body: responseBody);
 });
+```
+
+## Edit and resend
+
+Calls made by Dio, the http package and `HttpClient` can be sent again from
+the call details: the resend button opens an editor with the method, URL,
+headers and body of the call. The new call is caught by NetLens like any other.
+The editor starts from the real values, also when the inspector hides
+sensitive ones. Form data can't be resent, because NetLens keeps only the names
+and sizes of form fields and files.
+
+`NetLensHttpAdapter` and `NetLensHttpClientAdapter` take an optional
+`replayClient`, when calls must be resent with a configured client.
+
+An adapter of another client can support it by implementing
+`NetLensCallReplayer`:
+
+```dart
+class MyAdapter with NetLensAdapter implements NetLensCallReplayer {
+  @override
+  bool canReplay(NetLensHttpCall call) => call.client == 'MyClient';
+
+  @override
+  Future<void> replay(NetLensReplayRequest request) async {
+    // Send request.method, request.url, request.headers and request.body
+    // with your client, and report the call to NetLens as usual.
+  }
+}
 ```
 
 ## ObjectBox
 
-Setting up ObjectBox with Alice is simple, however, there are a few crucial steps which need to be followed.
+Setting up ObjectBox with NetLens is simple, however, there are a few crucial steps which need to be followed.
 
 ```dart
 Future<void> main() async {
@@ -111,11 +144,11 @@ Future<void> main() async {
   /// to store the database in.
   WidgetsFlutterBinding.ensureInitialized();
 
-  /// Initialize [AliceObjectBoxStore] before running the app.
-  final AliceObjectBoxStore store =
-      await AliceObjectBoxStore.create(persistent: false);
+  /// Initialize [NetLensObjectBoxStore] before running the app.
+  final NetLensObjectBoxStore store =
+      await NetLensObjectBoxStore.create(persistent: false);
 
-  /// Pass [AliceObjectBoxStore] to the app
+  /// Pass [NetLensObjectBoxStore] to the app
   runApp(MyApp(store: store));
 }
 
@@ -125,21 +158,22 @@ class MyApp extends StatefulWidget {
     required this.store,
   });
 
-  final AliceObjectBoxStore store;
+  final NetLensObjectBoxStore store;
 
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  late final Alice _alice = Alice(
-    showNotification: true,
-    showInspectorOnShake: true,
-    maxCallsCount: 1000,
-    /// Pass [AliceObjectBox] to the [Alice] constructor
-    aliceStorage: AliceObjectBox(
-      store: widget.store,
-      maxCallsCount: 1000,
+  late final NetLens _netLens = NetLens(
+    configuration: NetLensConfiguration(
+      showNotification: true,
+      showInspectorOnShake: true,
+      /// Pass [NetLensObjectBox] as the storage of [NetLens]
+      storage: NetLensObjectBox(
+        store: widget.store,
+        maxCallsCount: 1000,
+      ),
     ),
   );
 

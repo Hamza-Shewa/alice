@@ -1,4 +1,4 @@
-- [Alice](README)
+- [NetLens](README)
 - [Installation](install)
 - [Configuration](config)
 - [Usage](usage)

@@ -1,83 +1,81 @@
-<p align="center">
-<img src="https://raw.githubusercontent.com/jhomlala/alice/master/packages/alice/media/logo.png" width="250px">
-</p>
+# NetLens
 
-# Alice
-
-[![pub package](https://img.shields.io/pub/v/alice.svg)](https://pub.dartlang.org/packages/alice)
-[![pub package](https://img.shields.io/pub/v/alice_dio.svg)](https://pub.dartlang.org/packages/alice_dio)
-[![pub package](https://img.shields.io/pub/v/alice_chopper.svg)](https://pub.dartlang.org/packages/alice_chopper)
-[![pub package](https://img.shields.io/pub/v/alice_http.svg)](https://pub.dartlang.org/packages/alice_http)
-[![pub package](https://img.shields.io/pub/v/alice_http_client.svg)](https://pub.dartlang.org/packages/alice_http_client)
-[![pub package](https://img.shields.io/pub/v/alice_objectbox.svg)](https://pub.dartlang.org/packages/alice_objectbox)
-[![pub package](https://img.shields.io/badge/platform-flutter-blue.svg)](https://github.com/jhomlala/alice)
+[![pub package](https://img.shields.io/pub/v/netlens.svg)](https://pub.dev/packages/netlens)
+[![pub package](https://img.shields.io/pub/v/netlens_dio.svg?label=netlens_dio)](https://pub.dev/packages/netlens_dio)
+[![pub package](https://img.shields.io/pub/v/netlens_chopper.svg?label=netlens_chopper)](https://pub.dev/packages/netlens_chopper)
+[![pub package](https://img.shields.io/pub/v/netlens_http.svg?label=netlens_http)](https://pub.dev/packages/netlens_http)
+[![pub package](https://img.shields.io/pub/v/netlens_http_client.svg?label=netlens_http_client)](https://pub.dev/packages/netlens_http_client)
+[![pub package](https://img.shields.io/pub/v/netlens_objectbox.svg?label=netlens_objectbox)](https://pub.dev/packages/netlens_objectbox)
+[![platform](https://img.shields.io/badge/platform-flutter-blue.svg)](https://github.com/Hamza-Shewa/alice)
 [![melos](https://img.shields.io/badge/maintained%20with-melos-f700ff.svg?style=flat-square)](https://github.com/invertase/melos)
 
-Alice is an HTTP Inspector tool for Flutter which helps debugging http requests. It catches and stores http requests and responses, which can be viewed via simple UI. It is inspired from [Chuck](https://github.com/jgilfelt/chuck) and [Chucker](https://github.com/ChuckerTeam/chucker).
+NetLens is an in-app HTTP inspector for Flutter. It catches the requests and
+responses your app makes and lets you look through them, filter them, export
+them and send them again, right on the device.
 
-<table>
-  <tr>
-    <td>
-		<img width="250px" src="https://raw.githubusercontent.com/jhomlala/alice/master/packages/alice/media/1.png">
-    </td>
-    <td>
-       <img width="250px" src="https://raw.githubusercontent.com/jhomlala/alice/master/packages/alice/media/2.png">
-    </td>
-    <td>
-       <img width="250px" src="https://raw.githubusercontent.com/jhomlala/alice/master/packages/alice/media/3.png">
-    </td>
-    <td>
-       <img width="250px" src="https://raw.githubusercontent.com/jhomlala/alice/master/packages/alice/media/4.png">
-    </td>
-     <td>
-       <img width="250px" src="https://raw.githubusercontent.com/jhomlala/alice/master/packages/alice/media/5.png">
-    </td>
-    <td>
-       <img width="250px" src="https://raw.githubusercontent.com/jhomlala/alice/master/packages/alice/media/6.png">
-    </td>
-  </tr>
-  <tr>
-    <td>
-	<img width="250px" src="https://raw.githubusercontent.com/jhomlala/alice/master/packages/alice/media/7.png">
-    </td>
-    <td>
-       <img width="250px" src="https://raw.githubusercontent.com/jhomlala/alice/master/packages/alice/media/8.png">
-    </td>
-    <td>
-       <img width="250px" src="https://raw.githubusercontent.com/jhomlala/alice/master/packages/alice/media/9.png">
-    </td>
-    <td>
-       <img width="250px" src="https://raw.githubusercontent.com/jhomlala/alice/master/packages/alice/media/10.png">
-    </td>
-    <td>
-       <img width="250px" src="https://raw.githubusercontent.com/jhomlala/alice/master/packages/alice/media/11.png">
-    </td>
-     <td>
-       <img width="250px" src="https://raw.githubusercontent.com/jhomlala/alice/master/packages/alice/media/12.png">
-    </td>
-  </tr>
+**Supported HTTP clients:**
 
-</table>
+| Client | Package |
+| --- | --- |
+| Dio | [netlens_dio](https://pub.dev/packages/netlens_dio) |
+| http | [netlens_http](https://pub.dev/packages/netlens_http) |
+| HttpClient from dart:io | [netlens_http_client](https://pub.dev/packages/netlens_http_client) |
+| Chopper | [netlens_chopper](https://pub.dev/packages/netlens_chopper) |
+| Any other client | `NetLensAdapter` from [netlens](https://pub.dev/packages/netlens) |
 
-**Supported Dart http client plugins:**
+Calls are kept in memory by default, or in a database with
+[netlens_objectbox](https://pub.dev/packages/netlens_objectbox).
 
-- Dio
-- HttpClient from dart:io package
-- Http from http/http package
-- Chopper
-- Generic HTTP client
+**Features:**
 
-**Features:**  
-✔️ Detailed logs for each HTTP calls (HTTP Request, HTTP Response)  
-✔️ Inspector UI for viewing HTTP calls  
-✔️ Save HTTP calls to file  
-✔️ Statistics  
-✔️ Notification on HTTP call  
-✔️ Support for top used HTTP clients in Dart  
-✔️ Error handling  
-✔️ Shake to open inspector  
-✔️ HTTP calls search  
-✔️ Flutter/Android logs  
+- Detailed request and response logs for every call
+- Inspector UI with statistics, notifications and shake to open
+- Search in URLs, headers and bodies, with quick filters by status, method and host
+- Sensitive headers, cookies and fields hidden in the inspector and masked in exports
+- Edit and resend a call (Dio, http and HttpClient)
+- Collapsible JSON viewer with search
+- Export to a log file or to HAR for Chrome DevTools, Proxyman or Charles
+- GraphQL operation names and errors
+- Timeline of calls and slowest endpoints
+- Flutter and Android logs
+
+## Quick start
+
+```yaml
+dependencies:
+  netlens: ^1.0.0
+  netlens_dio: ^1.0.0
+```
+
+```dart
+import 'package:dio/dio.dart';
+import 'package:netlens/netlens.dart';
+import 'package:netlens/model/netlens_configuration.dart';
+import 'package:netlens_dio/netlens_dio.dart';
+
+final netLens = NetLens(
+  configuration: NetLensConfiguration(showInspectorOnShake: true),
+);
+final dioAdapter = NetLensDioAdapter();
+netLens.addAdapter(dioAdapter);
+
+final dio = Dio()..interceptors.add(dioAdapter);
+
+MaterialApp(
+  navigatorKey: netLens.getNavigatorKey(),
+  // ...
+);
+```
 
 ## Documentation
-You can find documentation [here.](https://jhomlala.github.io/alice/)
+
+You can find the documentation
+[here](https://github.com/Hamza-Shewa/alice/tree/master/docs).
+
+## Credits
+
+NetLens is a fork of [Alice](https://github.com/jhomlala/alice) by Jakub
+Homlala and its contributors, licensed under the Apache License 2.0. See
+[NOTICE](https://github.com/Hamza-Shewa/alice/blob/master/NOTICE) for details.
+Alice itself was inspired by [Chuck](https://github.com/jgilfelt/chuck) and
+[Chucker](https://github.com/ChuckerTeam/chucker).

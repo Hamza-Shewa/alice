@@ -1,4 +1,4 @@
-name: alice
+name: netlens
 
 packages:
   - packages/**

@@ -1,0 +1,28 @@
+name: netlens_dio
+description: "NetLens adapter for Dio. Catches Dio calls for the NetLens in-app HTTP inspector and lets NetLens resend them."
+version: 1.0.0
+repository: https://github.com/Hamza-Shewa/alice
+issue_tracker: https://github.com/Hamza-Shewa/alice/issues
+topics:
+  - http
+  - inspector
+  - dio
+  - interceptor
+  - netlens
+
+environment:
+  sdk: ">=3.7.0 <4.0.0"
+  flutter: ">=3.29.0"
+
+dependencies:
+  netlens: ^1.0.0
+  dio: ^5.11.0
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  test: ^1.25.15
+  mocktail: ^1.0.4
+  http_mock_adapter: ^0.6.1
+  netlens_test: ^1.0.0
