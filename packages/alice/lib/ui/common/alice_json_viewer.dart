@@ -58,8 +58,9 @@ class _AliceJsonViewerState extends State<AliceJsonViewer> {
   void didUpdateWidget(covariant AliceJsonViewer oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!identical(oldWidget.json, widget.json)) {
+      // Build follows, so the state is updated without setState.
       _expanded = AliceJsonTree.initiallyExpanded(widget.json);
-      _search(_searchController.text);
+      _applySearch(_searchController.text);
     }
   }
 
@@ -69,16 +70,17 @@ class _AliceJsonViewerState extends State<AliceJsonViewer> {
     super.dispose();
   }
 
-  void _search(String query) {
-    setState(() {
-      _matches = AliceJsonTree.search(widget.json, query);
-      if (_matches.isNotEmpty) {
-        _expanded = {
-          ..._expanded,
-          ...AliceJsonTree.ancestorsOf(widget.json, _matches),
-        };
-      }
-    });
+  void _search(String query) => setState(() => _applySearch(query));
+
+  /// Finds values matching [query] and expands the containers holding them.
+  void _applySearch(String query) {
+    _matches = AliceJsonTree.search(widget.json, query);
+    if (_matches.isNotEmpty) {
+      _expanded = {
+        ..._expanded,
+        ...AliceJsonTree.ancestorsOf(widget.json, _matches),
+      };
+    }
   }
 
   void _toggle(String path) => setState(() {

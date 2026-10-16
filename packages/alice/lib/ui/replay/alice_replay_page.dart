@@ -100,7 +100,12 @@ class _AliceReplayPageState extends State<AliceReplayPage> {
                 const SizedBox(height: 16),
               ],
               DropdownButtonFormField<String>(
-                initialValue: _method,
+                // Keyed by the method, so reset shows the original method.
+                key: ValueKey<String>('alice_replay_method_$_method'),
+                // `initialValue` replaces this from Flutter 3.35, but Alice
+                // still supports Flutter 3.29.
+                // ignore: deprecated_member_use
+                value: _method,
                 decoration: InputDecoration(
                   labelText: context.i18n(AliceTranslationKey.replayMethod),
                   border: const OutlineInputBorder(),
