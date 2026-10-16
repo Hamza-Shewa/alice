@@ -1,54 +1,54 @@
 ## Configuration
 
-1. Create Alice instance:
+1. Create NetLens instance:
 
 ```dart
 
-Alice alice = Alice();
+NetLens netLens = NetLens();
 ```
 
 2. Add navigator key to your application:
 
 ```dart
-MaterialApp(navigatorKey: alice.getNavigatorKey(), home: ...);
+MaterialApp(navigatorKey: netLens.getNavigatorKey(), home: ...);
 ```
 
 You need to add this navigator key in order to show inspector UI.
-You can use also your navigator key in Alice:
+You can use also your navigator key in NetLens:
 
 ```dart
 
-Alice alice = Alice(configuration: AliceConfiguration(navigatorKey: yourNavigatorKeyHere));
+NetLens netLens = NetLens(configuration: NetLensConfiguration(navigatorKey: yourNavigatorKeyHere));
 ```
 
 If you need to pass navigatorKey lazily, you can use:
 
 ```dart
-alice.setNavigatorKey(yourNavigatorKeyHere);
+netLens.setNavigatorKey(yourNavigatorKeyHere);
 ```
 
-This is minimal configuration required to run Alice. Can set optional settings in Alice constructor,
+This is minimal configuration required to run NetLens. Can set optional settings in NetLens constructor,
 which are presented below. If you don't want to change anything, you can move to Http clients
 configuration.
 
-### Alice configuration
+### NetLens configuration
 
-You can pass optional `AliceConfiguration` parameter to `Alice` instance.
+You can pass optional `NetLensConfiguration` parameter to `NetLens` instance.
 
-You can set `showNotification` in Alice constructor to show notification. Clicking on this
+You can set `showNotification` in NetLens constructor to show notification. Clicking on this
 notification will open inspector.
 
 ```dart
 
-Alice alice = Alice(configuration: AliceConfiguration(showNotification: true));
+NetLens netLens = NetLens(configuration: NetLensConfiguration(showNotification: true));
 ```
 
-You can set `showInspectorOnShake` in Alice constructor to open inspector by shaking your device (
+You can set `showInspectorOnShake` in NetLens constructor to open inspector by shaking your device (
 default disabled):
 
 ```dart
 
-Alice alice = Alice(configuration: AliceConfiguation(showInspectorOnShake: true));
+NetLens netLens = NetLens(configuration: NetLensConfiguation(showInspectorOnShake: true));
 ```
 
 If you want to pass another notification icon, you can use `notificationIcon` parameter. Default
@@ -56,27 +56,27 @@ value is @mipmap/ic_launcher.
 
 ```dart
 
-Alice alice = Alice(configuration: AliceConfiguration(notificationIcon: "myNotificationIconResourceName"));
+NetLens netLens = NetLens(configuration: NetLensConfiguration(notificationIcon: "myNotificationIconResourceName"));
 ```
 
-If you want to change the Directionality of Alice, you can use the `directionality` parameter. If
+If you want to change the Directionality of NetLens, you can use the `directionality` parameter. If
 the parameter is set to null, the Directionality of the app will be used.
 
 ```dart
 
-Alice alice = Alice(configuration: AliceConfiguration(directionality: TextDirection.ltr));
+NetLens netLens = NetLens(configuration: NetLensConfiguration(directionality: TextDirection.ltr));
 ```
 
 If you want to hide share button, you can use `showShareButton` parameter.
 
 ```dart
 
-Alice alice = Alice(configuration: AliceConfiguration(showShareButton: false));
+NetLens netLens = NetLens(configuration: NetLensConfiguration(showShareButton: false));
 ```
 
 ### Sensitive values
 
-Alice hides credentials in the inspector and masks them in everything which
+NetLens hides credentials in the inspector and masks them in everything which
 leaves the app: shared calls, saved files, copied calls, cURL commands and HAR
 exports. By default it covers common headers (`Authorization`, `Cookie`,
 `Set-Cookie`, `X-Api-Key` and others), JSON body and form fields (`password`,
@@ -87,20 +87,20 @@ the eye button shows the hidden values on screen.
 Use your own names, matched without case at any depth of a JSON body:
 
 ```dart
-Alice alice = Alice(
-  configuration: AliceConfiguration(
-    redaction: AliceRedaction(
-      headers: {...AliceRedaction.defaultHeaders, 'x-session'},
-      bodyFields: {...AliceRedaction.defaultBodyFields, 'pin'},
+NetLens netLens = NetLens(
+  configuration: NetLensConfiguration(
+    redaction: NetLensRedaction(
+      headers: {...NetLensRedaction.defaultHeaders, 'x-session'},
+      bodyFields: {...NetLensRedaction.defaultBodyFields, 'pin'},
       mask: '[hidden]',
     ),
   ),
 );
 ```
 
-Turn it off with `AliceRedaction.none`:
+Turn it off with `NetLensRedaction.none`:
 
 ```dart
-Alice alice = Alice(configuration: AliceConfiguration(redaction: AliceRedaction.none));
+NetLens netLens = NetLens(configuration: NetLensConfiguration(redaction: NetLensRedaction.none));
 ```
 

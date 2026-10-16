@@ -3,7 +3,7 @@ name: Bug report
 about: Create a report to help us improve
 title: "[BUG]"
 labels: new issue
-assignees: jhomlala
+assignees: Hamza-Shewa
 
 ---
 
@@ -26,7 +26,7 @@ If applicable, add screenshots to help explain your problem.
 **Flutter doctor**
 Please add flutter doctor output here.
 
-**Alice version**
+**NetLens version**
 - Version: 
 
 **Smartphone (please complete the following information):**

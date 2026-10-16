@@ -1,0 +1,32 @@
+name: netlens_objectbox_example
+description: "NetLens + ObjectBox + HTTP package - Example"
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+version: 1.0.0+2
+
+environment:
+  sdk: ">=3.7.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  netlens:
+  netlens_http:
+  netlens_objectbox:
+  cupertino_icons: ^1.0.8
+  http: ^1.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+dependency_overrides:
+  netlens:
+    path: ../../packages/netlens
+  netlens_http:
+    path: ../../packages/netlens_http
+  netlens_objectbox:
+    path: ../../packages/netlens_objectbox
+
+flutter:
+  uses-material-design: true

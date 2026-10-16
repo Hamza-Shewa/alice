@@ -1,0 +1,22 @@
+name: netlens_http_client
+description: "NetLens adapter for dart:io HttpClient. Catches HttpClient calls for the NetLens in-app HTTP inspector and lets NetLens resend them."
+version: 1.0.0
+repository: https://github.com/Hamza-Shewa/alice
+issue_tracker: https://github.com/Hamza-Shewa/alice/issues
+topics:
+  - http
+  - inspector
+  - netlens
+  - interceptor
+
+environment:
+  sdk: ">=3.7.0 <4.0.0"
+  flutter: ">=3.29.0"
+
+dependencies:
+  netlens: ^1.0.0
+dev_dependencies:
+  flutter_lints: ^5.0.0
+  netlens_test: ^1.0.0
+  mocktail: ^1.0.4
+  test: ^1.25.15

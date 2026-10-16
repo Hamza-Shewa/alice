@@ -1,0 +1,13 @@
+NetLens
+Copyright 2026 Hamza Aboshhiwa
+
+This product is a modified version of Alice
+(https://github.com/jhomlala/alice), Copyright 2019 Jakub Homlala and the
+Alice contributors, licensed under the Apache License, Version 2.0.
+
+Changes from Alice include the new name, sensitive value redaction, quick
+filters and deeper search, edit and resend, a collapsible JSON viewer, HAR
+export, GraphQL awareness, a call timeline and slowest endpoint statistics.
+
+Alice was inspired by Chuck (https://github.com/jgilfelt/chuck) and Chucker
+(https://github.com/ChuckerTeam/chucker).

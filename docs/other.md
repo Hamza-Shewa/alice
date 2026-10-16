@@ -5,17 +5,17 @@
 You may need that if you won't use shake or notification:
 
 ```dart
-alice.showInspector();
+netLens.showInspector();
 ```
 
 ## Flutter logs
 
-If you want to log Flutter logs in Alice, you may use these methods:
+If you want to log Flutter logs in NetLens, you may use these methods:
 
 ```dart
-alice.addLog(log);
+netLens.addLog(log);
 
-alice.addLogs(logList);
+netLens.addLogs(logList);
 ```
 
 
@@ -24,7 +24,7 @@ alice.addLogs(logList);
 Check current inspector state (opened/closed) with:
 
 ```dart
-alice.isInspectorOpened();
+netLens.isInspectorOpened();
 ```
 
 ## Filters and search

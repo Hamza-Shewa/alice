@@ -1,0 +1,16 @@
+analyzer:
+  exclude:
+    - "lib/generated_plugin_registrant.dart"
+    - "**.g.dart"
+    - "**.chopper.dart"
+    - "**.mocks.dart"
+    - "**.gen.dart"
+    - build/**
+    - android/**
+    - ios/**
+
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    - require_trailing_commas
