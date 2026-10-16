@@ -1,4 +1,6 @@
 name: netlens_workspace
+# The packages are published from their own folders under packages/.
+publish_to: none
 
 environment:
   sdk: ">=3.0.0 <4.0.0"

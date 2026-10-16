@@ -13,6 +13,19 @@ NetLens is an in-app HTTP inspector for Flutter. It catches the requests and
 responses your app makes and lets you look through them, filter them, export
 them and send them again, right on the device.
 
+<table>
+  <tr>
+    <td><img width="200" alt="Calls list with quick filters, status and GraphQL badges" src="https://raw.githubusercontent.com/Hamza-Shewa/alice/master/packages/netlens/screenshots/1_calls.png"></td>
+    <td><img width="200" alt="Response body in the collapsible JSON viewer" src="https://raw.githubusercontent.com/Hamza-Shewa/alice/master/packages/netlens/screenshots/2_json_viewer.png"></td>
+    <td><img width="200" alt="Request with the API key and password hidden" src="https://raw.githubusercontent.com/Hamza-Shewa/alice/master/packages/netlens/screenshots/3_request_redacted.png"></td>
+  </tr>
+  <tr>
+    <td><img width="200" alt="Editing a call before sending it again" src="https://raw.githubusercontent.com/Hamza-Shewa/alice/master/packages/netlens/screenshots/4_edit_and_resend.png"></td>
+    <td><img width="200" alt="Timeline of calls as a waterfall" src="https://raw.githubusercontent.com/Hamza-Shewa/alice/master/packages/netlens/screenshots/5_timeline.png"></td>
+    <td><img width="200" alt="Statistics with the slowest endpoints" src="https://raw.githubusercontent.com/Hamza-Shewa/alice/master/packages/netlens/screenshots/6_statistics.png"></td>
+  </tr>
+</table>
+
 **Supported HTTP clients:**
 
 | Client | Package |

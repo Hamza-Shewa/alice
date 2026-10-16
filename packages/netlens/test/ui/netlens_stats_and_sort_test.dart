@@ -77,6 +77,8 @@ void main() {
       expect(find.text('POST'), findsNWidgets(2));
       expect(find.text('HTTPS'), findsOneWidget);
       expect(find.text('SLOWEST ENDPOINTS'), findsOneWidget);
+      expect(find.text('1 call'), findsOneWidget);
+      expect(find.text('3 calls'), findsOneWidget);
     });
 
     testWidgets('says when nothing failed and handles no calls', (
