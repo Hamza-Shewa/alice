@@ -7,6 +7,7 @@ import 'package:alice/model/alice_http_call.dart';
 import 'package:alice/model/alice_http_error.dart';
 import 'package:alice/model/alice_http_response.dart';
 import 'package:alice/model/alice_log.dart';
+import 'package:alice/model/alice_replay_request.dart';
 import 'package:alice_dio/alice_dio_adapter.dart';
 import 'package:alice_test/alice_test.dart';
 import 'package:dio/dio.dart';
@@ -410,5 +411,69 @@ void main() {
     );
 
     verify(() => aliceCore.addResponse(any(that: nextResponseMatcher), any()));
+  });
+
+  group("replay", () {
+    test("should replay only calls made by Dio", () {
+      expect(aliceDioAdapter.canReplay(AliceHttpCall(1)..client = 'Dio'), true);
+      expect(
+        aliceDioAdapter.canReplay(AliceHttpCall(1)..client = 'Chopper'),
+        false,
+      );
+    });
+
+    test("should send request again through the replay client", () async {
+      aliceDioAdapter.replayClient = dio;
+      dioAdapter.onPost(
+        'https://test.com/items',
+        (server) => server.reply(201, '{"id": 2}'),
+        data: '{"name":"a"}',
+        headers: {'x-token': 'abc'},
+      );
+
+      await aliceDioAdapter.replay(
+        const AliceReplayRequest(
+          method: 'POST',
+          url: 'https://test.com/items',
+          headers: {'x-token': 'abc'},
+          body: '{"name":"a"}',
+        ),
+      );
+
+      final call =
+          verify(() => aliceCore.addCall(captureAny())).captured.single
+              as AliceHttpCall;
+      expect(call.method, 'POST');
+      expect(call.uri, 'https://test.com/items');
+      expect(call.request?.headers['x-token'], 'abc');
+      verify(
+        () => aliceCore.addResponse(
+          any(that: buildResponseMatcher(status: 201)),
+          any(),
+        ),
+      );
+    });
+
+    test("should record error responses without throwing", () async {
+      aliceDioAdapter.replayClient = dio;
+      dioAdapter.onGet(
+        'https://test.com/missing',
+        (server) => server.reply(404, '{"error": "not found"}'),
+      );
+
+      await aliceDioAdapter.replay(
+        const AliceReplayRequest(
+          method: 'GET',
+          url: 'https://test.com/missing',
+        ),
+      );
+
+      verify(
+        () => aliceCore.addResponse(
+          any(that: buildResponseMatcher(status: 404)),
+          any(),
+        ),
+      );
+    });
   });
 }

@@ -1,12 +1,48 @@
 import 'dart:convert';
 
 import 'package:alice/core/alice_adapter.dart';
+import 'package:alice/core/alice_call_replayer.dart';
 import 'package:alice/model/alice_http_call.dart';
 import 'package:alice/model/alice_http_request.dart';
 import 'package:alice/model/alice_http_response.dart';
+import 'package:alice/model/alice_replay_request.dart';
 import 'package:http/http.dart' as http;
 
-class AliceHttpAdapter with AliceAdapter {
+class AliceHttpAdapter with AliceAdapter implements AliceCallReplayer {
+  AliceHttpAdapter({this.replayClient});
+
+  /// Name of the client shown in Alice.
+  static const String clientName = 'HttpClient (http package)';
+
+  /// Client used to send calls again from Alice. When it is null, a new
+  /// [http.Client] is used for each replay.
+  http.Client? replayClient;
+
+  @override
+  bool canReplay(AliceHttpCall call) => call.client == clientName;
+
+  @override
+  Future<void> replay(AliceReplayRequest request) async {
+    final http.Client client = replayClient ?? http.Client();
+    try {
+      final http.Request httpRequest = http.Request(
+        request.method,
+        Uri.parse(request.url),
+      )..headers.addAll(request.headers);
+      if (request.body != null) {
+        httpRequest.body = request.body!;
+      }
+      final http.Response response = await http.Response.fromStream(
+        await client.send(httpRequest),
+      );
+      onResponse(response);
+    } finally {
+      if (replayClient == null) {
+        client.close();
+      }
+    }
+  }
+
   /// Handles http response. It creates both request and response from http call
   void onResponse(http.Response response, {dynamic body}) {
     if (response.request == null) {
@@ -17,7 +53,7 @@ class AliceHttpAdapter with AliceAdapter {
     final call =
         AliceHttpCall(response.request.hashCode)
           ..loading = true
-          ..client = 'HttpClient (http package)'
+          ..client = clientName
           ..uri = request.url.toString()
           ..method = request.method;
     var path = request.url.path;

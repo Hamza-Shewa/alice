@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:alice/core/alice_adapter.dart';
+import 'package:alice/core/alice_call_replayer.dart';
 import 'package:alice/model/alice_form_data_file.dart';
 import 'package:alice/model/alice_from_data_field.dart';
 import 'package:alice/model/alice_http_call.dart';
@@ -8,11 +9,55 @@ import 'package:alice/model/alice_http_error.dart';
 import 'package:alice/model/alice_http_request.dart';
 import 'package:alice/model/alice_http_response.dart';
 import 'package:alice/model/alice_log.dart';
+import 'package:alice/model/alice_replay_request.dart';
 import 'package:alice/utils/alice_parser.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
-class AliceDioAdapter extends InterceptorsWrapper with AliceAdapter {
+class AliceDioAdapter extends InterceptorsWrapper
+    with AliceAdapter
+    implements AliceCallReplayer {
+  AliceDioAdapter({this.replayClient});
+
+  /// Name of the client shown in Alice.
+  static const String clientName = 'Dio';
+
+  /// Dio used to send calls again from Alice. Set it to the Dio which has
+  /// this adapter, so replayed calls use its base options, interceptors and
+  /// HTTP client adapter. When it is null, a plain Dio with this adapter is
+  /// used.
+  Dio? replayClient;
+
+  Dio? _defaultReplayClient;
+
+  @override
+  bool canReplay(AliceHttpCall call) => call.client == clientName;
+
+  @override
+  Future<void> replay(AliceReplayRequest request) async {
+    final Dio dio =
+        replayClient ??
+        (_defaultReplayClient ??= Dio()..interceptors.add(this));
+    try {
+      await dio.request<dynamic>(
+        request.url,
+        data: request.body,
+        options: Options(
+          method: request.method,
+          headers: request.headers,
+          // Error responses are results of the replay, not failures.
+          validateStatus: (_) => true,
+        ),
+      );
+    } on DioException catch (exception) {
+      // The adapter caught the error; only a failure without any response is
+      // reported to the caller.
+      if (exception.response == null) {
+        rethrow;
+      }
+    }
+  }
+
   /// Handles dio request and creates alice http call based on it
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
@@ -45,7 +90,7 @@ class AliceDioAdapter extends InterceptorsWrapper with AliceAdapter {
         ..uri = rawUrl
         ..secure = match?.group(1) == 'https';
     }
-    call.client = 'Dio';
+    call.client = clientName;
 
     final request = AliceHttpRequest();
 
