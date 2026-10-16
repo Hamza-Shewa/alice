@@ -1,4 +1,7 @@
+import 'package:alice/helper/alice_graphql.dart';
 import 'package:alice/model/alice_http_call.dart';
+import 'package:alice/model/alice_translation.dart';
+import 'package:alice/ui/common/alice_context_ext.dart';
 import 'package:alice/ui/common/alice_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -90,4 +93,71 @@ class AliceStatusPill extends StatelessWidget {
     0 || null => '???',
     _ => '$status',
   };
+}
+
+/// Badge which marks a GraphQL call, and its errors when the response has
+/// any.
+class AliceGraphQLBadge extends StatelessWidget {
+  const AliceGraphQLBadge({super.key, required this.operation});
+
+  /// Pink used by GraphQL itself.
+  static const Color _graphQLColor = Color(0xffe10098);
+
+  final AliceGraphQLOperation operation;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color errorColor = AliceTheme.getStatusColor(context, 500);
+    return Wrap(
+      spacing: 6,
+      runSpacing: 4,
+      children: [
+        _Badge(
+          icon: Icons.hub_outlined,
+          text: 'GraphQL ${operation.type.name}',
+          color: _graphQLColor,
+        ),
+        if (operation.hasErrors)
+          _Badge(
+            icon: Icons.error_outline,
+            text: context.i18n(AliceTranslationKey.graphQLErrors),
+            color: errorColor,
+          ),
+      ],
+    );
+  }
+}
+
+class _Badge extends StatelessWidget {
+  const _Badge({required this.icon, required this.text, required this.color});
+
+  final IconData icon;
+  final String text;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: color),
+          const SizedBox(width: 4),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

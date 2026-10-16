@@ -5,6 +5,7 @@ import 'dart:io' show Directory, File, FileMode, IOSink;
 
 import 'package:alice/core/alice_utils.dart';
 import 'package:alice/helper/alice_conversion_helper.dart';
+import 'package:alice/helper/alice_har_builder.dart';
 import 'package:alice/helper/operating_system.dart';
 import 'package:alice/model/alice_export_result.dart';
 import 'package:alice/model/alice_http_call.dart';
@@ -66,6 +67,42 @@ class AliceExportHelper {
     }
 
     return await _saveToFile(context, calls);
+  }
+
+  /// Saves [calls] as a HAR file in the cache directory and opens the system
+  /// share sheet with it, so it can be sent to a computer.
+  static Future<AliceExportResult> saveCallsToHarFile(
+    List<AliceHttpCall> calls,
+  ) async {
+    if (calls.isEmpty) {
+      return AliceExportResult(
+        success: false,
+        error: AliceExportResultError.empty,
+      );
+    }
+    final String path;
+    try {
+      final Directory directory = await getApplicationCacheDirectory();
+      path =
+          '${directory.path}/${_fileName}_'
+          '${DateTime.now().millisecondsSinceEpoch}.har';
+      await File(path).writeAsString(AliceHarBuilder.encode(calls));
+    } catch (exception) {
+      AliceUtils.log(exception.toString());
+      return AliceExportResult(
+        success: false,
+        error: AliceExportResultError.file,
+      );
+    }
+    try {
+      await SharePlus.instance.share(
+        ShareParams(files: [XFile(path, mimeType: 'application/json')]),
+      );
+    } catch (exception) {
+      // The file is saved, so its path is still useful when sharing fails.
+      AliceUtils.log(exception.toString());
+    }
+    return AliceExportResult(success: true, path: path);
   }
 
   /// Returns current storage permission status. Checks permission for iOS

@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:alice/core/alice_core.dart';
+import 'package:alice/helper/alice_call_redactor.dart';
 import 'package:alice/helper/alice_export_helper.dart';
 import 'package:alice/helper/alice_watcher.dart';
 import 'package:alice/model/alice_http_call.dart';
@@ -13,6 +14,7 @@ import 'package:alice/ui/call_details/widget/alice_call_response_screen.dart';
 import 'package:alice/ui/common/alice_app_bar.dart';
 import 'package:alice/ui/common/alice_context_ext.dart';
 import 'package:alice/ui/common/alice_language.dart';
+import 'package:alice/ui/common/alice_navigation.dart';
 import 'package:alice/ui/common/alice_page.dart';
 import 'package:alice/ui/common/alice_settings.dart';
 import 'package:alice/ui/common/alice_theme.dart';
@@ -52,6 +54,9 @@ class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
   Widget? _cachedPage;
   Object? _cachedSignature;
 
+  /// When true, sensitive values are shown instead of the mask.
+  bool _revealSensitive = false;
+
   @override
   void dispose() {
     _tabController.dispose();
@@ -82,15 +87,48 @@ class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
                 AliceLanguage.current.value,
                 AliceTheme.themeMode.value,
                 AliceWatcher.instance.version,
+                _revealSensitive,
               );
               if (_cachedPage != null && _cachedSignature == signature) {
                 return _cachedPage!;
               }
               _cachedSignature = signature;
+              final AliceCallRedactor redactor = widget.core.redactor;
+              final bool canRedact = !redactor.redaction.isEmpty;
+              final AliceHttpCall shownCall =
+                  _revealSensitive ? currentCall : redactor.redact(currentCall);
               return _cachedPage = Scaffold(
                 appBar: AliceAppBar(
                   actions: [
                     AliceSettingsButton(core: widget.core),
+                    if (canRedact)
+                      IconButton(
+                        icon: Icon(
+                          _revealSensitive
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                        ),
+                        tooltip: context.i18n(
+                          _revealSensitive
+                              ? AliceTranslationKey.callDetailsHideSensitive
+                              : AliceTranslationKey.callDetailsRevealSensitive,
+                        ),
+                        onPressed:
+                            () => setState(
+                              () => _revealSensitive = !_revealSensitive,
+                            ),
+                      ),
+                    if (!currentCall.loading &&
+                        widget.core.canReplay(currentCall))
+                      IconButton(
+                        icon: const Icon(Icons.replay),
+                        tooltip: context.i18n(AliceTranslationKey.replayAction),
+                        onPressed:
+                            () => AliceNavigation.navigateToReplay(
+                              call: currentCall,
+                              core: widget.core,
+                            ),
+                      ),
                     IconButton(
                       icon: const Icon(Icons.copy_all),
                       tooltip: context.i18n(
@@ -118,10 +156,10 @@ class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
                 body: TabBarView(
                   controller: _tabController,
                   children: [
-                    AliceCallOverviewScreen(call: currentCall),
-                    AliceCallRequestScreen(call: currentCall),
-                    AliceCallResponseScreen(call: currentCall),
-                    AliceCallErrorScreen(call: currentCall),
+                    AliceCallOverviewScreen(call: shownCall),
+                    AliceCallRequestScreen(call: shownCall),
+                    AliceCallResponseScreen(call: shownCall),
+                    AliceCallErrorScreen(call: shownCall),
                   ],
                 ),
                 floatingActionButton:
@@ -151,7 +189,10 @@ class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
   /// Called when share button has been pressed. It encodes the [call]
   /// and tries to invoke system action to share it.
   Future<void> _shareCall(AliceHttpCall call) async {
-    await AliceExportHelper.shareCall(context: context, call: call);
+    await AliceExportHelper.shareCall(
+      context: context,
+      call: widget.core.redactor.redact(call),
+    );
   }
 
   /// Copies everything related to [call] (general data, request and
@@ -159,7 +200,7 @@ class _AliceCallDetailsPageState extends State<AliceCallDetailsPage>
   Future<void> _copyCall(AliceHttpCall call) async {
     final String log = AliceExportHelper.buildCallLog(
       context: context,
-      call: call,
+      call: widget.core.redactor.redact(call),
     );
     await Clipboard.setData(ClipboardData(text: log));
     if (!mounted) {

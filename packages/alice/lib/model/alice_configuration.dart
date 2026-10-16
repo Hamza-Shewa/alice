@@ -1,6 +1,7 @@
 import 'package:alice/core/alice_logger.dart';
 import 'package:alice/core/alice_memory_storage.dart';
 import 'package:alice/core/alice_storage.dart';
+import 'package:alice/model/alice_redaction.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 
@@ -38,6 +39,12 @@ class AliceConfiguration with Equatable {
   /// Logger instance.
   final AliceLogger aliceLogger;
 
+  /// Sensitive values which are masked in shared and exported calls, and
+  /// hidden in the inspector until revealed. Default value masks common
+  /// credential headers, body fields and query parameters. Use
+  /// [AliceRedaction.none] to turn it off.
+  final AliceRedaction redaction;
+
   AliceConfiguration({
     this.showNotification = true,
     this.showInspectorOnShake = true,
@@ -47,6 +54,7 @@ class AliceConfiguration with Equatable {
     GlobalKey<NavigatorState>? navigatorKey,
     AliceStorage? storage,
     AliceLogger? logger,
+    this.redaction = const AliceRedaction(),
   }) : aliceStorage =
            storage ?? AliceMemoryStorage(maxCallsCount: _defaultMaxCalls),
        navigatorKey = navigatorKey ?? GlobalKey<NavigatorState>(),
@@ -61,6 +69,7 @@ class AliceConfiguration with Equatable {
     bool? showShareButton,
     AliceStorage? aliceStorage,
     AliceLogger? aliceLogger,
+    AliceRedaction? redaction,
   }) => AliceConfiguration(
     showNotification: showNotification ?? this.showNotification,
     showInspectorOnShake: showInspectorOnShake ?? this.showInspectorOnShake,
@@ -70,6 +79,7 @@ class AliceConfiguration with Equatable {
     navigatorKey: navigatorKey ?? this.navigatorKey,
     storage: aliceStorage ?? this.aliceStorage,
     logger: aliceLogger ?? this.aliceLogger,
+    redaction: redaction ?? this.redaction,
   );
 
   @override
@@ -82,5 +92,6 @@ class AliceConfiguration with Equatable {
     navigatorKey,
     aliceStorage,
     aliceLogger,
+    redaction,
   ];
 }

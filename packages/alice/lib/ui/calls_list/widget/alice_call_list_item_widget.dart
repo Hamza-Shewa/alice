@@ -1,4 +1,5 @@
 import 'package:alice/helper/alice_conversion_helper.dart';
+import 'package:alice/helper/alice_graphql.dart';
 import 'package:alice/helper/alice_issue_analyzer.dart';
 import 'package:alice/helper/alice_url_validator.dart';
 import 'package:alice/helper/alice_watcher.dart';
@@ -34,6 +35,7 @@ class AliceCallListItemWidget extends StatelessWidget {
     final Color urlIssueColor = getUrlIssueColor(context);
     final AliceIssue? issue = AliceIssueAnalyzer.analyze(call);
     final AliceWatchResult? watch = AliceWatcher.instance.evaluate(call);
+    final AliceGraphQLOperation? graphQL = AliceGraphQL.detect(call);
 
     return InkWell(
       onTap: () => itemClickAction.call(call),
@@ -61,7 +63,11 @@ class AliceCallListItemWidget extends StatelessWidget {
                   AliceMethodBadge(method: call.method),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _Endpoint(call: call, hasUrlIssues: hasUrlIssues),
+                    child: _Endpoint(
+                      call: call,
+                      title: graphQL?.title,
+                      hasUrlIssues: hasUrlIssues,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   ConstrainedBox(
@@ -82,7 +88,15 @@ class AliceCallListItemWidget extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 6),
-              _ServerAddress(call: call, hasUrlIssues: hasUrlIssues),
+              _ServerAddress(
+                call: call,
+                path: graphQL != null ? call.endpoint : null,
+                hasUrlIssues: hasUrlIssues,
+              ),
+              if (graphQL != null) ...[
+                const SizedBox(height: 6),
+                AliceGraphQLBadge(operation: graphQL),
+              ],
               if (hasUrlIssues) ...[
                 const SizedBox(height: 10),
                 AliceUrlIssueBanner(issues: urlIssues, compact: true),
@@ -101,18 +115,21 @@ class AliceCallListItemWidget extends StatelessWidget {
   }
 }
 
-/// Widget which renders endpoint of the call.
+/// Widget which renders endpoint of the call, or [title] when it is set.
 class _Endpoint extends StatelessWidget {
-  const _Endpoint({required this.call, required this.hasUrlIssues});
+  const _Endpoint({required this.call, required this.hasUrlIssues, this.title});
 
   final AliceHttpCall call;
   final bool hasUrlIssues;
+
+  /// Text shown instead of the endpoint, for example a GraphQL operation.
+  final String? title;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     return Text(
-      call.endpoint,
+      title ?? call.endpoint,
       maxLines: _endpointMaxLines,
       overflow: TextOverflow.ellipsis,
       style: theme.textTheme.titleSmall
@@ -129,12 +146,17 @@ class _Endpoint extends StatelessWidget {
   }
 }
 
-/// Widget which renders server address line.
+/// Widget which renders server address line, followed by [path] when set.
 class _ServerAddress extends StatelessWidget {
-  const _ServerAddress({required this.call, required this.hasUrlIssues});
+  const _ServerAddress({
+    required this.call,
+    required this.hasUrlIssues,
+    this.path,
+  });
 
   final AliceHttpCall call;
   final bool hasUrlIssues;
+  final String? path;
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +171,7 @@ class _ServerAddress extends StatelessWidget {
         const SizedBox(width: 4),
         Expanded(
           child: Text(
-            call.server,
+            path != null ? '${call.server}$path' : call.server,
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
             style: theme.textTheme.bodySmall

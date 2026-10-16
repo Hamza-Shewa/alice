@@ -6,10 +6,11 @@ import 'package:equatable/equatable.dart';
 /// Definition of http calls data holder.
 // ignore: must_be_immutable
 class AliceHttpCall with Equatable {
-  AliceHttpCall(this.id);
+  AliceHttpCall(this.id, {DateTime? createdTime})
+    : createdTime = createdTime ?? DateTime.now();
 
   final int id;
-  final DateTime createdTime = DateTime.now();
+  final DateTime createdTime;
   String client = '';
   bool loading = true;
   bool secure = false;

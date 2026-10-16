@@ -1,8 +1,11 @@
 import 'dart:async' show FutureOr, StreamSubscription, unawaited;
 
+import 'package:alice/core/alice_adapter.dart';
+import 'package:alice/core/alice_call_replayer.dart';
 import 'package:alice/core/alice_notification.dart';
 import 'package:alice/core/alice_storage.dart';
 import 'package:alice/core/alice_utils.dart';
+import 'package:alice/helper/alice_call_redactor.dart';
 import 'package:alice/helper/alice_export_helper.dart';
 import 'package:alice/helper/alice_watcher.dart';
 import 'package:alice/helper/operating_system.dart';
@@ -12,8 +15,10 @@ import 'package:alice/model/alice_http_call.dart';
 import 'package:alice/model/alice_http_error.dart';
 import 'package:alice/model/alice_http_response.dart';
 import 'package:alice/model/alice_log.dart';
+import 'package:alice/model/alice_replay_request.dart';
 import 'package:alice/ui/common/alice_navigation.dart';
 import 'package:alice/utils/shake_detector.dart';
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
 
 class AliceCore {
@@ -31,6 +36,9 @@ class AliceCore {
 
   /// Flag used to determine whether is inspector opened
   bool _isInspectorOpened = false;
+
+  /// Adapters which can send calls again.
+  final List<AliceCallReplayer> _replayers = [];
 
   /// Creates alice core instance
   AliceCore({required AliceConfiguration configuration}) {
@@ -133,12 +141,49 @@ class AliceCore {
   /// Returns all stored HTTP calls.
   List<AliceHttpCall> getCalls() => _configuration.aliceStorage.getCalls();
 
-  /// Save all calls to file.
+  /// Redactor which masks sensitive values as configured.
+  AliceCallRedactor get redactor => AliceCallRedactor(_configuration.redaction);
+
+  /// Returns all stored calls with sensitive values masked.
+  List<AliceHttpCall> _getRedactedCalls() =>
+      getCalls().map(redactor.redact).toList();
+
+  /// Save all calls to file. Sensitive values are masked.
   Future<AliceExportResult> saveCallsToFile(BuildContext context) =>
-      AliceExportHelper.saveCallsToFile(
-        context,
-        _configuration.aliceStorage.getCalls(),
+      AliceExportHelper.saveCallsToFile(context, _getRedactedCalls());
+
+  /// Save all calls to a HAR file. Sensitive values are masked.
+  Future<AliceExportResult> saveCallsToHarFile() =>
+      AliceExportHelper.saveCallsToHarFile(_getRedactedCalls());
+
+  /// Injects this core into [adapter]. An adapter which can send calls again
+  /// is used to replay calls of its client.
+  void addAdapter(AliceAdapter adapter) {
+    adapter.injectCore(this);
+    if (adapter is AliceCallReplayer) {
+      _replayers.add(adapter as AliceCallReplayer);
+    }
+  }
+
+  /// Returns the adapter which can send [call] again, or null when no added
+  /// adapter can.
+  AliceCallReplayer? getReplayer(AliceHttpCall call) =>
+      _replayers.firstWhereOrNull(
+        (AliceCallReplayer replayer) => replayer.canReplay(call),
       );
+
+  /// Returns true when [call] can be sent again.
+  bool canReplay(AliceHttpCall call) => getReplayer(call) != null;
+
+  /// Sends [request], which was built from [call], again with the client which
+  /// made [call]. The new call is caught like any other call.
+  Future<void> replay(AliceHttpCall call, AliceReplayRequest request) {
+    final AliceCallReplayer? replayer = getReplayer(call);
+    if (replayer == null) {
+      throw StateError('No adapter can replay calls of ${call.client}.');
+    }
+    return replayer.replay(request);
+  }
 
   /// Adds new log to Alice logger.
   void addLog(AliceLog log) => _configuration.aliceLogger.add(log);

@@ -1,5 +1,7 @@
+import 'package:alice/helper/alice_json_tree.dart';
 import 'package:alice/model/alice_translation.dart';
 import 'package:alice/ui/common/alice_context_ext.dart';
+import 'package:alice/ui/common/alice_json_viewer.dart';
 import 'package:alice/ui/common/alice_language.dart';
 import 'package:alice/ui/common/alice_url_issue_banner.dart';
 import 'package:alice/utils/alice_parser.dart';
@@ -615,8 +617,9 @@ class _AliceCollapsibleSectionState extends State<AliceCollapsibleSection> {
   }
 }
 
-/// Code block with a formatted HTTP body. Formatting a body (JSON decode and
-/// pretty print) is expensive, so the result is cached until the body, its
+/// Code block with a formatted HTTP body. A JSON object or array is shown in
+/// a collapsible tree, which can be switched to the formatted text.
+/// Formatting a body (JSON decode and pretty print) is expensive, so the result is cached until the body, its
 /// content type or the language changes. The block is kept alive inside lazy
 /// lists, so scrolling it out of view and back doesn't format it again.
 class AliceFormattedBodyBlock extends StatefulWidget {
@@ -637,6 +640,7 @@ class AliceFormattedBodyBlock extends StatefulWidget {
 class _AliceFormattedBodyBlockState extends State<AliceFormattedBodyBlock>
     with AutomaticKeepAliveClientMixin {
   String? _text;
+  dynamic _json;
   dynamic _body;
   String? _contentType;
   String? _language;
@@ -655,11 +659,22 @@ class _AliceFormattedBodyBlockState extends State<AliceFormattedBodyBlock>
       _body = widget.body;
       _contentType = widget.contentType;
       _language = language;
-      _text = AliceParser.formatBody(
-        context: context,
-        body: widget.body,
-        contentType: widget.contentType,
-      );
+      _json = AliceJsonTree.tryDecode(widget.body);
+      _text =
+          _json != null &&
+                  !(widget.body is String && widget.body.contains('\n'))
+              ? AliceJsonTree.copyText(_json)
+              : AliceParser.formatBody(
+                context: context,
+                body: widget.body,
+                contentType: widget.contentType,
+              );
+    }
+    final dynamic json = _json;
+    final bool hasChildren =
+        json is Map ? json.isNotEmpty : (json is List && json.isNotEmpty);
+    if (hasChildren) {
+      return AliceJsonViewer(json: json, rawText: _text!);
     }
     return AliceCodeBlock(text: _text!);
   }

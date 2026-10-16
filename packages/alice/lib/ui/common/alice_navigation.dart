@@ -3,6 +3,7 @@ import 'package:alice/model/alice_http_call.dart';
 import 'package:alice/ui/call_details/page/alice_call_details_page.dart';
 import 'package:alice/ui/calls_list/page/alice_calls_list_page.dart';
 import 'package:alice/ui/common/alice_theme.dart';
+import 'package:alice/ui/replay/alice_replay_page.dart';
 import 'package:alice/ui/stats/alice_stats_page.dart';
 import 'package:alice/ui/watcher/alice_watcher_page.dart';
 import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
@@ -30,6 +31,18 @@ class AliceNavigation {
   /// Navigates to stats page.
   static Future<void> navigateToStats({required AliceCore core}) {
     return _navigateToPage(core: core, child: AliceStatsPage(core), fade: true);
+  }
+
+  /// Navigates to page where [call] can be edited and sent again.
+  static Future<void> navigateToReplay({
+    required AliceHttpCall call,
+    required AliceCore core,
+  }) {
+    return _navigateToPage(
+      core: core,
+      child: AliceReplayPage(call: call, core: core),
+      fade: true,
+    );
   }
 
   /// Navigates to response watcher page.

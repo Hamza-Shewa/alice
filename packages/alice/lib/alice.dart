@@ -6,7 +6,10 @@ import 'package:alice/model/alice_log.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+export 'package:alice/core/alice_call_replayer.dart';
 export 'package:alice/model/alice_log.dart';
+export 'package:alice/model/alice_redaction.dart';
+export 'package:alice/model/alice_replay_request.dart';
 export 'package:alice/core/alice_memory_storage.dart';
 export 'package:alice/utils/alice_parser.dart';
 
@@ -52,5 +55,5 @@ class Alice {
   bool get isInspectorOpened => _aliceCore.isInspectorOpened;
 
   /// Adds new adapter to Alice.
-  void addAdapter(AliceAdapter adapter) => adapter.injectCore(_aliceCore);
+  void addAdapter(AliceAdapter adapter) => _aliceCore.addAdapter(adapter);
 }

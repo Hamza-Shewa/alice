@@ -1,4 +1,5 @@
 import 'package:alice/helper/alice_conversion_helper.dart';
+import 'package:alice/helper/alice_graphql.dart';
 import 'package:alice/helper/alice_issue_analyzer.dart';
 import 'package:alice/helper/alice_url_validator.dart';
 import 'package:alice/helper/alice_watcher.dart';
@@ -30,6 +31,7 @@ class AliceCallOverviewScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<AliceUrlIssue> urlIssues = AliceUrlValidator.validateCall(call);
     final AliceIssue? issue = AliceIssueAnalyzer.analyze(call);
+    final AliceGraphQLOperation? graphQL = AliceGraphQL.detect(call);
     final DateTime? started = call.request?.time;
     final DateTime? finished = call.loading ? null : call.response?.time;
     final String pending = context.i18n(
@@ -167,6 +169,18 @@ class AliceCallOverviewScreen extends StatelessWidget {
                         value: call.endpoint,
                         hasError: urlIssues.isNotEmpty,
                       ),
+                      if (graphQL != null)
+                        AliceInfoRow(
+                          label: _label(
+                            context,
+                            AliceTranslationKey.callOverviewGraphQL,
+                          ),
+                          value:
+                              graphQL.hasErrors
+                                  ? '${graphQL.title} (${context.i18n(AliceTranslationKey.graphQLErrors)})'
+                                  : graphQL.title,
+                          hasError: graphQL.hasErrors,
+                        ),
                       AliceInfoRow(
                         label: _label(
                           context,

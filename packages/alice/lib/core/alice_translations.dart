@@ -87,7 +87,7 @@ class AliceTranslations {
         AliceTranslationKey.callsListDeleteCallsDialogTitle: "Delete calls",
         AliceTranslationKey.callsListDeleteCallsDialogDescription:
             "Do you want to delete HTTP calls?",
-        AliceTranslationKey.callsListSearchHint: "Search HTTP call...",
+        AliceTranslationKey.callsListSearchHint: "Search URL, headers, body...",
         AliceTranslationKey.callsListSort: "Sort",
         AliceTranslationKey.callsListDelete: "Delete",
         AliceTranslationKey.callsListStats: "Stats",
@@ -320,6 +320,52 @@ class AliceTranslations {
         AliceTranslationKey.callResponseBodyUnsupportedWarning:
             "You can try to show the body as raw text, but it may be "
             "unreadable.",
+        AliceTranslationKey.callDetailsRevealSensitive: "Show hidden values",
+        AliceTranslationKey.callDetailsHideSensitive: "Hide sensitive values",
+        AliceTranslationKey.filtersFailed: "Failed",
+        AliceTranslationKey.filtersPending: "Pending",
+        AliceTranslationKey.filtersHost: "Host",
+        AliceTranslationKey.filtersAllHosts: "All hosts",
+        AliceTranslationKey.filtersClear: "Clear filters",
+        AliceTranslationKey.callsListNoFilterResults:
+            "No calls match the filters",
+        AliceTranslationKey.replayAction: "Edit and resend",
+        AliceTranslationKey.replayMethod: "Method",
+        AliceTranslationKey.replayUrl: "URL",
+        AliceTranslationKey.replayHeaders: "Headers",
+        AliceTranslationKey.replayHeadersHint:
+            "One header per line, as Name: value",
+        AliceTranslationKey.replayBody: "Body",
+        AliceTranslationKey.replaySend: "Send",
+        AliceTranslationKey.replayReset: "Reset",
+        AliceTranslationKey.replaySent:
+            "Request sent. The new call is at the top of the list.",
+        AliceTranslationKey.replayFailed: "Request couldn't be sent: [error]",
+        AliceTranslationKey.replayFormDataWarning:
+            "This call sent form data. Alice keeps only the names and sizes of form data, so the body is empty.",
+        AliceTranslationKey.replayInvalidUrl:
+            "Enter a full URL, for example https://api.example.com/users",
+        AliceTranslationKey.replayInvalidHeader:
+            "Line [line] isn't a header. Use Name: value.",
+        AliceTranslationKey.jsonViewTree: "Tree",
+        AliceTranslationKey.jsonViewRaw: "Raw",
+        AliceTranslationKey.jsonSearchHint: "Search keys and values",
+        AliceTranslationKey.jsonExpandAll: "Expand all",
+        AliceTranslationKey.jsonCollapseAll: "Collapse all",
+        AliceTranslationKey.jsonCopyValue: "Copy value",
+        AliceTranslationKey.jsonCopyPath: "Copy path",
+        AliceTranslationKey.jsonMatches: "[count] matches",
+        AliceTranslationKey.jsonNoMatches: "No matches",
+        AliceTranslationKey.callsListExportHar: "Export HAR",
+        AliceTranslationKey.callOverviewGraphQL: "GraphQL:",
+        AliceTranslationKey.graphQLErrors: "GraphQL errors",
+        AliceTranslationKey.callsListTimeline: "Timeline",
+        AliceTranslationKey.timelineEmpty: "No calls to show yet",
+        AliceTranslationKey.timelineSummary:
+            "[count] calls over [duration], up to [concurrency] at once",
+        AliceTranslationKey.statsSectionSlowest: "Slowest endpoints",
+        AliceTranslationKey.statsEndpointCalls: "[count] calls",
+        AliceTranslationKey.statsEndpointFailures: "[count] failed",
       },
     );
   }
@@ -395,7 +441,8 @@ class AliceTranslations {
         AliceTranslationKey.callsListDeleteCallsDialogTitle: "حذف الطلبات",
         AliceTranslationKey.callsListDeleteCallsDialogDescription:
             "هل تريد حذف طلبات HTTP؟",
-        AliceTranslationKey.callsListSearchHint: "ابحث في طلبات HTTP...",
+        AliceTranslationKey.callsListSearchHint:
+            "ابحث في الرابط والترويسات والمحتوى...",
         AliceTranslationKey.callsListSort: "ترتيب",
         AliceTranslationKey.callsListDelete: "حذف",
         AliceTranslationKey.callsListStats: "الإحصائيات",
@@ -623,6 +670,52 @@ class AliceTranslations {
             "المحتوى [contentType] لهذه الاستجابة لا يمكن معاينته.",
         AliceTranslationKey.callResponseBodyUnsupportedWarning:
             "يمكنك محاولة عرض المحتوى كنص خام، لكنه قد يكون غير مقروء.",
+        AliceTranslationKey.callDetailsRevealSensitive: "إظهار القيم المخفية",
+        AliceTranslationKey.callDetailsHideSensitive: "إخفاء القيم الحساسة",
+        AliceTranslationKey.filtersFailed: "فشل",
+        AliceTranslationKey.filtersPending: "قيد الانتظار",
+        AliceTranslationKey.filtersHost: "الخادم",
+        AliceTranslationKey.filtersAllHosts: "كل الخوادم",
+        AliceTranslationKey.filtersClear: "مسح الفلاتر",
+        AliceTranslationKey.callsListNoFilterResults:
+            "لا توجد طلبات تطابق الفلاتر",
+        AliceTranslationKey.replayAction: "تعديل وإعادة الإرسال",
+        AliceTranslationKey.replayMethod: "الطريقة",
+        AliceTranslationKey.replayUrl: "الرابط",
+        AliceTranslationKey.replayHeaders: "الترويسات",
+        AliceTranslationKey.replayHeadersHint:
+            "ترويسة واحدة في كل سطر، بالشكل الاسم: القيمة",
+        AliceTranslationKey.replayBody: "المحتوى",
+        AliceTranslationKey.replaySend: "إرسال",
+        AliceTranslationKey.replayReset: "إعادة التعيين",
+        AliceTranslationKey.replaySent:
+            "تم إرسال الطلب. الطلب الجديد في أعلى القائمة.",
+        AliceTranslationKey.replayFailed: "تعذر إرسال الطلب: [error]",
+        AliceTranslationKey.replayFormDataWarning:
+            "أرسل هذا الطلب بيانات نموذج. يحتفظ Alice بأسماء البيانات وأحجامها فقط، لذلك المحتوى فارغ.",
+        AliceTranslationKey.replayInvalidUrl:
+            "أدخل رابطًا كاملًا، مثل https://api.example.com/users",
+        AliceTranslationKey.replayInvalidHeader:
+            "السطر [line] ليس ترويسة. استخدم الاسم: القيمة.",
+        AliceTranslationKey.jsonViewTree: "شجرة",
+        AliceTranslationKey.jsonViewRaw: "نص خام",
+        AliceTranslationKey.jsonSearchHint: "ابحث في المفاتيح والقيم",
+        AliceTranslationKey.jsonExpandAll: "توسيع الكل",
+        AliceTranslationKey.jsonCollapseAll: "طي الكل",
+        AliceTranslationKey.jsonCopyValue: "نسخ القيمة",
+        AliceTranslationKey.jsonCopyPath: "نسخ المسار",
+        AliceTranslationKey.jsonMatches: "عدد النتائج: [count]",
+        AliceTranslationKey.jsonNoMatches: "لا توجد نتائج",
+        AliceTranslationKey.callsListExportHar: "تصدير HAR",
+        AliceTranslationKey.callOverviewGraphQL: "GraphQL:",
+        AliceTranslationKey.graphQLErrors: "أخطاء GraphQL",
+        AliceTranslationKey.callsListTimeline: "المخطط الزمني",
+        AliceTranslationKey.timelineEmpty: "لا توجد طلبات لعرضها بعد",
+        AliceTranslationKey.timelineSummary:
+            "[count] طلب خلال [duration]، وحتى [concurrency] في الوقت نفسه",
+        AliceTranslationKey.statsSectionSlowest: "أبطأ نقاط النهاية",
+        AliceTranslationKey.statsEndpointCalls: "عدد الطلبات: [count]",
+        AliceTranslationKey.statsEndpointFailures: "فشل: [count]",
       },
     );
   }
