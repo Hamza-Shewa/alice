@@ -18,6 +18,11 @@ Dio dio = Dio();
 /// Add interceptor to Dio
 dio.interceptors.add(aliceDioAdapter);
 
+/// Optional: resend calls from Alice with this Dio, so they use its base
+/// options, interceptors and HTTP client adapter. Without it, a plain Dio is
+/// used.
+aliceDioAdapter.replayClient = dio;
+
 ```
 
 ## Chopper
@@ -99,6 +104,34 @@ httpClient
       var responseBody = await utf8.decoder.bind(httpResponse).join();
       aliceHttpClientAdapter.onResponse(httpResponse, request, body: responseBody);
 });
+```
+
+## Edit and resend
+
+Calls made by Dio, the http package and `HttpClient` can be sent again from
+the call details: the resend button opens an editor with the method, URL,
+headers and body of the call. The new call is caught by Alice like any other.
+The editor starts from the real values, also when the inspector hides
+sensitive ones. Form data can't be resent, because Alice keeps only the names
+and sizes of form fields and files.
+
+`AliceHttpAdapter` and `AliceHttpClientAdapter` take an optional
+`replayClient`, when calls must be resent with a configured client.
+
+An adapter of another client can support it by implementing
+`AliceCallReplayer`:
+
+```dart
+class MyAdapter with AliceAdapter implements AliceCallReplayer {
+  @override
+  bool canReplay(AliceHttpCall call) => call.client == 'MyClient';
+
+  @override
+  Future<void> replay(AliceReplayRequest request) async {
+    // Send request.method, request.url, request.headers and request.body
+    // with your client, and report the call to Alice as usual.
+  }
+}
 ```
 
 ## ObjectBox

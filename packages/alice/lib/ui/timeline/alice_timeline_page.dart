@@ -91,7 +91,7 @@ class _AliceTimelinePageState extends State<AliceTimelinePage>
 class _Header extends StatelessWidget {
   const _Header({required this.timeline});
 
-  static const int _ticks = 4;
+  static const int _ticks = 2;
 
   final AliceTimeline timeline;
 
@@ -122,14 +122,23 @@ class _Header extends StatelessWidget {
           Directionality(
             textDirection: TextDirection.ltr,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 for (int tick = 0; tick <= _ticks; tick++)
-                  Text(
-                    AliceConversionHelper.formatTime(
-                      timeline.length * tick ~/ _ticks,
+                  Expanded(
+                    child: Text(
+                      AliceConversionHelper.formatTime(
+                        timeline.length * tick ~/ _ticks,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign:
+                          tick == 0
+                              ? TextAlign.left
+                              : tick == _ticks
+                              ? TextAlign.right
+                              : TextAlign.center,
+                      style: theme.textTheme.labelSmall?.copyWith(color: muted),
                     ),
-                    style: theme.textTheme.labelSmall?.copyWith(color: muted),
                   ),
               ],
             ),

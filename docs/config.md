@@ -73,3 +73,34 @@ If you want to hide share button, you can use `showShareButton` parameter.
 
 Alice alice = Alice(configuration: AliceConfiguration(showShareButton: false));
 ```
+
+### Sensitive values
+
+Alice hides credentials in the inspector and masks them in everything which
+leaves the app: shared calls, saved files, copied calls, cURL commands and HAR
+exports. By default it covers common headers (`Authorization`, `Cookie`,
+`Set-Cookie`, `X-Api-Key` and others), JSON body and form fields (`password`,
+`token`, `access_token`, `refresh_token`, `client_secret` and others) and query
+parameters (`token`, `api_key`, `signature` and others). In the call details,
+the eye button shows the hidden values on screen.
+
+Use your own names, matched without case at any depth of a JSON body:
+
+```dart
+Alice alice = Alice(
+  configuration: AliceConfiguration(
+    redaction: AliceRedaction(
+      headers: {...AliceRedaction.defaultHeaders, 'x-session'},
+      bodyFields: {...AliceRedaction.defaultBodyFields, 'pin'},
+      mask: '[hidden]',
+    ),
+  ),
+);
+```
+
+Turn it off with `AliceRedaction.none`:
+
+```dart
+Alice alice = Alice(configuration: AliceConfiguration(redaction: AliceRedaction.none));
+```
+
